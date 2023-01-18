@@ -1,15 +1,7 @@
 import {FC, useState} from "react";
-import {
-    CheckSquareOutlined,
-    CoffeeOutlined,
-    DesktopOutlined,
-    FileOutlined, HomeOutlined,
-    PieChartOutlined,
-    TeamOutlined, UserAddOutlined,
-    UserOutlined,
-} from '@ant-design/icons';
+import {CheckSquareOutlined, CoffeeOutlined, HomeOutlined, UserAddOutlined, UserOutlined,} from '@ant-design/icons';
 import type {MenuProps} from 'antd';
-import {Breadcrumb, Layout, Menu, theme, Typography} from 'antd';
+import {Layout, Menu, theme, Typography} from 'antd';
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {AdminRoutes, AppRoutes} from "../router/AppRoutes";
 
@@ -49,8 +41,6 @@ const adminItems = [
 
 type Props = {}
 
-const removePathnameSlash = (str:string)=> str.replace(/^\/|\/$/g, '')
-
 export const DefaultLayout: FC<Props> = (props) => {
     const [collapsed, setCollapsed] = useState(false);
     const {token} = useToken();
@@ -63,10 +53,10 @@ export const DefaultLayout: FC<Props> = (props) => {
                 <Menu theme="dark" onSelect={e => {
                     navigate(e.key)
                 }}
-                      defaultSelectedKeys={[removePathnameSlash(location.pathname)]} mode="inline"
+                      defaultSelectedKeys={[location.pathname]} mode="inline"
                       items={items.concat(adminItems)}/>
             </Sider>
-            <Layout className="site-layout">
+            <Layout>
                 <Content style={{margin: '0 16px'}}>
                     <Outlet/>
                 </Content>
