@@ -3,10 +3,16 @@ import {ErrorPage} from "../pages/ErrorPage";
 import {DefaultLayout} from "../layouts/DefaultLayout";
 import {HomePage} from "../pages/HomePage";
 import {AuthLayout} from "../layouts/AuthLayout";
+import {AdminRoutes, AppRoutes} from "./AppRoutes";
+import {BookDayOffPage} from "../pages/BookDayOffPage";
+import {ProfilePage} from "../pages/ProfilePage";
+import {ManageUsersPage} from "../pages/admin/ManageUsersPage";
+import {ConfirmDayOffPage} from "../pages/admin/ConfirmDayOffPage";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
-        <Routes>
+        <>
+            {/*    TODO authorized guard*/}
             <Route
                 path="/"
                 element={<DefaultLayout/>}
@@ -14,15 +20,28 @@ export const router = createBrowserRouter(
             >
                 <Route index element={<HomePage/>}/>
                 <Route
-                    path="book_day_off"
-                    element={<Contact/>}
-                    loader={contactLoader}
-                    action={contactAction}
+                    path={AppRoutes.bookDayOff}
+                    element={<BookDayOffPage/>}
+                    // loader={contactLoader}
+                    // action={contactAction}
+                />
+                <Route
+                    path={AppRoutes.profile}
+                    element={<ProfilePage/>}
+                />
+                {/*    TODO Admin role guard*/}
+                <Route
+                    path={AdminRoutes.manageUsers}
+                    element={<ManageUsersPage/>}
+                />
+                <Route
+                    path={AdminRoutes.confirmDayOff}
+                    element={<ConfirmDayOffPage/>}
                 />
             </Route>
             <Route element={<AuthLayout/>}>
 
             </Route>
-        </Routes>
+        </>
     )
 );
