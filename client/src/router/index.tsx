@@ -1,13 +1,14 @@
-import {createBrowserRouter, createRoutesFromElements, Route, Routes} from "react-router-dom";
+import {createBrowserRouter, createRoutesFromElements, Route} from "react-router-dom";
 import {ErrorPage} from "../pages/ErrorPage";
 import {DefaultLayout} from "../layouts/DefaultLayout";
 import {HomePage} from "../pages/HomePage";
 import {AuthLayout} from "../layouts/AuthLayout";
-import {AdminRoutes, AppRoutes} from "./AppRoutes";
+import {AdminRoutes, AppRoutes, AuthRoutes} from "./AppRoutes";
 import {BookDayOffPage} from "../pages/BookDayOffPage";
 import {ProfilePage} from "../pages/ProfilePage";
 import {ManageUsersPage} from "../pages/admin/ManageUsersPage";
 import {ConfirmDayOffPage} from "../pages/admin/ConfirmDayOffPage";
+import {LoginPage} from "../pages/auth/LoginPage";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -40,7 +41,10 @@ export const router = createBrowserRouter(
                 />
             </Route>
             <Route element={<AuthLayout/>}>
-
+                <Route
+                    path={AuthRoutes.login}
+                    element={<LoginPage/>}
+                />
             </Route>
         </>
     )
