@@ -9,6 +9,8 @@ import {ProfilePage} from "../pages/ProfilePage";
 import {ManageUsersPage} from "../pages/admin/ManageUsersPage";
 import {ConfirmDayOffPage} from "../pages/admin/ConfirmDayOffPage";
 import {LoginPage} from "../pages/auth/LoginPage";
+import {ForgotPasswordPage} from "../pages/auth/ForgotPasswordPage";
+import {NewPasswordPage} from "../pages/auth/NewPasswordPage";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -44,6 +46,14 @@ export const router = createBrowserRouter(
                 <Route
                     path={AuthRoutes.login}
                     element={<LoginPage/>}
+                />
+                <Route
+                    path={AuthRoutes.forgot_password}
+                    element={<ForgotPasswordPage/>}
+                />
+                <Route
+                    path={AuthRoutes.new_password}
+                    element={<NewPasswordPage/>}
                 />
             </Route>
         </>

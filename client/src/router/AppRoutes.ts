@@ -6,7 +6,8 @@ export enum AppRoutes {
 
 export enum AuthRoutes {
     login = "/login",
-    forgot_password = "/forgot_password"
+    forgot_password = "/forgot_password",
+    new_password = "/new_password"
 }
 
 export enum AdminRoutes {
