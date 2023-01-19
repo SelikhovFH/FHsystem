@@ -4,12 +4,6 @@ export enum AppRoutes {
     profile = "/profile"
 }
 
-export enum AuthRoutes {
-    login = "/login",
-    forgot_password = "/forgot_password",
-    new_password = "/new_password"
-}
-
 export enum AdminRoutes {
     confirmDayOff = "/confirm_day_off",
     manageUsers = "/manage_users"

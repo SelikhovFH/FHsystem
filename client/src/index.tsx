@@ -4,14 +4,28 @@ import 'antd/dist/reset.css';
 import reportWebVitals from './reportWebVitals';
 import {RouterProvider} from "react-router-dom";
 import {router} from "./router";
+import {Auth0Provider} from "@auth0/auth0-react";
+import Auth0Ready from "./router/Auth0Ready";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-      <RouterProvider router={router} />
-  </React.StrictMode>
+    <React.StrictMode>
+        <Auth0Provider
+            domain={process.env.REACT_APP_AUTH0_DOMAIN!}
+            clientId={process.env.REACT_APP_AUTH0_CLIENTID!}
+            audience={process.env.REACT_APP_AUTH0_AUDIENCE!}
+            redirectUri={process.env.REACT_APP_ATH0_REDIRECT_URI!}
+            scope="openid profile email"
+            useRefreshTokens={true}
+            cacheLocation={"localstorage"}
+        >
+            <Auth0Ready>
+                <RouterProvider router={router}/>
+            </Auth0Ready>
+        </Auth0Provider>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
