@@ -7,7 +7,7 @@ import {BookDayOffPage} from "../pages/BookDayOffPage";
 import {ProfilePage} from "../pages/ProfilePage";
 import {ManageUsersPage} from "../pages/admin/ManageUsersPage";
 import {ConfirmDayOffPage} from "../pages/admin/ConfirmDayOffPage";
-import {RequireAuth} from "./RequireAuth";
+import {RequireAuth} from "../wrappers/RequireAuth";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -23,8 +23,6 @@ export const router = createBrowserRouter(
                     <Route
                         path={AppRoutes.bookDayOff}
                         element={<BookDayOffPage/>}
-                        // loader={contactLoader}
-                        // action={contactAction}
                     />
                     <Route
                         path={AppRoutes.profile}

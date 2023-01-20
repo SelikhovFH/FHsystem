@@ -17,6 +17,7 @@ class UsersRoute implements Routes {
   private initializeRoutes() {
     this.router.post(`${this.path}/register`, isAdminMiddleware,
       validationMiddleware(CreateUserDto, 'body'), this.usersController.registerUser);
+    this.router.get(`${this.path}`, isAdminMiddleware, this.usersController.getUsers);
   }
 }
 

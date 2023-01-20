@@ -4,6 +4,7 @@ import type {MenuProps} from 'antd';
 import {Layout, Menu, theme, Typography} from 'antd';
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {AdminRoutes, AppRoutes} from "../router/AppRoutes";
+import {useAuth0} from "@auth0/auth0-react";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {Title} = Typography;
@@ -43,6 +44,7 @@ type Props = {}
 
 export const DefaultLayout: FC<Props> = (props) => {
     const [collapsed, setCollapsed] = useState(false);
+    const {user} = useAuth0()
     const {token} = useToken();
     const navigate = useNavigate()
     const location = useLocation()
@@ -54,12 +56,11 @@ export const DefaultLayout: FC<Props> = (props) => {
                     navigate(e.key)
                 }}
                       defaultSelectedKeys={[location.pathname]} mode="inline"
-                      items={items.concat(adminItems)}/>
+                      items={user?.is_admin ? items.concat(adminItems) : items}/>
             </Sider>
             <Layout>
-                <Content style={{margin: '0 16px'}}>
-                    <Outlet/>
-                </Content>
+
+                <Outlet/>
             </Layout>
         </Layout>
     )
