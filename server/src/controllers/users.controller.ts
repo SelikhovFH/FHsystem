@@ -12,8 +12,8 @@ class UsersController {
       if (userData.isAdmin) {
         await this.authOService.assignAdminPermission(user_id)
       }
-      await this.authOService.sendSignupInvitation(user_id)
-      res.status(201).json({message: 'created'});
+      const data = await this.authOService.sendSignupInvitation(user_id)
+      res.status(201).json({message: 'created', data});
     } catch (error) {
       next(error);
     }

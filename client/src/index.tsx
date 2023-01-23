@@ -6,12 +6,12 @@ import {RouterProvider} from "react-router-dom";
 import {router} from "./router";
 import {Auth0Provider} from "@auth0/auth0-react";
 import Auth0Ready from "./wrappers/Auth0Ready";
-import {QueryClient, QueryClientProvider} from "react-query";
+import {QueryClientProvider} from "react-query";
+import {queryClient} from "./services/queryClient";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
-const queryClient = new QueryClient()
 root.render(
     <React.StrictMode>
         <Auth0Provider

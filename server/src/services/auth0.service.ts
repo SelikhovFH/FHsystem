@@ -6,6 +6,7 @@ import {
   CLIENT_URL
 } from "@config";
 import {ManagementClient} from "auth0";
+import {generate} from "generate-password";
 
 class Auth0Service {
   private management = new ManagementClient({
@@ -20,13 +21,19 @@ class Auth0Service {
   public async createUser(email: string, isAdmin: boolean) {
     return this.management.createUser({
       email: email,
+      password: generate({
+        length: 10,
+        numbers: true,
+        symbols: true
+      }),
       connection: "Username-Password-Authentication",
-      user_metadata: {is_admin: isAdmin}
+      user_metadata: {is_admin: isAdmin},
+      verify_email: false
     })
   }
 
   public async sendSignupInvitation(user_id: string) {
-    return this.management.createPasswordChangeTicket({user_id, result_url: CLIENT_URL})
+    return this.management.createPasswordChangeTicket({user_id, result_url: CLIENT_URL, mark_email_as_verified: true,})
   }
 
   public async assignAdminPermission(id: string) {
