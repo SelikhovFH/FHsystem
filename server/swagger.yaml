@@ -1,119 +1,66 @@
 tags:
-- name: users
-  description: users API
+  - name: user
+    description: user API
 
 paths:
-# [GET] users
-  /users:
-    get:
-      tags:
-      - users
-      summary: Find All Users
-      responses:
-        200:
-          description: 'OK'
-        500:
-          description: 'Server Error'
-
-# [POST] users
+  # [POST] users/register
+  /users/register:
     post:
       tags:
-      - users
-      summary: Add User
+        - user
+      summary: Register User (Admin)
       parameters:
-      - name: body
-        in: body
-        description: user Data
-        required: true
-        schema:
-          $ref: '#/definitions/users'
+        - in: body
+          name: body
+          description: The user to register.
+          schema:
+            $ref: '#/definitions/userRegister'
       responses:
         201:
           description: 'Created'
         400:
           description: 'Bad Request'
-        409:
-          description: 'Conflict'
         500:
           description: 'Server Error'
-
-# [GET] users/id
-  /users/{id}:
+  # [GET] users
+  /users:
     get:
       tags:
-      - users
-      summary: Find User By Id
+        - user
+      summary: Get all users (Admin)
       parameters:
-      - name: id
-        in: path
-        description: User Id
-        required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Pagination page
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+          description: Pagination items per page
       responses:
         200:
           description: 'OK'
-        409:
-          description: 'Conflict'
         500:
           description: 'Server Error'
 
-# [PUT] users/id
-    put:
-      tags:
-      - users
-      summary: Update User By Id
-      parameters:
-      - name: id
-        in: path
-        description: user Id
-        required: true
-      - name: body
-        in: body
-        description: user Data
-        required: true
-        schema:
-          $ref: '#/definitions/users'
-      responses:
-        200:
-          description: 'OK'
-        400:
-          description: 'Bad Request'
-        409:
-          description: 'Conflict'
-        500:
-          description: 'Server Error'
-
-# [DELETE] users/id
-    delete:
-      tags:
-      - users
-      summary: Delete User By Id
-      parameters:
-      - name: id
-        in: path
-        description: user Id
-        required: true
-      responses:
-        200:
-          description: 'OK'
-        409:
-          description: 'Conflict'
-        500:
-          description: 'Server Error'
 
 # definitions
 definitions:
-  users:
+  userRegister:
     type: object
     required:
-        - email
-        - password
+      - email
+    optional:
+      - isAdmin
     properties:
       email:
         type: string
         description: user Email
-      password:
-        type: string
-        description: user Password
+      isAdmin:
+        type: boolean
+        description: user is admin
 
 schemes:
  - https

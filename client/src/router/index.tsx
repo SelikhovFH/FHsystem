@@ -7,7 +7,8 @@ import {BookDayOffPage} from "../pages/BookDayOffPage";
 import {ProfilePage} from "../pages/ProfilePage";
 import {ManageUsersPage} from "../pages/admin/ManageUsersPage";
 import {ConfirmDayOffPage} from "../pages/admin/ConfirmDayOffPage";
-import {RequireAuth} from "./RequireAuth";
+import {RequireAuth} from "../wrappers/RequireAuth";
+import RequireAdmin from "../wrappers/RequireAdmin";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -23,22 +24,21 @@ export const router = createBrowserRouter(
                     <Route
                         path={AppRoutes.bookDayOff}
                         element={<BookDayOffPage/>}
-                        // loader={contactLoader}
-                        // action={contactAction}
                     />
                     <Route
                         path={AppRoutes.profile}
                         element={<ProfilePage/>}
                     />
-                    {/*    TODO Admin role guard*/}
-                    <Route
-                        path={AdminRoutes.manageUsers}
-                        element={<ManageUsersPage/>}
-                    />
-                    <Route
-                        path={AdminRoutes.confirmDayOff}
-                        element={<ConfirmDayOffPage/>}
-                    />
+                    <Route element={<RequireAdmin/>}>
+                        <Route
+                            path={AdminRoutes.manageUsers}
+                            element={<ManageUsersPage/>}
+                        />
+                        <Route
+                            path={AdminRoutes.confirmDayOff}
+                            element={<ConfirmDayOffPage/>}
+                        />
+                    </Route>
                 </Route>
             </Route>
         </>
