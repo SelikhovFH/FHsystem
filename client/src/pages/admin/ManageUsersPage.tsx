@@ -98,10 +98,7 @@ export const ManageUsersPage: FC = () => {
         },
     })
 
-    console.log(data)
-
     const onFinish = (values: any) => {
-        console.log(values)
         mutation.mutate(values)
     };
     return (

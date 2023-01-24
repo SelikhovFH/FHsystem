@@ -1,18 +1,23 @@
 import {NextFunction, Request, Response} from 'express';
-import {CreateUserDto} from '@dtos/users.dto';
+import {CreateUserDto} from '@dtos/user.dto';
 import Auth0Service from "@services/auth0.service";
+import UserService from "@services/user.service";
+import * as mongoose from "mongoose";
 
-class UsersController {
+class UserController {
   private authOService = new Auth0Service()
+  private userService = new UserService()
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: CreateUserDto = req.body;
-      const {user_id} = await this.authOService.createUser(userData.email, userData.isAdmin)
+      const mongoUserId = new mongoose.Types.ObjectId()
+      const {user_id} = await this.authOService.createUser({...userData, dbId: mongoUserId.toString()})
       if (userData.isAdmin) {
         await this.authOService.assignAdminPermission(user_id)
       }
       const data = await this.authOService.sendSignupInvitation(user_id)
+      await this.userService.createUser({auth0id: user_id, _id: mongoUserId.toString()})
       res.status(201).json({message: 'created', data});
     } catch (error) {
       next(error);
@@ -31,4 +36,4 @@ class UsersController {
 
 }
 
-export default UsersController;
+export default UserController;
