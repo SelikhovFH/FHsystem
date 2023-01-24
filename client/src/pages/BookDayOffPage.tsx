@@ -18,6 +18,9 @@ import {
 } from "antd";
 import {Gutter} from "../components/Gutter";
 import type {Dayjs} from 'dayjs';
+import {useQuery} from "react-query";
+import {API, getRequestConfig} from "../services/api";
+import {useAuth0} from "@auth0/auth0-react";
 
 const {Header, Content} = Layout;
 const {Title, Paragraph} = Typography
@@ -55,6 +58,14 @@ const dateCellRender = (value: Dayjs) => {
 export const BookDayOffPage: FC = (props) => {
     const {token: {colorBgContainer}} = theme.useToken()
     const [form] = Form.useForm();
+    const {getAccessTokenSilently} = useAuth0()
+    const myDaysOff = useQuery("days_off", async () => {
+        const token = await getAccessTokenSilently()
+        const res = await API.get(`/days_off/my`, getRequestConfig(token))
+        return res.data.data
+    })
+
+    console.log(myDaysOff.data?.data)
 
     const onFinish = (values: any) => {
         console.log(values)

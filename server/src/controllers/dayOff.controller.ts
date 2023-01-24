@@ -1,10 +1,8 @@
 import {NextFunction, Request, Response} from 'express';
-import UserService from "@services/user.service";
 import DayOffService from "@services/dayOff.service";
-import {CreateDayOffDto} from "@dtos/dayOff.dto";
+import {ConfirmDayOffDto, CreateDayOffDto} from "@dtos/dayOff.dto";
 
 class DayOffController {
-  private userService = new UserService()
   private dayOffService = new DayOffService()
 
   createDayOff = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,12 +24,25 @@ class DayOffController {
     }
   };
 
+  confirmDayOff = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.auth.payload.db_id as string
+      const dayOffData: ConfirmDayOffDto = req.body;
+      const data = await this.dayOffService.updateDayOff(dayOffData.id, {
+        status: dayOffData.status,
+        approvedById: userId
+      })
+      res.status(200).json({data: data, message: 'OK'});
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getMyDaysOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.auth.payload
-      console.debug(req.auth)
-      // const pendingDaysOff = await this.dayOffService.getPendingDaysOff()
-      res.status(200).json({data: [], message: 'OK'});
+      const userId = req.auth.payload.db_id as string
+      const myDaysOff = await this.dayOffService.getUserDaysOff(userId)
+      res.status(200).json({data: myDaysOff, message: 'OK'});
     } catch (error) {
       next(error);
     }

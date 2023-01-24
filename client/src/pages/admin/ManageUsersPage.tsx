@@ -2,7 +2,7 @@ import {Alert, Avatar, Button, Card, Checkbox, Form, Input, Layout, message, Tab
 import {FC, useState} from "react";
 import {useAuth0} from "@auth0/auth0-react";
 import {useMutation, useQuery} from "react-query";
-import {API} from "../../services/api";
+import {API, getRequestConfig} from "../../services/api";
 import {Gutter} from "../../components/Gutter";
 import {AxiosError} from "axios";
 import * as yup from 'yup';
@@ -57,11 +57,7 @@ export const ManageUsersPage: FC = () => {
     const [page, setPage] = useState(1)
     const {data, error, isError, isLoading} = useQuery(["users", page], async () => {
         const token = await getAccessTokenSilently({scope: 'admin:admin'})
-        const res = await API.get(`/users?page=${page - 1}&per_page=${PAGE_SIZE}`, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
+        const res = await API.get(`/users?page=${page - 1}&per_page=${PAGE_SIZE}`, getRequestConfig(token))
         return res.data.data
     }, {keepPreviousData: true})
     const mutation = useMutation(async newUser => {
@@ -71,11 +67,7 @@ export const ManageUsersPage: FC = () => {
             type: 'loading',
             content: 'Loading...',
         })
-        const res = await API.post('/users/register', newUser, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
+        const res = await API.post('/users/register', newUser, getRequestConfig(token))
         return res.data.data
     }, {
         onSuccess: async () => {

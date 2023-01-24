@@ -3,7 +3,7 @@ import {Routes} from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import {isAdminMiddleware} from "@middlewares/auth.middleware";
 import DayOffController from "@controllers/dayOff.controller";
-import {CreateDayOffDto} from "@dtos/dayOff.dto";
+import {ConfirmDayOffDto, CreateDayOffDto} from "@dtos/dayOff.dto";
 
 class DaysOffRoute implements Routes {
   public path = '/days_off';
@@ -19,6 +19,9 @@ class DaysOffRoute implements Routes {
       validationMiddleware(CreateDayOffDto, 'body'), this.dayOffController.createDayOff);
     this.router.get(`${this.path}/pending`, isAdminMiddleware, this.dayOffController.getPendingDaysOff);
     this.router.get(`${this.path}/my`, this.dayOffController.getMyDaysOff)
+    this.router.patch(`${this.path}/confirm`,
+      isAdminMiddleware, validationMiddleware(ConfirmDayOffDto, 'body'),
+      this.dayOffController.confirmDayOff)
   }
 }
 

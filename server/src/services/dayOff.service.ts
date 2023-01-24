@@ -9,6 +9,10 @@ class DayOffService {
     return this.dayOff.create(data);
   }
 
+  public async updateDayOff(id: string, data: Partial<DayOff>): Promise<DayOff> {
+    return this.dayOff.findOneAndUpdate(data);
+  }
+
   public async getPendingDaysOff(): Promise<DayOff[]> {
     return this.dayOff.find({status: DayOffStatus.pending});
   }
