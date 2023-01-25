@@ -7,8 +7,9 @@ class DayOffController {
 
   createDayOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.auth.payload.db_id as string
       const dayOffData: CreateDayOffDto = req.body;
-      const data = await this.dayOffService.createDayOff(dayOffData)
+      const data = await this.dayOffService.createDayOff({...dayOffData, userId})
       res.status(201).json({message: 'created', data});
     } catch (error) {
       next(error);

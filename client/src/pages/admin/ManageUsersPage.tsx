@@ -1,4 +1,4 @@
-import {Alert, Avatar, Button, Card, Checkbox, Form, Input, Layout, message, Table, theme, Typography} from "antd";
+import {Alert, Avatar, Button, Card, Checkbox, Form, Input, Layout, Table, theme, Typography} from "antd";
 import {FC, useState} from "react";
 import {useAuth0} from "@auth0/auth0-react";
 import {useMutation, useQuery} from "react-query";
@@ -8,6 +8,8 @@ import {AxiosError} from "axios";
 import * as yup from 'yup';
 import {getYupRule} from "../../utils/yupRule";
 import {queryClient} from "../../services/queryClient";
+import {ErrorsBlock} from "../../components/ErrorsBlock";
+import {useRequestMessages} from "../../hooks/useRequestMessages";
 
 const {Header, Content} = Layout;
 const {Title, Paragraph} = Typography
@@ -46,14 +48,13 @@ const schema = yup.object().shape({
     email: yup.string().required().email(),
     isAdmin: yup.boolean(),
 });
-const MESSAGE_KEY = 'USER_REGISTER';
 const PAGE_SIZE = 20
 //TODO CHECK PAGINATION ON BIGGER DATA SET
 export const ManageUsersPage: FC = () => {
     const {token: {colorBgContainer}} = theme.useToken()
     const [form] = Form.useForm();
     const {getAccessTokenSilently} = useAuth0()
-    const [messageApi, contextHolder] = message.useMessage();
+    const requestMessages = useRequestMessages('USER_REGISTER')
     const [page, setPage] = useState(1)
     const {data, error, isError, isLoading} = useQuery(["users", page], async () => {
         const token = await getAccessTokenSilently({scope: 'admin:admin'})
@@ -62,31 +63,17 @@ export const ManageUsersPage: FC = () => {
     }, {keepPreviousData: true})
     const mutation = useMutation(async newUser => {
         const token = await getAccessTokenSilently({scope: 'admin:admin'})
-        messageApi.open({
-            key: MESSAGE_KEY,
-            type: 'loading',
-            content: 'Loading...',
-        })
+        requestMessages.onLoad()
         const res = await API.post('/users/register', newUser, getRequestConfig(token))
         return res.data.data
     }, {
         onSuccess: async () => {
-            messageApi.open({
-                key: MESSAGE_KEY,
-                type: 'success',
-                content: 'Loaded!',
-                duration: 2,
-            });
+            requestMessages.onSuccess()
             form.resetFields();
             await queryClient.invalidateQueries({queryKey: ['users']})
         },
         onError: async () => {
-            messageApi.open({
-                key: MESSAGE_KEY,
-                type: 'error',
-                content: 'Error!',
-                duration: 2,
-            });
+            requestMessages.onError()
         },
     })
 
@@ -95,15 +82,15 @@ export const ManageUsersPage: FC = () => {
     };
     return (
         <>
-            {contextHolder}
+            {requestMessages.contextHolder}
             <Header style={{background: colorBgContainer, display: "flex", alignItems: "center"}}>
                 <Title style={{margin: 0}} level={4}>
                     Manage users
                 </Title>
             </Header>
             <Content style={{margin: 32}}>
-                {isError && <Alert message={(error as AxiosError).message} type="error"/>}
-                {mutation.isError && <Alert message={(mutation.error as AxiosError).message} type="error"/>}
+                <ErrorsBlock errors={[error as AxiosError, mutation.error as AxiosError]}/>
+
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Form

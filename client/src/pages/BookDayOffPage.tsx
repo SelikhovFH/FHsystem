@@ -1,8 +1,6 @@
 import {FC} from "react";
 import {
     Alert,
-    Badge,
-    BadgeProps,
     Button,
     Calendar,
     Card,
@@ -18,77 +16,136 @@ import {
 } from "antd";
 import {Gutter} from "../components/Gutter";
 import type {Dayjs} from 'dayjs';
-import {useQuery} from "react-query";
+import dayjs from 'dayjs';
+import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../services/api";
 import {useAuth0} from "@auth0/auth0-react";
+import {queryClient} from "../services/queryClient";
+import {ErrorsBlock} from "../components/ErrorsBlock";
+import {AxiosError} from "axios";
+import {useRequestMessages} from "../hooks/useRequestMessages";
+import * as yup from "yup";
+import {getYupRule} from "../utils/yupRule";
+import {DayOff, DayOffStatus, DayOffType} from "../interfaces/dayOff.interface";
+
 
 const {Header, Content} = Layout;
-const {Title, Paragraph} = Typography
+const {Title, Text} = Typography
 const {RangePicker} = DatePicker;
 
-const getListData = (value: Dayjs) => {
-    let listData;
-    switch (value.date()) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            listData = [
-                {type: 'success', content: 'Vacation approved'},
-            ];
-            break;
+const schema = yup.object().shape({
+    type: yup.string().required(),
+    dates: yup.array().of(yup.string()).required()
+});
 
-        default:
-    }
-    return listData || [];
-};
+const StatusLabels: Record<DayOffStatus, string> = {
+    approved: "Approved",
+    declined: "Declined",
+    pending: "Pending"
+}
 
-const dateCellRender = (value: Dayjs) => {
-    const listData = getListData(value);
-    return (
-        <div style={listData.length ? {background: "green", height: "100%"} : {}} className="events">
-            {listData.map((item) => (
-                <Badge status={item.type as BadgeProps['status']} text={item.content}/>
-            ))}
-        </div>
-    );
-};
+const TypeLabels: Record<DayOffType, string> = {
+    vacation: "Vacation",
+    sickLeave: "Sick leave",
+    dayOff: "Day off",
+    unpaid: "Unpaid day off",
+}
 
 export const BookDayOffPage: FC = (props) => {
-    const {token: {colorBgContainer}} = theme.useToken()
+    const {token} = theme.useToken()
     const [form] = Form.useForm();
     const {getAccessTokenSilently} = useAuth0()
-    const myDaysOff = useQuery("days_off", async () => {
+    const requestMessages = useRequestMessages('BOOK_DAY_OFF')
+    const myDaysOff = useQuery<DayOff[]>("days_off", async () => {
         const token = await getAccessTokenSilently()
         const res = await API.get(`/days_off/my`, getRequestConfig(token))
         return res.data.data
     })
+    const mutation = useMutation(async (newDayOff) => {
+        const token = await getAccessTokenSilently()
+        requestMessages.onLoad()
+        const res = await API.post('/days_off', newDayOff, getRequestConfig(token))
+        return res.data.data
+    }, {
+        onSuccess: async () => {
+            requestMessages.onSuccess()
+            form.resetFields();
+            await queryClient.invalidateQueries({queryKey: ['days_off']})
+        },
+        onError: async () => {
+            requestMessages.onError()
+        },
+    })
 
-    console.log(myDaysOff.data?.data)
+    const dateCellRender = (value: Dayjs) => {
+        const dayOffForDate = myDaysOff.data?.find(d => {
+            return dayjs(value).isBetween(d.startDate, d.finishDate, 'day', '[]')
+        })
 
-    const onFinish = (values: any) => {
-        console.log(values)
-        // mutation.mutate(values)
+        if (!dayOffForDate) {
+            return null
+        }
+        const {status, type} = dayOffForDate
+        const getColorForStatus = () => {
+            switch (status) {
+                case DayOffStatus.pending:
+                    return token.colorInfoBg
+                case DayOffStatus.approved:
+                    return token.colorSuccessBg
+                case DayOffStatus.declined:
+                    return token.colorErrorBg
+            }
+        }
+
+        return (
+            <div style={{
+                background: getColorForStatus(),
+                height: "100%",
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
+                justifyContent: 'center'
+            }}>
+                <Text>{TypeLabels[type]}</Text>
+                <Text italic>{StatusLabels[status]}</Text>
+            </div>
+        );
+    };
+
+    const onFinish = (values: { type: DayOffType, dates: [Dayjs, Dayjs] }) => {
+        const startDate = values.dates[0].set('hour', 0).set('minute', 0).set('second', 0).toISOString()
+        const finishDate = values.dates[0].set('hour', 23).set('minute', 59).set('second', 59).toISOString()
+
+        const data: any = {
+            type: values.type,
+            startDate,
+            finishDate,
+        }
+        mutation.mutate(data)
     };
     return (
         <>
-            <Header style={{background: colorBgContainer, display: "flex", alignItems: "center"}}>
+            {requestMessages.contextHolder}
+            <Header style={{background: token.colorBgContainer, display: "flex", alignItems: "center"}}>
                 <Title style={{margin: 0}} level={4}>
                     Book day off
                 </Title>
             </Header>
             <Content style={{margin: 32}}>
+                <ErrorsBlock errors={[myDaysOff.error as AxiosError, mutation.error as AxiosError]}/>
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Row gutter={16}>
-                        <Col span={8}>
-                            <Statistic title="Vacation usage (yearly)" value={12} suffix="/ 24"/>
+                        <Col span={6}>
+                            <Statistic title="Vacation usage (yearly)" value={12} suffix="/ 15"/>
                         </Col>
-                        <Col span={8}>
-                            <Statistic title="Sick leave usage (yearly)" value={5} suffix="/ 10"/>
+                        <Col span={6}>
+                            <Statistic title="Sick leave usage (yearly)" value={5} suffix="/ 7"/>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <Statistic title="Day off usage (yearly)" value={3} suffix="/ 5"/>
+                        </Col>
+                        <Col span={6}>
                             <Statistic title="Unpaid day off usage (yearly)" value={0}/>
                         </Col>
                     </Row>
@@ -104,15 +161,13 @@ export const BookDayOffPage: FC = (props) => {
                         onFinish={onFinish}
                         autoComplete="off"
                     >
-                        <Form.Item name="type" label="Day off type">
+                        <Form.Item name="type" label="Day off type" rules={[getYupRule(schema)]}>
                             <Radio.Group>
-                                <Radio value={'vacation'}>Vacation</Radio>
-                                <Radio value={'sickLeave'}>Sick leave</Radio>
-                                <Radio value={'unpaid'}>Unpaid day off</Radio>
+                                {Object.values(DayOffType).map(v => (<Radio key={v} value={v}>{TypeLabels[v]}</Radio>))}
                             </Radio.Group>
                         </Form.Item>
-                        <Form.Item name="dates" label="Dates">
-                            <RangePicker/>
+                        <Form.Item name="dates" label="Dates" rules={[getYupRule(schema)]}>
+                            <RangePicker disabledDate={current => current && current.valueOf() < Date.now()}/>
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit">

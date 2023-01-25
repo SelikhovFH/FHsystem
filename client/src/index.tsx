@@ -8,6 +8,10 @@ import {Auth0Provider} from "@auth0/auth0-react";
 import Auth0Ready from "./wrappers/Auth0Ready";
 import {QueryClientProvider} from "react-query";
 import {queryClient} from "./services/queryClient";
+import * as dayjs from 'dayjs'
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween)
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

@@ -12,6 +12,13 @@ export class CreateDayOffDto {
   public type: DayOffType
 }
 
+export class CreateDayOffWithUserIdDto extends CreateDayOffDto {
+  @IsString()
+  public userId: string;
+
+
+}
+
 export class ConfirmDayOffDto {
   @IsString()
   id: string
