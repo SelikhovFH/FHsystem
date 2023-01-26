@@ -49,6 +49,10 @@ class Auth0Service {
     })
   }
 
+  public async getUser(id: string) {
+    return this.management.getUser({id})
+  }
+
   public async getUsers(page: number, per_page: number) {
     return this.management.getUsers({page, per_page})
   }

@@ -1,11 +1,20 @@
 import {FC} from "react";
+import {Layout, theme, Typography} from "antd";
 
-type Props = {}
+type Props = {
+    title: string
+}
 
-export const Header: FC<Props> = (props) => {
+const {Header} = Layout;
+const {Title} = Typography
+
+export const AppHeader: FC<Props> = (props) => {
+    const {token} = theme.useToken()
     return (
-        <div>
-
-        </div>
+        <Header style={{background: token.colorBgContainer, display: "flex", alignItems: "center"}}>
+            <Title style={{margin: 0}} level={4}>
+                Book day off
+            </Title>
+        </Header>
     )
 }

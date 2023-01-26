@@ -1,9 +1,13 @@
 import {NextFunction, Request, Response} from 'express';
 import DayOffService from "@services/dayOff.service";
 import {ConfirmDayOffDto, CreateDayOffDto} from "@dtos/dayOff.dto";
+import Auth0Service from "@services/auth0.service";
+import UserService from "@services/user.service";
 
 class DayOffController {
   private dayOffService = new DayOffService()
+  private authOservice = new Auth0Service()
+  private userService = new UserService()
 
   createDayOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -21,7 +25,17 @@ class DayOffController {
   getPendingDaysOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const pendingDaysOff = await this.dayOffService.getPendingDaysOff()
-      res.status(200).json({data: pendingDaysOff, message: 'OK'});
+      //I assume that we won't have too many concurrent pending days off, so code is  simple but not optimized here
+      const promises = pendingDaysOff.map(async (dayOff) => {
+        const user = await this.userService.findUserById(dayOff.userId)
+        const auth0User = await this.authOservice.getUser(user.auth0id)
+        return {
+          ...dayOff,
+          user: auth0User
+        }
+      })
+      const data = await Promise.all(promises)
+      res.status(200).json({data, message: 'OK'});
     } catch (error) {
       next(error);
     }

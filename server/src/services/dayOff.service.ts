@@ -16,7 +16,7 @@ class DayOffService {
   }
 
   public async getPendingDaysOff(): Promise<DayOff[]> {
-    return this.dayOff.find({status: DayOffStatus.pending});
+    return this.dayOff.aggregate().match({status: DayOffStatus.pending})
   }
 
   public async getUserDaysOff(userId: string): Promise<DayOff[]> {

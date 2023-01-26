@@ -29,29 +29,18 @@ import {getYupRule} from "../utils/yupRule";
 import {DayOff, DayOffStatus, DayOffType} from "../shared/dayOff.interface";
 import {Rule} from "rc-field-form/lib/interface";
 import {getWorkingDays, YearlyLimitsForDaysOffTypes} from "../shared/dayOff.helpers";
+import {AppHeader} from "../layouts/Header";
+import {StatusLabels, TypeLabels} from "../sections/dayOff";
 
 
-const {Header, Content} = Layout;
-const {Title, Text} = Typography
+const {Content} = Layout;
+const {Text} = Typography
 const {RangePicker} = DatePicker;
 
 const schema = yup.object().shape({
     type: yup.string().required(),
     dates: yup.array().of(yup.string()).required()
 });
-
-const StatusLabels: Record<DayOffStatus, string> = {
-    approved: "Approved",
-    declined: "Declined",
-    pending: "Pending"
-}
-
-const TypeLabels: Record<DayOffType, string> = {
-    vacation: "Vacation",
-    sickLeave: "Sick leave",
-    dayOff: "Day off",
-    unpaid: "Unpaid day off",
-}
 
 export const BookDayOffPage: FC = (props) => {
     const {token} = theme.useToken()
@@ -164,15 +153,10 @@ export const BookDayOffPage: FC = (props) => {
             return Promise.resolve();
         }
     }
-    console.log(usage)
     return (
         <>
             {requestMessages.contextHolder}
-            <Header style={{background: token.colorBgContainer, display: "flex", alignItems: "center"}}>
-                <Title style={{margin: 0}} level={4}>
-                    Book day off
-                </Title>
-            </Header>
+            <AppHeader title={"Book day off"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock
                     errors={[myDaysOff.error as AxiosError, mutation.error as AxiosError, usageError as AxiosError]}/>

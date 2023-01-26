@@ -1,4 +1,4 @@
-import {Alert, Avatar, Button, Card, Checkbox, Form, Input, Layout, Table, theme, Typography} from "antd";
+import {Alert, Avatar, Button, Card, Checkbox, Form, Input, Layout, Table, Typography} from "antd";
 import {FC, useState} from "react";
 import {useAuth0} from "@auth0/auth0-react";
 import {useMutation, useQuery} from "react-query";
@@ -10,9 +10,10 @@ import {getYupRule} from "../../utils/yupRule";
 import {queryClient} from "../../services/queryClient";
 import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
+import {AppHeader} from "../../layouts/Header";
 
-const {Header, Content} = Layout;
-const {Title, Paragraph} = Typography
+const {Content} = Layout;
+const {Paragraph} = Typography
 
 const columns = [
     {
@@ -51,7 +52,6 @@ const schema = yup.object().shape({
 const PAGE_SIZE = 20
 //TODO CHECK PAGINATION ON BIGGER DATA SET
 export const ManageUsersPage: FC = () => {
-    const {token: {colorBgContainer}} = theme.useToken()
     const [form] = Form.useForm();
     const {getAccessTokenSilently} = useAuth0()
     const requestMessages = useRequestMessages('USER_REGISTER')
@@ -83,11 +83,7 @@ export const ManageUsersPage: FC = () => {
     return (
         <>
             {requestMessages.contextHolder}
-            <Header style={{background: colorBgContainer, display: "flex", alignItems: "center"}}>
-                <Title style={{margin: 0}} level={4}>
-                    Manage users
-                </Title>
-            </Header>
+            <AppHeader title={"Manage users"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock errors={[error as AxiosError, mutation.error as AxiosError]}/>
 
