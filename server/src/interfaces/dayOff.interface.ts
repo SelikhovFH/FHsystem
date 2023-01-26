@@ -2,6 +2,7 @@ export interface DayOff {
   _id: string;
   startDate: string;
   finishDate: string;
+  dayCount: number
   userId: string;
   approvedById: string;
   status: DayOffStatus

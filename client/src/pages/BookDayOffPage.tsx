@@ -26,7 +26,9 @@ import {AxiosError} from "axios";
 import {useRequestMessages} from "../hooks/useRequestMessages";
 import * as yup from "yup";
 import {getYupRule} from "../utils/yupRule";
-import {DayOff, DayOffStatus, DayOffType} from "../interfaces/dayOff.interface";
+import {DayOff, DayOffStatus, DayOffType} from "../shared/dayOff.interface";
+import {Rule} from "rc-field-form/lib/interface";
+import {getWorkingDays, YearlyLimitsForDaysOffTypes} from "../shared/dayOff.helpers";
 
 
 const {Header, Content} = Layout;
@@ -56,9 +58,19 @@ export const BookDayOffPage: FC = (props) => {
     const [form] = Form.useForm();
     const {getAccessTokenSilently} = useAuth0()
     const requestMessages = useRequestMessages('BOOK_DAY_OFF')
-    const myDaysOff = useQuery<DayOff[]>("days_off", async () => {
+    const dayOffType = Form.useWatch('type', form) as DayOffType;
+    const myDaysOff = useQuery<DayOff[]>("/days_off/my", async () => {
         const token = await getAccessTokenSilently()
         const res = await API.get(`/days_off/my`, getRequestConfig(token))
+        return res.data.data
+    })
+    const {
+        data: usage,
+        error: usageError,
+        isLoading: usageLoading
+    } = useQuery<Record<DayOffType, { used: number; limit: number }>>("/days_off/my/usage", async () => {
+        const token = await getAccessTokenSilently()
+        const res = await API.get(`/days_off/my/usage`, getRequestConfig(token))
         return res.data.data
     })
     const mutation = useMutation(async (newDayOff) => {
@@ -70,7 +82,7 @@ export const BookDayOffPage: FC = (props) => {
         onSuccess: async () => {
             requestMessages.onSuccess()
             form.resetFields();
-            await queryClient.invalidateQueries({queryKey: ['days_off']})
+            await queryClient.invalidateQueries({queryKey: ['/days_off/my', '/days_off/my/usage']})
         },
         onError: async () => {
             requestMessages.onError()
@@ -113,9 +125,8 @@ export const BookDayOffPage: FC = (props) => {
     };
 
     const onFinish = (values: { type: DayOffType, dates: [Dayjs, Dayjs] }) => {
-        const startDate = values.dates[0].set('hour', 0).set('minute', 0).set('second', 0).toISOString()
-        const finishDate = values.dates[0].set('hour', 23).set('minute', 59).set('second', 59).toISOString()
-
+        const startDate = values.dates[0].toISOString()
+        const finishDate = values.dates[1].toISOString()
         const data: any = {
             type: values.type,
             startDate,
@@ -123,6 +134,37 @@ export const BookDayOffPage: FC = (props) => {
         }
         mutation.mutate(data)
     };
+
+    const dateValidationLimitRule: Rule = {
+        message: 'Your limit is not sufficient to cover new day off',
+        validator: (_, value: [Dayjs, Dayjs]) => {
+            //Validation logic is same with backend but has slightly different implementation
+            const userDaysOffOfType = myDaysOff.data?.filter(d => d.status !== DayOffStatus.declined).filter(d => d.type === dayOffType) ?? []
+            const currentLimit = YearlyLimitsForDaysOffTypes[dayOffType]()
+            const limitUsed = userDaysOffOfType.reduce((acc, val) => acc + val.dayCount, 0) ?? 0
+            const limitLeft = currentLimit - limitUsed
+            const limitRequired = getWorkingDays(value[0].toDate(), value[1].toDate())
+            if (limitLeft < limitRequired) {
+                return Promise.reject('Your limit is not sufficient to cover new day off');
+            }
+            return Promise.resolve();
+        }
+    }
+    const dateValidationIntersectionRule: Rule = {
+        message: 'New day off intersects with previously created',
+        validator: (_, value: [Dayjs, Dayjs]) => {
+            //Validation logic is same with backend but has slightly different implementation
+            const intersectingDaysOff = myDaysOff.data?.filter(d => d.status !== DayOffStatus.declined).find(d => {
+                return dayjs(d.startDate).isBetween(value[0], value[1], 'day', '[]')
+                    || dayjs(d.finishDate).isBetween(value[0], value[1], 'day', '[]')
+            })
+            if (intersectingDaysOff) {
+                return Promise.reject('New day off intersects with previously created');
+            }
+            return Promise.resolve();
+        }
+    }
+    console.log(usage)
     return (
         <>
             {requestMessages.contextHolder}
@@ -132,21 +174,27 @@ export const BookDayOffPage: FC = (props) => {
                 </Title>
             </Header>
             <Content style={{margin: 32}}>
-                <ErrorsBlock errors={[myDaysOff.error as AxiosError, mutation.error as AxiosError]}/>
+                <ErrorsBlock
+                    errors={[myDaysOff.error as AxiosError, mutation.error as AxiosError, usageError as AxiosError]}/>
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Row gutter={16}>
                         <Col span={6}>
-                            <Statistic title="Vacation usage (yearly)" value={12} suffix="/ 15"/>
+                            <Statistic loading={usageLoading} title="Vacation limit (monthly / yearly)"
+                                       value={usage?.vacation.used}
+                                       suffix={`/ ${usage?.vacation.limit} / ${+(usage?.vacation.limit || 0) * 12}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic title="Sick leave usage (yearly)" value={5} suffix="/ 7"/>
+                            <Statistic loading={usageLoading} title="Sick leave limit (yearly)"
+                                       value={usage?.sickLeave.used} suffix={`/ ${usage?.sickLeave.limit}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic title="Day off usage (yearly)" value={3} suffix="/ 5"/>
+                            <Statistic loading={usageLoading} title="Day off limit (yearly)" value={usage?.dayOff.used}
+                                       suffix={`/ ${usage?.dayOff.limit}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic title="Unpaid day off usage (yearly)" value={0}/>
+                            <Statistic loading={usageLoading} title="Unpaid day off limit (yearly)"
+                                       value={usage?.unpaid.used}/>
                         </Col>
                     </Row>
                 </Card>
@@ -166,11 +214,13 @@ export const BookDayOffPage: FC = (props) => {
                                 {Object.values(DayOffType).map(v => (<Radio key={v} value={v}>{TypeLabels[v]}</Radio>))}
                             </Radio.Group>
                         </Form.Item>
-                        <Form.Item name="dates" label="Dates" rules={[getYupRule(schema)]}>
-                            <RangePicker disabledDate={current => current && current.valueOf() < Date.now()}/>
+                        <Form.Item name="dates" label="Dates"
+                                   rules={[getYupRule(schema), dateValidationLimitRule, dateValidationIntersectionRule]}>
+                            <RangePicker disabled={!dayOffType}
+                                         disabledDate={current => current && current.valueOf() < Date.now()}/>
                         </Form.Item>
                         <Form.Item>
-                            <Button type="primary" htmlType="submit">
+                            <Button disabled={mutation.isLoading} type="primary" htmlType="submit">
                                 Book
                             </Button>
                         </Form.Item>

@@ -19,6 +19,7 @@ class DaysOffRoute implements Routes {
       validationMiddleware(CreateDayOffDto, 'body'), this.dayOffController.createDayOff);
     this.router.get(`${this.path}/pending`, isAdminMiddleware, this.dayOffController.getPendingDaysOff);
     this.router.get(`${this.path}/my`, this.dayOffController.getMyDaysOff)
+    this.router.get(`${this.path}/my/usage`, this.dayOffController.getMyDaysOffUsage)
     this.router.patch(`${this.path}/confirm`,
       isAdminMiddleware, validationMiddleware(ConfirmDayOffDto, 'body'),
       this.dayOffController.confirmDayOff)

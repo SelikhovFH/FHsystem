@@ -1,2 +1,3 @@
-Interfaces are copypast3ed from server.
+Code that is copypasted from server.
 It would be great to share it via linked folders or yarn workspaces
+

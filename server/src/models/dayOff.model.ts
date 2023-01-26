@@ -6,6 +6,7 @@ const dayOffSchema: Schema = new Schema({
   finishDate: Date,
   userId: String,
   approvedById: String,
+  dayCount: Number,
   status: {
     type: String,
     enum: Object.values(DayOffStatus),

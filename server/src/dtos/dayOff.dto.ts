@@ -1,4 +1,4 @@
-import {IsEnum, IsString} from 'class-validator';
+import {IsEnum, IsInt, IsString} from 'class-validator';
 import {DayOffStatus, DayOffType} from "@interfaces/dayOff.interface";
 
 export class CreateDayOffDto {
@@ -12,10 +12,12 @@ export class CreateDayOffDto {
   public type: DayOffType
 }
 
-export class CreateDayOffWithUserIdDto extends CreateDayOffDto {
+export class CreateDayOffBackendDto extends CreateDayOffDto {
   @IsString()
   public userId: string;
 
+  @IsInt()
+  public dayCount: number
 
 }
 
