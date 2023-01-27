@@ -29,8 +29,10 @@ class DayOffController {
       const promises = pendingDaysOff.map(async (dayOff) => {
         const user = await this.userService.findUserById(dayOff.userId)
         const auth0User = await this.authOservice.getUser(user.auth0id)
+        const dayOffExceedsLimit = await this.dayOffService.dayOffExceedsLimit(dayOff)
         return {
           ...dayOff,
+          dayOffExceedsLimit,
           user: auth0User
         }
       })

@@ -27,23 +27,28 @@ class DayOffService {
     });
   }
 
-  public async validateDayOff(userId: string, data: CreateDayOffDto): Promise<boolean> {
+  public async dayOffExceedsLimit(dayOff: DayOff): Promise<boolean> {
     const userDaysOffOfType = await this.dayOff.find({
-      userId,
+      userId: dayOff.userId,
       status: {$ne: DayOffStatus.declined},
+      '_id': {$ne: dayOff._id},
       startDate: {
         $gte: getStartOfCurrentYear(),
       },
-      type: data.type
+      type: dayOff.type
     })
-    const currentLimit = YearlyLimitsForDaysOffTypes[data.type]()
+    const currentLimit = YearlyLimitsForDaysOffTypes[dayOff.type]()
     const limitUsed = userDaysOffOfType.reduce((acc, val) => acc + val.dayCount, 0) ?? 0
     const limitLeft = currentLimit - limitUsed
-    const limitRequired = this.calculateDayOffDayCount(data)
-
+    const limitRequired = this.calculateDayOffDayCount(dayOff)
     if (limitLeft < limitRequired) {
-      throw new HttpException(409, 'Day limit exceeded')
+      return true
     }
+    return false
+  }
+
+  public async validateDayOff(userId: string, data: CreateDayOffDto): Promise<boolean> {
+
     const intersectingDaysOff = await this.dayOff.findOne({
       userId,
       status: {$ne: DayOffStatus.declined},

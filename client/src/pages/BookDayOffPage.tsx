@@ -125,7 +125,7 @@ export const BookDayOffPage: FC = (props) => {
     };
 
     const dateValidationLimitRule: Rule = {
-        message: 'Your limit is not sufficient to cover new day off',
+        message: 'Your limit is not sufficient to cover new day off. Your request may be rejected by the admin',
         validator: (_, value: [Dayjs, Dayjs]) => {
             //Validation logic is same with backend but has slightly different implementation
             const userDaysOffOfType = myDaysOff.data?.filter(d => d.status !== DayOffStatus.declined).filter(d => d.type === dayOffType) ?? []
@@ -134,10 +134,11 @@ export const BookDayOffPage: FC = (props) => {
             const limitLeft = currentLimit - limitUsed
             const limitRequired = getWorkingDays(value[0].toDate(), value[1].toDate())
             if (limitLeft < limitRequired) {
-                return Promise.reject('Your limit is not sufficient to cover new day off');
+                return Promise.reject('Your limit is not sufficient to cover new day off. Your request may be rejected by the admin');
             }
             return Promise.resolve();
-        }
+        },
+        warningOnly: true
     }
     const dateValidationIntersectionRule: Rule = {
         message: 'New day off intersects with previously created',
@@ -151,7 +152,7 @@ export const BookDayOffPage: FC = (props) => {
                 return Promise.reject('New day off intersects with previously created');
             }
             return Promise.resolve();
-        }
+        },
     }
     return (
         <>

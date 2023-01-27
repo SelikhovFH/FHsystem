@@ -4,7 +4,7 @@ import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Avatar, Button, Card, Layout, List, Typography} from "antd";
+import {Avatar, Button, Card, Layout, List, Tag, Typography} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
@@ -20,7 +20,7 @@ const {Title} = Typography
 export const ConfirmDayOffPage: FC<Props> = (props) => {
     const requestMessages = useRequestMessages('USER_REGISTER')
     const {getAccessTokenSilently} = useAuth0()
-    const pendingDaysOff = useQuery<(DayOff & { user: { email: string, picture: string } })[]>("/days_off/pending", async () => {
+    const pendingDaysOff = useQuery<(DayOff & { user: { email: string, picture: string }, dayOffExceedsLimit: boolean })[]>("/days_off/pending", async () => {
         const token = await getAccessTokenSilently({scope: 'admin:admin'})
         const res = await API.get(`/days_off/pending`, getRequestConfig(token))
         return res.data.data
@@ -83,6 +83,8 @@ export const ConfirmDayOffPage: FC<Props> = (props) => {
                                         <b>{formatDate(item.finishDate)}</b>
                                     </span>}
                                 />
+                                {item.dayOffExceedsLimit && <Tag color="warning">Day off exceeds user limit</Tag>}
+
                             </List.Item>
                         )}
                     />
