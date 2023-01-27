@@ -8,6 +8,10 @@ import {Auth0Provider} from "@auth0/auth0-react";
 import Auth0Ready from "./wrappers/Auth0Ready";
 import {QueryClientProvider} from "react-query";
 import {queryClient} from "./services/queryClient";
+import * as dayjs from 'dayjs'
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween)
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -19,7 +23,7 @@ root.render(
             clientId={process.env.REACT_APP_AUTH0_CLIENTID!}
             audience={process.env.REACT_APP_AUTH0_AUDIENCE!}
             redirectUri={process.env.REACT_APP_ATH0_REDIRECT_URI!}
-            scope="openid profile email"
+            scope="openid profile email admin:admin"
             useRefreshTokens={true}
             cacheLocation={"localstorage"}
         >
