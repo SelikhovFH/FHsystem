@@ -5,6 +5,7 @@ import {Layout, Menu, theme, Typography} from 'antd';
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import {AdminRoutes, AppRoutes} from "../router/AppRoutes";
 import {useAuth0} from "@auth0/auth0-react";
+import {UserRole} from "../shared/user.interface";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {Title} = Typography;
@@ -33,12 +34,28 @@ const items: MenuItem[] = [
     getItem('Profile', AppRoutes.profile, <UserOutlined/>),
 ];
 
-const adminItems = [
-    getItem('Admin', 'admin', null, [
-        getItem('Manage users', AdminRoutes.manageUsers, <UserAddOutlined/>),
+const editorItems = [
+    getItem('Editor', 'editor', null, [
         getItem('Confirm day off', AdminRoutes.confirmDayOff, <CheckSquareOutlined/>)
     ], 'group'),
 ]
+
+const adminItems = [
+    getItem('Admin', 'admin', null, [
+        getItem('Manage users', AdminRoutes.manageUsers, <UserAddOutlined/>),
+    ], 'group'),
+]
+
+const getMenuItemsByRole = (role: UserRole) => {
+    switch (role) {
+        case UserRole.user:
+            return items
+        case UserRole.editor:
+            return items.concat(editorItems)
+        case UserRole.admin:
+            return items.concat(editorItems).concat(adminItems)
+    }
+}
 
 type Props = {}
 
@@ -56,7 +73,7 @@ export const DefaultLayout: FC<Props> = (props) => {
                     navigate(e.key)
                 }}
                       defaultSelectedKeys={[location.pathname]} mode="inline"
-                      items={user?.is_admin ? items.concat(adminItems) : items}/>
+                      items={getMenuItemsByRole(user?.role)}/>
             </Sider>
             <Layout>
 

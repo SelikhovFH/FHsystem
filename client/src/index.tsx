@@ -23,7 +23,7 @@ root.render(
             clientId={process.env.REACT_APP_AUTH0_CLIENTID!}
             audience={process.env.REACT_APP_AUTH0_AUDIENCE!}
             redirectUri={process.env.REACT_APP_ATH0_REDIRECT_URI!}
-            scope="openid profile email admin:admin"
+            scope="openid profile email admin:admin editor:editor"
             useRefreshTokens={true}
             cacheLocation={"localstorage"}
         >

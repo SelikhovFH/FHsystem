@@ -10,4 +10,7 @@ export const authMiddleware = auth({
 
 export const isAdminMiddleware = requiredScopes('admin:admin');
 
+export const isEditorMiddleware = requiredScopes('editor:editor');
+
+
 

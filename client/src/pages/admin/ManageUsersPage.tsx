@@ -1,4 +1,4 @@
-import {Alert, Avatar, Button, Card, Checkbox, Form, Input, Layout, Table, Typography} from "antd";
+import {Alert, Avatar, Button, Card, Form, Input, Layout, Select, Table, Typography} from "antd";
 import {FC, useState} from "react";
 import {useAuth0} from "@auth0/auth0-react";
 import {useMutation, useQuery} from "react-query";
@@ -11,6 +11,8 @@ import {queryClient} from "../../services/queryClient";
 import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
 import {AppHeader} from "../../layouts/Header";
+import {UserRole} from "../../shared/user.interface";
+import {capitalize} from "../../utils/strings";
 
 const {Content} = Layout;
 const {Paragraph} = Typography
@@ -36,18 +38,15 @@ const columns = [
         }
     },
     {
-        title: 'Admin',
-        dataIndex: ['user_metadata', 'is_admin'],
-        key: 'admin',
-        render: (text: string) => {
-            return text ? '✅' : '';
-        }
+        title: 'Role',
+        dataIndex: ['user_metadata', 'role'],
+        key: 'role',
     },
 ];
 
 const schema = yup.object().shape({
     email: yup.string().required().email(),
-    isAdmin: yup.boolean(),
+    role: yup.string().required(),
 });
 const PAGE_SIZE = 20
 //TODO CHECK PAGINATION ON BIGGER DATA SET
@@ -104,9 +103,13 @@ export const ManageUsersPage: FC = () => {
                             <Input style={{minWidth: 250}}/>
                         </Form.Item>
 
-                        <Form.Item name="isAdmin" valuePropName="checked" rules={[getYupRule(schema)]}
+                        <Form.Item name="role" label={'User role'} rules={[getYupRule(schema)]}
                         >
-                            <Checkbox>Is Admin</Checkbox>
+                            <Select
+                                defaultValue={UserRole.user}
+                                style={{width: 120}}
+                                options={Object.values(UserRole).map(role => ({value: role, label: capitalize(role)}))}
+                            />
                         </Form.Item>
 
                         <Form.Item>
