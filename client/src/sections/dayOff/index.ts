@@ -7,8 +7,8 @@ export const StatusLabels: Record<DayOffStatus, string> = {
 }
 
 export const TypeLabels: Record<DayOffType, string> = {
-    vacation: "Vacation",
-    sickLeave: "Sick leave",
-    dayOff: "Day off",
-    unpaid: "Unpaid day off",
+    vacation: "🏖️ Vacation",
+    sickLeave: "🤒 Sick leave",
+    dayOff: "📆 Day off",
+    unpaid: "💰 Unpaid day off",
 }

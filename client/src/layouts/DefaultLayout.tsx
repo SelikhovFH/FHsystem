@@ -1,9 +1,8 @@
 import {FC, useState} from "react";
-import {CheckSquareOutlined, CoffeeOutlined, HomeOutlined, UserAddOutlined, UserOutlined,} from '@ant-design/icons';
 import type {MenuProps} from 'antd';
 import {Layout, Menu, theme, Typography} from 'antd';
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
-import {AdminRoutes, AppRoutes} from "../router/AppRoutes";
+import {AdminRoutes, AppRoutes, EditorRoutes} from "../router/AppRoutes";
 import {useAuth0} from "@auth0/auth0-react";
 import {UserRole} from "../shared/user.interface";
 
@@ -29,20 +28,21 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Homepage', AppRoutes.index, <HomeOutlined/>),
-    getItem('Book day off', AppRoutes.bookDayOff, <CoffeeOutlined/>),
-    getItem('Profile', AppRoutes.profile, <UserOutlined/>),
+    getItem('🏠 Homepage', AppRoutes.index,),
+    getItem('📅 Book day off', AppRoutes.bookDayOff),
+    getItem('👤 Profile', AppRoutes.profile,),
 ];
 
 const editorItems = [
     getItem('Editor', 'editor', null, [
-        getItem('Confirm day off', AdminRoutes.confirmDayOff, <CheckSquareOutlined/>)
+        getItem('✅ Confirm day off', EditorRoutes.confirmDayOff),
+        getItem('🎉 Holidays & celebrations', EditorRoutes.holidaysAndCelebrations)
     ], 'group'),
 ]
 
 const adminItems = [
     getItem('Admin', 'admin', null, [
-        getItem('Manage users', AdminRoutes.manageUsers, <UserAddOutlined/>),
+        getItem('👥 Manage users', AdminRoutes.manageUsers,),
     ], 'group'),
 ]
 

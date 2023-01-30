@@ -13,7 +13,7 @@ export const AppHeader: FC<Props> = (props) => {
     return (
         <Header style={{background: token.colorBgContainer, display: "flex", alignItems: "center"}}>
             <Title style={{margin: 0}} level={4}>
-                Book day off
+                {props.title}
             </Title>
         </Header>
     )

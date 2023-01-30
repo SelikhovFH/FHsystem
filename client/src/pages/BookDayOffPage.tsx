@@ -71,7 +71,8 @@ export const BookDayOffPage: FC = (props) => {
         onSuccess: async () => {
             requestMessages.onSuccess()
             form.resetFields();
-            await queryClient.invalidateQueries({queryKey: ['/days_off/my', '/days_off/my/usage']})
+            await Promise.all([queryClient.invalidateQueries({queryKey: ['/days_off/my']}),
+                queryClient.invalidateQueries({queryKey: ['/days_off/my/usage']})])
         },
         onError: async () => {
             requestMessages.onError()
@@ -165,20 +166,21 @@ export const BookDayOffPage: FC = (props) => {
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Row gutter={16}>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Vacation limit (monthly / yearly)"
+                            <Statistic loading={usageLoading} title={`${TypeLabels.vacation} (monthly / yearly)`}
                                        value={usage?.vacation.used}
                                        suffix={`/ ${usage?.vacation.limit} / ${+(usage?.vacation.limit || 0) * 12}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Sick leave limit (yearly)"
+                            <Statistic loading={usageLoading} title={`${TypeLabels.sickLeave} limit (yearly)`}
                                        value={usage?.sickLeave.used} suffix={`/ ${usage?.sickLeave.limit}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Day off limit (yearly)" value={usage?.dayOff.used}
+                            <Statistic loading={usageLoading} title={`${TypeLabels.dayOff} limit (yearly)`}
+                                       value={usage?.dayOff.used}
                                        suffix={`/ ${usage?.dayOff.limit}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Unpaid day off limit (yearly)"
+                            <Statistic loading={usageLoading} title={`${TypeLabels.unpaid} limit (yearly)`}
                                        value={usage?.unpaid.used}/>
                         </Col>
                     </Row>
