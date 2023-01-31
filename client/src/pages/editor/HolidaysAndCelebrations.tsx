@@ -4,7 +4,7 @@ import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Alert, Button, Calendar, Card, Checkbox, Form, Input, Layout, Popover, Space, theme, Typography} from "antd";
+import {Alert, Button, Calendar, Card, Checkbox, Form, Input, Layout, Popover, Space, theme} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
@@ -17,8 +17,7 @@ import {getYupRule} from "../../utils/yupRule";
 import {formatDate} from "../../utils/dates";
 import styles from './HolidaysAndCelebrations.module.css'
 import {FormInstance} from "antd/es/form/hooks/useForm";
-
-const {Text} = Typography
+import {Event} from "../../components/calendar/Event";
 
 type EventProps = {
     event: CalendarEvent
@@ -63,67 +62,43 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
     </Form>
 }
 
-export const Event: FC<EventProps> = ({event, onDelete, onFinish, isLoading}) => {
-    const {token} = theme.useToken()
+export const EventWithControls: FC<EventProps> = ({event, onDelete, onFinish, isLoading}) => {
     const [showEditForm, setShowEditForm] = useState(false)
     const [form] = Form.useForm()
     const toggleShowEditForm = () => setShowEditForm(!showEditForm)
     return (
-        <div onClick={e => e.stopPropagation()}>
-            <Popover placement={'left'} title={`${event.title} on ${formatDate(event.date)}`} trigger="click"
-                     content={<div>
-                         {showEditForm ? <AddOrUpdateForm form={form} initialValues={{
-                             ...event
-                         }} onFinish={(v) => {
-                             console.log(event)
-                             onFinish({
-                                 ...v,
-                                 _id: event._id,
-                                 date: event.date
-                             })
-                             setShowEditForm(false)
-                             form.resetFields()
-                         }
-                         } buttonDisabled={isLoading}
-                                                          buttonText={"Update event"}/> : <>
-                             <Text>
-                                 {event.description}
-                             </Text>
-                             <br/>
-                             <Text>
-                                 Day off: {event.isDayOff ? '✅' : '❌'}
-                             </Text>
-                             <br/>
-                             <Text>
-                                 Recurring: {event.isRecurring ? '✅' : '❌'}
-                             </Text>
-                             <Gutter size={2}/>
-                             <Space>
-                                 <Button onClick={toggleShowEditForm} type={"primary"} icon={<EditOutlined/>}>
-                                     Edit
-                                 </Button>
-                                 <Button disabled={isLoading} onClick={() => onDelete(event._id)} danger
-                                         type={"primary"}
-                                         icon={<DeleteOutlined/>}>
-                                     Delete
-                                 </Button>
+        <Event event={event} popoverContent={<div>
+            {showEditForm ? <AddOrUpdateForm form={form} initialValues={{
+                ...event
+            }} onFinish={(v) => {
+                console.log(event)
+                onFinish({
+                    ...v,
+                    _id: event._id,
+                    date: event.date
+                })
+                setShowEditForm(false)
+                form.resetFields()
+            }
+            } buttonDisabled={isLoading}
+                                             buttonText={"Update event"}/> : <>
+                <Event.DefaultPopoverContent {...event}/>
+                <Gutter size={2}/>
+                <Space>
+                    <Button onClick={toggleShowEditForm} type={"primary"} icon={<EditOutlined/>}>
+                        Edit
+                    </Button>
+                    <Button disabled={isLoading} onClick={() => onDelete(event._id)} danger
+                            type={"primary"}
+                            icon={<DeleteOutlined/>}>
+                        Delete
+                    </Button>
 
-                             </Space>
-                         </>}
+                </Space>
+            </>}
 
-                     </div>}>
-                <div style={{
-                    border: `1px solid ${token.colorPrimary}`,
-                    background: event.isDayOff ? token.colorPrimary : "unset",
-                    color: token.colorPrimary,
-                    padding: 4,
-                    borderRadius: 4,
-                    marginBottom: 4
-                }}>
-                    <Text style={{color: event.isDayOff ? token.colorWhite : token.colorPrimary}}>{event.title}</Text>
-                </div>
-            </Popover>
-        </div>
+        </div>}/>
+
     )
 }
 
@@ -221,8 +196,9 @@ export const HolidaysAndCelebrationsPage: FC = () => {
         }) ?? []
 
         const children = eventsForThisDay.map(e => (
-            <Event key={e._id} event={e} onDelete={(id: string) => deleteMutation.mutate(id as any)}
-                   isLoading={deleteMutation.isLoading || editMutation.isLoading} onFinish={onEditFinish}/>));
+            <EventWithControls key={e._id} event={e} onDelete={(id: string) => deleteMutation.mutate(id as any)}
+                               isLoading={deleteMutation.isLoading || editMutation.isLoading}
+                               onFinish={onEditFinish}/>));
 
         return <Popover placement={'left'} content={<AddOrUpdateForm form={form} buttonDisabled={addMutation.isLoading}
                                                                      buttonText={"Add event"} onFinish={onAddFinish}/>}
