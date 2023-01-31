@@ -4,12 +4,12 @@ import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Alert, Button, Calendar, Card, Checkbox, Form, Input, Layout, Popover, Space, theme} from "antd";
+import {Alert, Button, Card, Checkbox, Form, Input, Layout, Popover, Space, theme} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
 import {queryClient} from "../../services/queryClient";
-import dayjs, {Dayjs} from "dayjs";
+import {Dayjs} from "dayjs";
 import {CalendarEvent} from "../../shared/calendarEvent.interface";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import * as yup from 'yup'
@@ -18,6 +18,7 @@ import {formatDate} from "../../utils/dates";
 import styles from './HolidaysAndCelebrations.module.css'
 import {FormInstance} from "antd/es/form/hooks/useForm";
 import {Event} from "../../components/calendar/Event";
+import {AppCalendar} from "../../components/calendar/AppCalendar";
 
 type EventProps = {
     event: CalendarEvent
@@ -182,39 +183,6 @@ export const HolidaysAndCelebrationsPage: FC = () => {
         editMutation.mutate({...values})
     }
 
-
-    const dateCellRender = (value: Dayjs) => {
-        const eventsForThisDay = calendarEvents.data?.filter(d => {
-            if (value.isSame(new Date(d.date), 'day')) {
-                return true;
-            }
-            if (!d.isRecurring) {
-                return false
-            }
-            // @ts-ignore
-            return dayjs(d.date).dayOfYear() === value.dayOfYear()
-        }) ?? []
-
-        const children = eventsForThisDay.map(e => (
-            <EventWithControls key={e._id} event={e} onDelete={(id: string) => deleteMutation.mutate(id as any)}
-                               isLoading={deleteMutation.isLoading || editMutation.isLoading}
-                               onFinish={onEditFinish}/>));
-
-        return <Popover placement={'left'} content={<AddOrUpdateForm form={form} buttonDisabled={addMutation.isLoading}
-                                                                     buttonText={"Add event"} onFinish={onAddFinish}/>}
-                        title={`Add event for ${formatDate(selectedDate!)}`}
-                        trigger="click"
-        >
-            <div className={styles.day} style={{borderTop: `2px solid ${token.colorBorderSecondary}`}}>
-                {value.date()}
-                <Gutter size={0.5}/>
-                {children}
-            </div>
-        </Popover>
-
-    };
-
-
     return (
         <>
             {requestMessages.contextHolder}
@@ -232,7 +200,22 @@ export const HolidaysAndCelebrationsPage: FC = () => {
                 <Gutter size={2}/>
                 <Card className={styles.tdHack} title="Add events" bordered={false}
                       style={{boxShadow: "none", borderRadius: 4}}>
-                    <Calendar onSelect={onSelect} mode={'month'} dateFullCellRender={dateCellRender}/>
+                    <AppCalendar onSelect={onSelect} events={calendarEvents.data} renderEvent={e => (
+                        <EventWithControls key={e._id} event={e}
+                                           onDelete={(id: string) => deleteMutation.mutate(id as any)}
+                                           isLoading={deleteMutation.isLoading || editMutation.isLoading}
+                                           onFinish={onEditFinish}/>)} renderDateCell={(value, children) => (
+                        <Popover placement={'left'}
+                                 content={<AddOrUpdateForm form={form} buttonDisabled={addMutation.isLoading}
+                                                           buttonText={"Add event"} onFinish={onAddFinish}/>}
+                                 title={`Add event for ${formatDate(selectedDate!)}`}
+                                 trigger="click"
+                        >
+                            <AppCalendar.DayCell value={value}>
+                                {children}
+                            </AppCalendar.DayCell>
+                        </Popover>
+                    )}/>
                 </Card>
             </Content>
         </>

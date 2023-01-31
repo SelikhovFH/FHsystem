@@ -1,19 +1,5 @@
 import {FC} from "react";
-import {
-    Alert,
-    Button,
-    Calendar,
-    Card,
-    Col,
-    DatePicker,
-    Form,
-    Layout,
-    Radio,
-    Row,
-    Statistic,
-    theme,
-    Typography
-} from "antd";
+import {Alert, Button, Card, Col, DatePicker, Form, Layout, Radio, Row, Statistic, theme, Typography} from "antd";
 import {Gutter} from "../components/Gutter";
 import type {Dayjs} from 'dayjs';
 import dayjs from 'dayjs';
@@ -30,7 +16,9 @@ import {DayOff, DayOffStatus, DayOffType} from "../shared/dayOff.interface";
 import {Rule} from "rc-field-form/lib/interface";
 import {getWorkingDays, YearlyLimitsForDaysOffTypes} from "../shared/dayOff.helpers";
 import {AppHeader} from "../layouts/Header";
-import {StatusLabels, TypeLabels} from "../sections/dayOff";
+import {TypeLabels} from "../sections/dayOff";
+import {CalendarEvent} from "../shared/calendarEvent.interface";
+import {AppCalendar} from "../components/calendar/AppCalendar";
 
 
 const {Content} = Layout;
@@ -62,6 +50,11 @@ export const BookDayOffPage: FC = (props) => {
         const res = await API.get(`/days_off/my/usage`, getRequestConfig(token))
         return res.data.data
     })
+    const calendarEvents = useQuery<CalendarEvent[]>("/calendar_events", async () => {
+        const token = await getAccessTokenSilently()
+        const res = await API.get(`/calendar_events`, getRequestConfig(token))
+        return res.data.data
+    })
     const mutation = useMutation(async (newDayOff) => {
         const token = await getAccessTokenSilently()
         requestMessages.onLoad()
@@ -78,41 +71,6 @@ export const BookDayOffPage: FC = (props) => {
             requestMessages.onError()
         },
     })
-
-    const dateCellRender = (value: Dayjs) => {
-        const dayOffForDate = myDaysOff.data?.find(d => {
-            return dayjs(value).isBetween(d.startDate, d.finishDate, 'day', '[]')
-        })
-
-        if (!dayOffForDate) {
-            return null
-        }
-        const {status, type} = dayOffForDate
-        const getColorForStatus = () => {
-            switch (status) {
-                case DayOffStatus.pending:
-                    return token.colorInfoBg
-                case DayOffStatus.approved:
-                    return token.colorSuccessBg
-                case DayOffStatus.declined:
-                    return token.colorErrorBg
-            }
-        }
-
-        return (
-            <div style={{
-                background: getColorForStatus(),
-                height: "100%",
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'column',
-                justifyContent: 'center'
-            }}>
-                <Text>{TypeLabels[type]}</Text>
-                <Text italic>{StatusLabels[status]}</Text>
-            </div>
-        );
-    };
 
     const onFinish = (values: { type: DayOffType, dates: [Dayjs, Dayjs] }) => {
         const startDate = values.dates[0].toISOString()
@@ -161,7 +119,12 @@ export const BookDayOffPage: FC = (props) => {
             <AppHeader title={"Book day off"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock
-                    errors={[myDaysOff.error as AxiosError, mutation.error as AxiosError, usageError as AxiosError]}/>
+                    errors={[
+                        myDaysOff.error as AxiosError,
+                        mutation.error as AxiosError,
+                        usageError as AxiosError,
+                        calendarEvents.error as AxiosError
+                    ]}/>
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Row gutter={16}>
@@ -215,7 +178,7 @@ export const BookDayOffPage: FC = (props) => {
                 </Card>
                 <Gutter size={2}/>
                 <Card title="Overview" bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
-                    <Calendar dateCellRender={dateCellRender}/>
+                    <AppCalendar events={calendarEvents.data} daysOff={myDaysOff.data}/>
                 </Card>
             </Content>
         </>
