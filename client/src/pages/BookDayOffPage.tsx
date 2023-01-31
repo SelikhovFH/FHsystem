@@ -1,19 +1,5 @@
 import {FC} from "react";
-import {
-    Alert,
-    Button,
-    Calendar,
-    Card,
-    Col,
-    DatePicker,
-    Form,
-    Layout,
-    Radio,
-    Row,
-    Statistic,
-    theme,
-    Typography
-} from "antd";
+import {Alert, Button, Card, Col, DatePicker, Form, Layout, Radio, Row, Statistic, theme, Typography} from "antd";
 import {Gutter} from "../components/Gutter";
 import type {Dayjs} from 'dayjs';
 import dayjs from 'dayjs';
@@ -30,7 +16,9 @@ import {DayOff, DayOffStatus, DayOffType} from "../shared/dayOff.interface";
 import {Rule} from "rc-field-form/lib/interface";
 import {getWorkingDays, YearlyLimitsForDaysOffTypes} from "../shared/dayOff.helpers";
 import {AppHeader} from "../layouts/Header";
-import {StatusLabels, TypeLabels} from "../sections/dayOff";
+import {TypeLabels} from "../sections/dayOff";
+import {CalendarEvent} from "../shared/calendarEvent.interface";
+import {AppCalendar} from "../components/calendar/AppCalendar";
 
 
 const {Content} = Layout;
@@ -62,6 +50,11 @@ export const BookDayOffPage: FC = (props) => {
         const res = await API.get(`/days_off/my/usage`, getRequestConfig(token))
         return res.data.data
     })
+    const calendarEvents = useQuery<CalendarEvent[]>("/calendar_events", async () => {
+        const token = await getAccessTokenSilently()
+        const res = await API.get(`/calendar_events`, getRequestConfig(token))
+        return res.data.data
+    })
     const mutation = useMutation(async (newDayOff) => {
         const token = await getAccessTokenSilently()
         requestMessages.onLoad()
@@ -71,47 +64,13 @@ export const BookDayOffPage: FC = (props) => {
         onSuccess: async () => {
             requestMessages.onSuccess()
             form.resetFields();
-            await queryClient.invalidateQueries({queryKey: ['/days_off/my', '/days_off/my/usage']})
+            await Promise.all([queryClient.invalidateQueries({queryKey: ['/days_off/my']}),
+                queryClient.invalidateQueries({queryKey: ['/days_off/my/usage']})])
         },
         onError: async () => {
             requestMessages.onError()
         },
     })
-
-    const dateCellRender = (value: Dayjs) => {
-        const dayOffForDate = myDaysOff.data?.find(d => {
-            return dayjs(value).isBetween(d.startDate, d.finishDate, 'day', '[]')
-        })
-
-        if (!dayOffForDate) {
-            return null
-        }
-        const {status, type} = dayOffForDate
-        const getColorForStatus = () => {
-            switch (status) {
-                case DayOffStatus.pending:
-                    return token.colorInfoBg
-                case DayOffStatus.approved:
-                    return token.colorSuccessBg
-                case DayOffStatus.declined:
-                    return token.colorErrorBg
-            }
-        }
-
-        return (
-            <div style={{
-                background: getColorForStatus(),
-                height: "100%",
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'column',
-                justifyContent: 'center'
-            }}>
-                <Text>{TypeLabels[type]}</Text>
-                <Text italic>{StatusLabels[status]}</Text>
-            </div>
-        );
-    };
 
     const onFinish = (values: { type: DayOffType, dates: [Dayjs, Dayjs] }) => {
         const startDate = values.dates[0].toISOString()
@@ -141,15 +100,29 @@ export const BookDayOffPage: FC = (props) => {
         warningOnly: true
     }
     const dateValidationIntersectionRule: Rule = {
-        message: 'New day off intersects with previously created',
+        message: 'New day off intersects with previously created or with calendar events',
         validator: (_, value: [Dayjs, Dayjs]) => {
             //Validation logic is same with backend but has slightly different implementation
+            if (!calendarEvents.data || !myDaysOff.data) {
+                return Promise.reject('Error while loading data for check');
+            }
+            const holidayCalendarEvents = calendarEvents.data.filter(d => d.isDayOff)
+
+            const dayOffYear = dayjs(value[0]).year()
+            const intersectingHolidayCalendarEvent = holidayCalendarEvents
+                .find(h => dayjs(h.date).set('year', dayOffYear).isBetween(value[0], value[1], 'day', '[]'))
+
+            if (intersectingHolidayCalendarEvent) {
+                return Promise.reject('New day off intersects with previously created or with calendar events');
+            }
+
             const intersectingDaysOff = myDaysOff.data?.filter(d => d.status !== DayOffStatus.declined).find(d => {
                 return dayjs(d.startDate).isBetween(value[0], value[1], 'day', '[]')
                     || dayjs(d.finishDate).isBetween(value[0], value[1], 'day', '[]')
             })
+
             if (intersectingDaysOff) {
-                return Promise.reject('New day off intersects with previously created');
+                return Promise.reject('New day off intersects with previously created or with calendar events');
             }
             return Promise.resolve();
         },
@@ -160,25 +133,31 @@ export const BookDayOffPage: FC = (props) => {
             <AppHeader title={"Book day off"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock
-                    errors={[myDaysOff.error as AxiosError, mutation.error as AxiosError, usageError as AxiosError]}/>
+                    errors={[
+                        myDaysOff.error as AxiosError,
+                        mutation.error as AxiosError,
+                        usageError as AxiosError,
+                        calendarEvents.error as AxiosError
+                    ]}/>
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Row gutter={16}>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Vacation limit (monthly / yearly)"
+                            <Statistic loading={usageLoading} title={`${TypeLabels.vacation} (monthly / yearly)`}
                                        value={usage?.vacation.used}
                                        suffix={`/ ${usage?.vacation.limit} / ${+(usage?.vacation.limit || 0) * 12}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Sick leave limit (yearly)"
+                            <Statistic loading={usageLoading} title={`${TypeLabels.sickLeave} limit (yearly)`}
                                        value={usage?.sickLeave.used} suffix={`/ ${usage?.sickLeave.limit}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Day off limit (yearly)" value={usage?.dayOff.used}
+                            <Statistic loading={usageLoading} title={`${TypeLabels.dayOff} limit (yearly)`}
+                                       value={usage?.dayOff.used}
                                        suffix={`/ ${usage?.dayOff.limit}`}/>
                         </Col>
                         <Col span={6}>
-                            <Statistic loading={usageLoading} title="Unpaid day off limit (yearly)"
+                            <Statistic loading={usageLoading} title={`${TypeLabels.unpaid} limit (yearly)`}
                                        value={usage?.unpaid.used}/>
                         </Col>
                     </Row>
@@ -213,7 +192,7 @@ export const BookDayOffPage: FC = (props) => {
                 </Card>
                 <Gutter size={2}/>
                 <Card title="Overview" bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
-                    <Calendar dateCellRender={dateCellRender}/>
+                    <AppCalendar events={calendarEvents.data} daysOff={myDaysOff.data}/>
                 </Card>
             </Content>
         </>

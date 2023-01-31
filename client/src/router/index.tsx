@@ -2,13 +2,15 @@ import {createBrowserRouter, createRoutesFromElements, Route} from "react-router
 import {ErrorPage} from "../pages/ErrorPage";
 import {DefaultLayout} from "../layouts/DefaultLayout";
 import {HomePage} from "../pages/HomePage";
-import {AdminRoutes, AppRoutes} from "./AppRoutes";
+import {AdminRoutes, AppRoutes, EditorRoutes} from "./AppRoutes";
 import {BookDayOffPage} from "../pages/BookDayOffPage";
 import {ProfilePage} from "../pages/ProfilePage";
 import {ManageUsersPage} from "../pages/admin/ManageUsersPage";
-import {ConfirmDayOffPage} from "../pages/admin/ConfirmDayOffPage";
+import {ConfirmDayOffPage} from "../pages/editor/ConfirmDayOffPage";
 import {RequireAuth} from "../wrappers/RequireAuth";
 import RequireAdmin from "../wrappers/RequireAdmin";
+import RequireEditor from "../wrappers/RequireEditor";
+import {HolidaysAndCelebrationsPage} from "../pages/editor/HolidaysAndCelebrations";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -29,14 +31,20 @@ export const router = createBrowserRouter(
                         path={AppRoutes.profile}
                         element={<ProfilePage/>}
                     />
+                    <Route element={<RequireEditor/>}>
+                        <Route
+                            path={EditorRoutes.confirmDayOff}
+                            element={<ConfirmDayOffPage/>}
+                        />
+                        <Route
+                            path={EditorRoutes.holidaysAndCelebrations}
+                            element={<HolidaysAndCelebrationsPage/>}
+                        />
+                    </Route>
                     <Route element={<RequireAdmin/>}>
                         <Route
                             path={AdminRoutes.manageUsers}
                             element={<ManageUsersPage/>}
-                        />
-                        <Route
-                            path={AdminRoutes.confirmDayOff}
-                            element={<ConfirmDayOffPage/>}
                         />
                     </Route>
                 </Route>

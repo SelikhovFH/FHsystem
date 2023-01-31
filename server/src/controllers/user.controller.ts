@@ -3,6 +3,7 @@ import {CreateUserDto} from '@dtos/user.dto';
 import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
 import * as mongoose from "mongoose";
+import {UserRole} from "@interfaces/user.interface";
 
 class UserController {
   private authOService = new Auth0Service()
@@ -13,8 +14,12 @@ class UserController {
       const userData: CreateUserDto = req.body;
       const mongoUserId = new mongoose.Types.ObjectId()
       const {user_id} = await this.authOService.createUser({...userData, dbId: mongoUserId.toString()})
-      if (userData.isAdmin) {
-        await this.authOService.assignAdminPermission(user_id)
+      if (userData.role !== UserRole.editor) {
+        const permissions = ['editor:editor'] as ('admin:admin' | 'editor:editor')[]
+        if (userData.role === UserRole.admin) {
+          permissions.push('admin:admin')
+        }
+        await this.authOService.assignPermissions(user_id, permissions)
       }
       const data = await this.authOService.sendSignupInvitation(user_id)
       await this.userService.createUser({auth0id: user_id, _id: mongoUserId.toString()})

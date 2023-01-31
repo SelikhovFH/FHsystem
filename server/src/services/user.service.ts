@@ -9,7 +9,7 @@ class UserService {
     return findUser;
   }
 
-  public async createUser(data: { auth0id: string; _id: string }): Promise<User> {
+  public async createUser(data: { auth0id: string; _id: string; }): Promise<User> {
     const createUserData: User = await this.user.create(data);
     return createUserData;
   }

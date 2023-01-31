@@ -14,6 +14,10 @@ import {Routes} from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
 import {logger, stream} from '@utils/logger';
 import {authMiddleware} from "@middlewares/auth.middleware";
+import dayjs from 'dayjs';
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween)
 
 class App {
   public app: express.Application;

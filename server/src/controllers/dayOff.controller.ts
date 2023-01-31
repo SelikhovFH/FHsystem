@@ -3,16 +3,20 @@ import DayOffService from "@services/dayOff.service";
 import {ConfirmDayOffDto, CreateDayOffDto} from "@dtos/dayOff.dto";
 import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
+import CalendarEventService from "@services/calendarEvent.service";
 
 class DayOffController {
   private dayOffService = new DayOffService()
   private authOservice = new Auth0Service()
   private userService = new UserService()
+  private calendarEventService = new CalendarEventService()
+
 
   createDayOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.auth.payload.db_id as string
       const dayOffData: CreateDayOffDto = req.body;
+      await this.calendarEventService.validateDayOff(dayOffData)
       await this.dayOffService.validateDayOff(userId, dayOffData)
       const dayCount = this.dayOffService.calculateDayOffDayCount(dayOffData)
       const data = await this.dayOffService.createDayOff({...dayOffData, userId, dayCount})

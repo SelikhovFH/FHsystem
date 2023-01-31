@@ -4,7 +4,11 @@ export enum AppRoutes {
     profile = "/profile"
 }
 
-export enum AdminRoutes {
+export enum EditorRoutes {
     confirmDayOff = "/confirm_day_off",
+    holidaysAndCelebrations = "/holidays_and_celebrations"
+}
+
+export enum AdminRoutes {
     manageUsers = "/manage_users"
 }

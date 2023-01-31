@@ -1,10 +1,10 @@
 import {FC, useState} from "react";
-import {CheckSquareOutlined, CoffeeOutlined, HomeOutlined, UserAddOutlined, UserOutlined,} from '@ant-design/icons';
 import type {MenuProps} from 'antd';
 import {Layout, Menu, theme, Typography} from 'antd';
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
-import {AdminRoutes, AppRoutes} from "../router/AppRoutes";
+import {AdminRoutes, AppRoutes, EditorRoutes} from "../router/AppRoutes";
 import {useAuth0} from "@auth0/auth0-react";
+import {UserRole} from "../shared/user.interface";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {Title} = Typography;
@@ -28,17 +28,34 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Homepage', AppRoutes.index, <HomeOutlined/>),
-    getItem('Book day off', AppRoutes.bookDayOff, <CoffeeOutlined/>),
-    getItem('Profile', AppRoutes.profile, <UserOutlined/>),
+    getItem('🏠 Homepage', AppRoutes.index,),
+    getItem('📅 Book day off', AppRoutes.bookDayOff),
+    getItem('👤 Profile', AppRoutes.profile,),
 ];
+
+const editorItems = [
+    getItem('Editor', 'editor', null, [
+        getItem('✅ Confirm day off', EditorRoutes.confirmDayOff),
+        getItem('🎉 Holidays & celebrations', EditorRoutes.holidaysAndCelebrations)
+    ], 'group'),
+]
 
 const adminItems = [
     getItem('Admin', 'admin', null, [
-        getItem('Manage users', AdminRoutes.manageUsers, <UserAddOutlined/>),
-        getItem('Confirm day off', AdminRoutes.confirmDayOff, <CheckSquareOutlined/>)
+        getItem('👥 Manage users', AdminRoutes.manageUsers,),
     ], 'group'),
 ]
+
+const getMenuItemsByRole = (role: UserRole) => {
+    switch (role) {
+        case UserRole.user:
+            return items
+        case UserRole.editor:
+            return items.concat(editorItems)
+        case UserRole.admin:
+            return items.concat(editorItems).concat(adminItems)
+    }
+}
 
 type Props = {}
 
@@ -56,7 +73,7 @@ export const DefaultLayout: FC<Props> = (props) => {
                     navigate(e.key)
                 }}
                       defaultSelectedKeys={[location.pathname]} mode="inline"
-                      items={user?.is_admin ? items.concat(adminItems) : items}/>
+                      items={getMenuItemsByRole(user?.role)}/>
             </Sider>
             <Layout>
 

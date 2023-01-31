@@ -5,13 +5,13 @@ import {AppRoutes} from "../router/AppRoutes";
 import {UserRole} from "../shared/user.interface";
 
 
-const RequireAdmin: FC = () => {
+const RequireEditor: FC = () => {
     const {user,} = useAuth0();
     const navigate = useNavigate()
-    if (user?.role !== UserRole.admin) {
+    if (!(user?.role === UserRole.admin || user?.role === UserRole.editor)) {
         navigate(AppRoutes.index);
         return null
     }
     return <Outlet/>;
 };
-export default RequireAdmin;
+export default RequireEditor;

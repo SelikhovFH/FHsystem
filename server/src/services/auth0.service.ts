@@ -7,6 +7,7 @@ import {
 } from "@config";
 import {ManagementClient, UpdateUserData} from "auth0";
 import {generate} from "generate-password";
+import {UserRole} from "@interfaces/user.interface";
 
 class Auth0Service {
   private management = new ManagementClient({
@@ -18,7 +19,7 @@ class Auth0Service {
   constructor() {
   }
 
-  public async createUser({dbId, isAdmin, email}: { email: string, isAdmin: boolean, dbId: string }) {
+  public async createUser({dbId, role, email}: { email: string, dbId: string; role: UserRole }) {
     return this.management.createUser({
       email: email,
       password: generate({
@@ -27,7 +28,7 @@ class Auth0Service {
         symbols: true
       }),
       connection: "Username-Password-Authentication",
-      user_metadata: {is_admin: isAdmin, db_id: dbId},
+      user_metadata: {role, db_id: dbId},
       verify_email: false
     })
   }
@@ -40,12 +41,12 @@ class Auth0Service {
     return this.management.createPasswordChangeTicket({user_id, result_url: CLIENT_URL, mark_email_as_verified: true,})
   }
 
-  public async assignAdminPermission(id: string) {
+  public async assignPermissions(id: string, permissions: ('admin:admin' | 'editor:editor')[]) {
     return this.management.assignPermissionsToUser({id}, {
-      permissions: [{
-        permission_name: "admin:admin",
+      permissions: permissions.filter(Boolean).map(p => ({
+        permission_name: p,
         resource_server_identifier: AUTH0_AUDIENCE,
-      }]
+      }))
     })
   }
 

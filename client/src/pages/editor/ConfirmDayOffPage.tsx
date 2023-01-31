@@ -21,12 +21,12 @@ export const ConfirmDayOffPage: FC<Props> = (props) => {
     const requestMessages = useRequestMessages('USER_REGISTER')
     const {getAccessTokenSilently} = useAuth0()
     const pendingDaysOff = useQuery<(DayOff & { user: { email: string, picture: string }, dayOffExceedsLimit: boolean })[]>("/days_off/pending", async () => {
-        const token = await getAccessTokenSilently({scope: 'admin:admin'})
+        const token = await getAccessTokenSilently({scope: 'editor:editor'})
         const res = await API.get(`/days_off/pending`, getRequestConfig(token))
         return res.data.data
     })
     const mutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently({scope: 'admin:admin'})
+        const token = await getAccessTokenSilently({scope: 'editor:editor'})
         requestMessages.onLoad()
         const res = await API.patch('/days_off/confirm', data, getRequestConfig(token))
         return res.data.data
