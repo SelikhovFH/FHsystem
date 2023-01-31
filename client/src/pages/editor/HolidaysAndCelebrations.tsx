@@ -200,22 +200,33 @@ export const HolidaysAndCelebrationsPage: FC = () => {
                 <Gutter size={2}/>
                 <Card className={styles.tdHack} title="Add events" bordered={false}
                       style={{boxShadow: "none", borderRadius: 4}}>
-                    <AppCalendar onSelect={onSelect} events={calendarEvents.data} renderEvent={e => (
-                        <EventWithControls key={e._id} event={e}
-                                           onDelete={(id: string) => deleteMutation.mutate(id as any)}
-                                           isLoading={deleteMutation.isLoading || editMutation.isLoading}
-                                           onFinish={onEditFinish}/>)} renderDateCell={(value, children) => (
-                        <Popover placement={'left'}
-                                 content={<AddOrUpdateForm form={form} buttonDisabled={addMutation.isLoading}
-                                                           buttonText={"Add event"} onFinish={onAddFinish}/>}
-                                 title={`Add event for ${formatDate(selectedDate!)}`}
-                                 trigger="click"
-                        >
-                            <AppCalendar.DayCell value={value}>
-                                {children}
-                            </AppCalendar.DayCell>
-                        </Popover>
-                    )}/>
+                    <AppCalendar
+                        showDaysOff={false}
+                        onSelect={onSelect}
+                        events={calendarEvents.data}
+                        renderEvent={e => (
+                            <EventWithControls key={e._id} event={e}
+                                               onDelete={(id: string) => deleteMutation.mutate(id as any)}
+                                               isLoading={deleteMutation.isLoading || editMutation.isLoading}
+                                               onFinish={onEditFinish}/>)}
+                        renderDateCell={(value, children) => {
+                            // console.log(value)
+                            return (
+                                <Popover placement={'left'}
+                                         content={<AddOrUpdateForm form={form}
+                                                                   buttonDisabled={addMutation.isLoading}
+                                                                   buttonText={"Add event"}
+                                                                   onFinish={onAddFinish}/>}
+                                         title={`Add event for ${formatDate(selectedDate!)}`}
+                                         trigger="click"
+                                >
+                                    <div>
+                                        <AppCalendar.DayCell value={value}>
+                                            {children}
+                                        </AppCalendar.DayCell>
+                                    </div>
+                                </Popover>);
+                        }}/>
                 </Card>
             </Content>
         </>

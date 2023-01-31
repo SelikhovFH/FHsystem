@@ -100,15 +100,29 @@ export const BookDayOffPage: FC = (props) => {
         warningOnly: true
     }
     const dateValidationIntersectionRule: Rule = {
-        message: 'New day off intersects with previously created',
+        message: 'New day off intersects with previously created or with calendar events',
         validator: (_, value: [Dayjs, Dayjs]) => {
             //Validation logic is same with backend but has slightly different implementation
+            if (!calendarEvents.data || !myDaysOff.data) {
+                return Promise.reject('Error while loading data for check');
+            }
+            const holidayCalendarEvents = calendarEvents.data.filter(d => d.isDayOff)
+
+            const dayOffYear = dayjs(value[0]).year()
+            const intersectingHolidayCalendarEvent = holidayCalendarEvents
+                .find(h => dayjs(h.date).set('year', dayOffYear).isBetween(value[0], value[1], 'day', '[]'))
+
+            if (intersectingHolidayCalendarEvent) {
+                return Promise.reject('New day off intersects with previously created or with calendar events');
+            }
+
             const intersectingDaysOff = myDaysOff.data?.filter(d => d.status !== DayOffStatus.declined).find(d => {
                 return dayjs(d.startDate).isBetween(value[0], value[1], 'day', '[]')
                     || dayjs(d.finishDate).isBetween(value[0], value[1], 'day', '[]')
             })
+
             if (intersectingDaysOff) {
-                return Promise.reject('New day off intersects with previously created');
+                return Promise.reject('New day off intersects with previously created or with calendar events');
             }
             return Promise.resolve();
         },
