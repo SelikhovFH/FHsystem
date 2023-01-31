@@ -18,9 +18,8 @@ class CalendarEventController {
 
   updateCalendarEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.auth.payload.db_id as string
       const calendarEventData: UpdateCalendarEventDto = req.body;
-      const data = await this.calendarEventService.updateCalendarEvent(calendarEventData.id, calendarEventData)
+      const data = await this.calendarEventService.updateCalendarEvent(calendarEventData._id, calendarEventData)
       res.status(200).json({message: 'OK', data});
     } catch (error) {
       next(error);

@@ -10,12 +10,12 @@ class CalendarEventService {
     return this.calendarEvent.create({...data, date: new Date(data.date)});
   }
 
-  public async updateCalendarEvent(id: string, data: Partial<UpdateCalendarEventDto>): Promise<CalendarEvent> {
-    return this.calendarEvent.findOneAndUpdate({_id: id}, {...data, date: new Date(data.date)});
+  public async updateCalendarEvent(_id: string, data: Partial<UpdateCalendarEventDto>): Promise<CalendarEvent> {
+    return this.calendarEvent.findOneAndUpdate({_id}, {...data, date: new Date(data.date)});
   }
 
-  public async deleteCalendarEvent(id: string) {
-    return this.calendarEvent.findOneAndDelete({id})
+  public async deleteCalendarEvent(_id: string) {
+    return this.calendarEvent.findOneAndDelete({_id})
   }
 
   public async getCalendarEventsForCurrentYear(): Promise<CalendarEvent[]> {

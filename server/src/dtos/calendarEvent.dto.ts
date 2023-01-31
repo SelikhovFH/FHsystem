@@ -1,15 +1,18 @@
-import {IsBoolean, IsString} from 'class-validator';
+import {IsBoolean, IsOptional, IsString} from 'class-validator';
 
 export class CreateCalendarEventDto {
   @IsString()
   title: string
   @IsString()
+  @IsOptional()
   description: string
   @IsString()
   date: string
   @IsBoolean()
+  @IsOptional()
   isDayOff: boolean
   @IsBoolean()
+  @IsOptional()
   isRecurring: boolean
 }
 
@@ -21,6 +24,6 @@ export class CreateCalendarEventBackendDto extends CreateCalendarEventDto {
 
 export class UpdateCalendarEventDto extends CreateCalendarEventDto {
   @IsString()
-  id: string
+  _id: string
 
 }
