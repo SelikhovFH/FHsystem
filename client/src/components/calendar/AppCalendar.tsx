@@ -39,7 +39,7 @@ export const AppCalendar: AppCalendarType = ({
                 return false
             }
             // @ts-ignore
-            return dayjs(d.date).dayOfYear() === value.dayOfYear()
+            return dayjs(d.date).date() === value.date() && dayjs(d.date).month() === value.month()
         }) ?? []
 
 
