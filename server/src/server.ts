@@ -5,9 +5,17 @@ import validateEnv from '@utils/validateEnv';
 import DaysOffRoute from "@routes/daysOff.route";
 import CalendarEventsRoute from "@routes/calendarEvent.route";
 import ItemsRoute from "@routes/item.route";
+import DevicesRoute from "@routes/device.route";
 
 validateEnv();
 
-const app = new App([new IndexRoute(), new UsersRoute(), new DaysOffRoute(), new CalendarEventsRoute(), new ItemsRoute()]);
+const app = new App([
+  new IndexRoute(),
+  new UsersRoute(),
+  new DaysOffRoute(),
+  new CalendarEventsRoute(),
+  new ItemsRoute(),
+  new DevicesRoute()
+]);
 
 app.listen();
