@@ -26,7 +26,7 @@ export class CreateDeviceDto {
   owner: deviceOwnerUnion
   @IsString()
   @IsOptional()
-  assignedTo: string | null
+  assignedToId: string | null
   @IsString()
   @IsOptional()
   notes?: string

@@ -17,6 +17,10 @@ class ItemService {
     return this.item.findOneAndDelete({_id})
   }
 
+  public async getItemById(_id: string) {
+    return this.item.findOne({_id})
+  }
+
   public async getItems(): Promise<Item[]> {
     return this.item.find()
   }

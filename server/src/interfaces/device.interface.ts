@@ -1,3 +1,5 @@
+import {User} from "@interfaces/user.interface";
+
 export interface Device {
   _id: string
   name: string
@@ -8,10 +10,15 @@ export interface Device {
   storage?: number
   serialNumber?: string
   owner: deviceOwnerUnion
-  assignedTo: string | null
+  assignedToId: string | null
   notes?: string
 
 }
+
+export interface DeviceResponse extends Device {
+  assignedToUser: User
+}
+
 
 export type deviceOwnerUnion = 'FH' | 'Personal' | string
 

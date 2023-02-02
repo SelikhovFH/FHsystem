@@ -6,6 +6,7 @@ import DaysOffRoute from "@routes/daysOff.route";
 import CalendarEventsRoute from "@routes/calendarEvent.route";
 import ItemsRoute from "@routes/item.route";
 import DevicesRoute from "@routes/device.route";
+import DeliveriesRoute from "@routes/delivery.route";
 
 validateEnv();
 
@@ -15,7 +16,8 @@ const app = new App([
   new DaysOffRoute(),
   new CalendarEventsRoute(),
   new ItemsRoute(),
-  new DevicesRoute()
+  new DevicesRoute(),
+  new DeliveriesRoute()
 ]);
 
 app.listen();

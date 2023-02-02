@@ -17,8 +17,17 @@ class DeviceService {
     return this.device.findOneAndDelete({_id})
   }
 
+  public async getDeviceById(_id: string) {
+    return this.device.findOne({_id})
+  }
+
   public async getDevices(): Promise<Device[]> {
-    return this.device.find()
+    return this.device.aggregate().lookup({
+      from: "users",
+      as: "assignedToUser",
+      localField: "assignedToId",
+      foreignField: "_id"
+    }).exec()
   }
 
 }
