@@ -4,11 +4,14 @@ import {Outlet, useNavigate} from "react-router-dom";
 import {AppRoutes} from "../router/AppRoutes";
 import {UserRole} from "../shared/user.interface";
 
-
-const RequireEditor: FC = () => {
+export const useIsEditor = () => {
     const {user,} = useAuth0();
+    return user?.role === UserRole.admin || user?.role === UserRole.editor
+}
+const RequireEditor: FC = () => {
+    const isEditor = useIsEditor()
     const navigate = useNavigate()
-    if (!(user?.role === UserRole.admin || user?.role === UserRole.editor)) {
+    if (!isEditor) {
         navigate(AppRoutes.index);
         return null
     }

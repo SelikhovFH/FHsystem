@@ -15,13 +15,12 @@ export const UserSelect: FC<Props> = (props) => {
         const res = await API.get(`/users?page=${0}&per_page=${100}`, getRequestConfig(token))
         return res.data.data
     },)
-    // @ts-ignore TODO check if this will work after user updates
 
     const options = useMemo(() => data?.map(user => ({
-        value: user.user_metadata.db_id,
+        value: user._id,
+        // @ts-ignore TODO check if this will work after user updates
         label: user.email
     })) ?? [], [data])
-    console.log(options)
     return (
         <Select
             {...props}

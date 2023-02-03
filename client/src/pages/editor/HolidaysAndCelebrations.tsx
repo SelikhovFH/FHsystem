@@ -16,9 +16,9 @@ import * as yup from 'yup'
 import {getYupRule} from "../../utils/yupRule";
 import {formatDate} from "../../utils/dates";
 import styles from './HolidaysAndCelebrations.module.css'
-import {FormInstance} from "antd/es/form/hooks/useForm";
 import {Event} from "../../components/calendar/Event";
 import {AppCalendar} from "../../components/calendar/AppCalendar";
+import {FormProps} from "../../utils/types";
 
 type EventProps = {
     event: CalendarEvent
@@ -26,14 +26,6 @@ type EventProps = {
 
     isLoading: boolean
     onFinish: (values: any) => void
-}
-
-type FormProps = {
-    form: FormInstance
-    onFinish: (values: any) => void
-    buttonDisabled: boolean
-    buttonText: string
-    initialValues?: any
 }
 
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {

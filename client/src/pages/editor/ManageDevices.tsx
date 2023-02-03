@@ -1,10 +1,10 @@
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import {AppHeader} from "../../layouts/Header";
 import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table} from "antd";
+import {Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table, Tooltip} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
@@ -12,12 +12,13 @@ import {queryClient} from "../../services/queryClient";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import * as yup from 'yup'
 import {getYupRule} from "../../utils/yupRule";
-import {FormInstance} from "antd/es/form/hooks/useForm";
 import {Device, DeviceType} from "../../shared/device.interface";
 import {UserSelect} from "../../components/form/UserSelect";
-import styles from "./ManageDevices.module.css"
+import styles from "./FormStyles.module.css"
 import {DeviceTypeLabels} from "../../sections/devices";
 import {ColumnsType} from "antd/es/table";
+import {FormProps} from "../../utils/types";
+import {useIsAdmin} from "../../wrappers/RequireAdmin";
 
 const {Content} = Layout;
 
@@ -34,15 +35,10 @@ const schema = yup.object().shape({
     notes: yup.string()
 });
 
-type FormProps = {
-    form: FormInstance
-    onFinish: (values: any) => void
-    buttonDisabled: boolean
-    buttonText: string
-    initialValues?: any
-}
-
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {
+    useEffect(() => {
+        form.resetFields()
+    }, [form, initialValues])
     return <Form className={styles.form} initialValues={initialValues} form={form} name="device"
                  layout={"vertical"}
                  onFinish={onFinish}
@@ -87,7 +83,7 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
         </Form.Item>
         <Form.Item rules={[getYupRule(schema)]} label="Notes"
                    name="notes">
-            <Input/>
+            <Input.TextArea rows={4}/>
         </Form.Item>
         <Form.Item>
             <Button disabled={buttonDisabled} type="primary" htmlType="submit">
@@ -98,6 +94,7 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
 }
 
 export const ManageDevicesPage: FC = () => {
+    const isAdmin = useIsAdmin()
     const [addForm] = Form.useForm()
     const [editForm] = Form.useForm()
 
@@ -110,18 +107,14 @@ export const ManageDevicesPage: FC = () => {
         setIsAddOpen(true);
     };
 
-    const showEditModal = () => {
-        setIsEditOpen(true);
-    };
-
     const handleAddCancel = () => {
         addForm.resetFields()
         setIsAddOpen(false);
     };
 
     const handleEditCancel = () => {
-        editForm.resetFields()
         setDeviceToEdit(null)
+        editForm.resetFields()
         setIsEditOpen(false);
     };
 
@@ -268,6 +261,19 @@ export const ManageDevicesPage: FC = () => {
             dataIndex: 'operations',
             key: 'operations',
             render: (_, record) => {
+                if (!isAdmin) {
+                    return <Tooltip title="Only admins can edit and update devices">
+                        <Space>
+                            <Button disabled type={"primary"} icon={<EditOutlined/>}>
+                            </Button>
+                            <Button disabled danger
+                                    type={"primary"}
+                                    icon={<DeleteOutlined/>}>
+                            </Button>
+
+                        </Space>
+                    </Tooltip>
+                }
                 return <Space>
                     <Button onClick={() => onEditClick(record)} type={"primary"} icon={<EditOutlined/>}>
                     </Button>
@@ -321,7 +327,9 @@ export const ManageDevicesPage: FC = () => {
                     </Button>
                 </Card>
                 <Gutter size={2}/>
-                <Table scroll={{x: true}} loading={devices.isLoading} dataSource={devices.data} columns={columns}/>
+                <Table scroll={{x: true}} loading={devices.isLoading} dataSource={devices.data} columns={columns}
+
+                />
             </Content>
         </>
     )
