@@ -1,4 +1,4 @@
-import {User} from "@interfaces/user.interface";
+import {User} from "./user.interface";
 
 export interface Device {
   _id: string

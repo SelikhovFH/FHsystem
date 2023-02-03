@@ -4,7 +4,7 @@ import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Alert, Button, Card, Checkbox, Form, Input, Layout, Popover, Space, theme} from "antd";
+import {Alert, Button, Card, Checkbox, Form, Input, Layout, Popover, Space} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
@@ -72,7 +72,6 @@ export const EventWithControls: FC<EventProps> = ({event, onDelete, onFinish, is
             {showEditForm ? <AddOrUpdateForm form={form} initialValues={{
                 ...event
             }} onFinish={(v) => {
-                console.log(event)
                 onFinish({
                     ...v,
                     _id: event._id,
@@ -115,7 +114,6 @@ const schema = yup.object().shape({
 });
 
 export const HolidaysAndCelebrationsPage: FC = () => {
-    const {token} = theme.useToken()
     const [form] = Form.useForm()
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>();
     const onSelect = (newValue: Dayjs) => {
@@ -210,7 +208,6 @@ export const HolidaysAndCelebrationsPage: FC = () => {
                                                isLoading={deleteMutation.isLoading || editMutation.isLoading}
                                                onFinish={onEditFinish}/>)}
                         renderDateCell={(value, children) => {
-                            // console.log(value)
                             return (
                                 <Popover placement={'left'}
                                          content={<AddOrUpdateForm form={form}
