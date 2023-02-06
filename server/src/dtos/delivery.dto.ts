@@ -31,3 +31,14 @@ export class UpdateDeliveryDto extends CreateDeliveryDto {
   _id: string
 
 }
+
+export class GetDeliveryDto {
+  @IsString()
+  @IsOptional()
+  user: string
+
+  @IsEnum(DeliveryStatus)
+  @IsOptional()
+  status: DeliveryStatus
+
+}

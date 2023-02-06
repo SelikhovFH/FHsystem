@@ -14,6 +14,7 @@ import {HolidaysAndCelebrationsPage} from "../pages/editor/HolidaysAndCelebratio
 import {ManageDevicesPage} from "../pages/editor/ManageDevices";
 import {ManageItemsPage} from "../pages/editor/ManageItems";
 import {ManageDeliveriesPage} from "../pages/editor/ManageDeliveries";
+import {MyDeliveriesPage} from "../pages/MyDeliveriesPage";
 
 // TODO Dynamic module import
 
@@ -35,6 +36,10 @@ export const router = createBrowserRouter(
                     <Route
                         path={AppRoutes.profile}
                         element={<ProfilePage/>}
+                    />
+                    <Route
+                        path={AppRoutes.myDeliveries}
+                        element={<MyDeliveriesPage/>}
                     />
                     <Route element={<RequireEditor/>}>
                         <Route

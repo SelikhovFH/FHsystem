@@ -4,6 +4,7 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import {isAdminMiddleware, isEditorMiddleware} from "@middlewares/auth.middleware";
 import UserController from "@controllers/user.controller";
 import {CreateUserDto} from "@dtos/user.dto";
+import {PaginationDto} from "@dtos/common.dto";
 
 class UsersRoute implements Routes {
   public path = '/users';
@@ -17,7 +18,7 @@ class UsersRoute implements Routes {
   private initializeRoutes() {
     this.router.post(`${this.path}/register`, isAdminMiddleware,
       validationMiddleware(CreateUserDto, 'body'), this.userController.registerUser);
-    this.router.get(`${this.path}`, isEditorMiddleware, this.userController.getUsers);
+    this.router.get(`${this.path}`, isEditorMiddleware, validationMiddleware(PaginationDto, 'query'), this.userController.getUsers);
   }
 }
 

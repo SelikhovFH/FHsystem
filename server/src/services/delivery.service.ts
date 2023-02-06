@@ -2,6 +2,7 @@ import deliveryModel from "@models/delivery.model";
 import {CreateDeliveryDto, UpdateDeliveryDto} from "@dtos/delivery.dto";
 import {Delivery} from "@interfaces/delivery.interface";
 import {HttpException} from "@exceptions/HttpException";
+import * as mongoose from "mongoose";
 
 class DeliveryService {
   private delivery = deliveryModel;
@@ -21,8 +22,12 @@ class DeliveryService {
     return this.delivery.findOne({_id});
   }
 
-  public async getDeliveries(): Promise<Delivery[]> {
+  public async getDeliveries(status?: string, user?: string): Promise<Delivery[]> {
     return this.delivery.aggregate()
+      .match({
+        ...(status ? {status} : {}),
+        ...(user ? {deliverToId: new mongoose.Types.ObjectId(user)} : {}),
+      })
       .lookup({
         from: "users",
         as: "deliverToUser",
@@ -59,7 +64,7 @@ class DeliveryService {
   public async getUserDeliveries(userId: string): Promise<Delivery[]> {
     return this.delivery.aggregate()
       .match({
-        deliverToId: userId
+        deliverToId: new mongoose.Types.ObjectId(userId)
       })
       .lookup({
         from: "items",
@@ -74,10 +79,12 @@ class DeliveryService {
         foreignField: "_id"
       })
       .unwind({
-        path: "$item"
+        path: "$item",
+        preserveNullAndEmptyArrays: true
       })
       .unwind({
-        path: "$device"
+        path: "$device",
+        preserveNullAndEmptyArrays: true
       })
       .exec()
   }

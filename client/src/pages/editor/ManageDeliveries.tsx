@@ -4,7 +4,7 @@ import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Button, Card, DatePicker, Form, Input, Layout, Modal, Radio, Select, Table, Tag} from "antd";
+import {Button, Card, DatePicker, Form, Input, Layout, Modal, Radio, Select, Space, Table} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
@@ -24,6 +24,7 @@ import {formatDate} from "../../utils/dates";
 import {renderUserCell} from "../../components/table/RenderUserCell";
 import {Device} from "../../shared/device.interface";
 import dayjs from "dayjs";
+import {renderDeliveryStatus} from "../../sections/deliveries";
 
 const {Content} = Layout;
 
@@ -122,6 +123,10 @@ export const ManageDeliveriesPage: FC = () => {
     const [addForm] = Form.useForm()
     const [editForm] = Form.useForm()
 
+    const [selectedUser, setSelectedUser] = useState<string | null>(null)
+    const [selectedStatus, setSelectedStatus] = useState<DeliveryStatus | null>(null)
+
+
     const addPayload = Form.useWatch('payload', addForm);
     useEffect(() => {
         if (addPayload === "item") {
@@ -166,9 +171,13 @@ export const ManageDeliveriesPage: FC = () => {
 
     const requestMessages = useRequestMessages('DELIVERIES')
     const {getAccessTokenSilently} = useAuth0()
-    const deliveries = useQuery<DeliveryResponse[]>("/deliveries", async () => {
+    const deliveries = useQuery<DeliveryResponse[]>(["/deliveries", selectedUser, selectedStatus], async () => {
         const token = await getAccessTokenSilently()
-        const res = await API.get(`/deliveries`, getRequestConfig(token))
+        const params = new URLSearchParams({
+            ...(selectedUser ? {user: selectedUser} : {}),
+            ...(selectedStatus ? {status: selectedStatus} : {}),
+        });
+        const res = await API.get(`/deliveries?${params.toString()}`, getRequestConfig(token))
         return res.data.data
     })
 
@@ -250,19 +259,7 @@ export const ManageDeliveriesPage: FC = () => {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            render: (text: DeliveryStatus) => {
-                switch (text) {
-                    case DeliveryStatus.toSend:
-                        return <Tag color="default">To send</Tag>;
-                    case DeliveryStatus.sent:
-                        return <Tag color="processing">Sent</Tag>
-                    case DeliveryStatus.delivered:
-                        return <Tag color="success">Delivered</Tag>
-                    case DeliveryStatus.canceled:
-                        return <Tag color="error">Canceled</Tag>
-
-                }
-            },
+            render: renderDeliveryStatus,
         },
         {
             title: 'Deliver to User',
@@ -355,9 +352,24 @@ export const ManageDeliveriesPage: FC = () => {
                     ]}/>
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
-                    <Button onClick={showAddModal} type="primary" icon={<PlusOutlined/>}>
-                        Add delivery
-                    </Button>
+                    <Space>
+                        <Form.Item label="Status" style={{marginBottom: 0}}>
+                            <Select
+                                allowClear
+                                options={Object.values(DeliveryStatus).map(v => ({value: v, label: v}))}
+                                style={{minWidth: 100}}
+                                value={selectedStatus}
+                                onChange={v => setSelectedStatus(v as any)}
+                            />
+                        </Form.Item>
+                        <Form.Item label="User" style={{marginBottom: 0}}>
+                            <UserSelect style={{minWidth: 200}} value={selectedUser}
+                                        onChange={v => setSelectedUser(v as any)}/>
+                        </Form.Item>
+                        <Button onClick={showAddModal} type="primary" icon={<PlusOutlined/>}>
+                            Add delivery
+                        </Button>
+                    </Space>
                 </Card>
                 <Gutter size={2}/>
                 <Table scroll={{x: true}} loading={deliveries.isLoading} dataSource={deliveries.data}

@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import DeliveryService from "@services/delivery.service";
-import {CreateDeliveryDto, UpdateDeliveryDto} from "@dtos/delivery.dto";
+import {CreateDeliveryDto, GetDeliveryDto, UpdateDeliveryDto} from "@dtos/delivery.dto";
 import ItemService from "@services/item.service";
 import DeviceService from "@services/device.service";
 import {HttpException} from "@exceptions/HttpException";
@@ -44,10 +44,6 @@ class DeliveryController {
       const deliveryData: UpdateDeliveryDto = req.body;
       this.deliveryService.validateDelivery(deliveryData)
       const prevDelivery = await this.deliveryService.getDeliveryById(deliveryData._id)
-
-      console.log("deliveryData", deliveryData)
-      console.log("prevDelivery", prevDelivery)
-
 
       if (prevDelivery.status === DeliveryStatus.canceled) {
         throw new HttpException(409, `Can't edit cancelled delivery`)
@@ -100,7 +96,8 @@ class DeliveryController {
 
   getDeliveries = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = await this.deliveryService.getDeliveries()
+      const {status, user} = req.query as unknown as GetDeliveryDto;
+      const data = await this.deliveryService.getDeliveries(status, user)
       res.status(200).json({message: 'ok', data});
     } catch (error) {
       next(error);
@@ -111,6 +108,7 @@ class DeliveryController {
   getMyDeliveries = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.auth.payload.db_id as string
+      console.log(userId)
       const data = await this.deliveryService.getUserDeliveries(userId)
       res.status(200).json({message: 'ok', data});
     } catch (error) {
