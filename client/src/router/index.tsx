@@ -13,6 +13,7 @@ import RequireEditor from "../wrappers/RequireEditor";
 import {HolidaysAndCelebrationsPage} from "../pages/editor/HolidaysAndCelebrations";
 import {ManageDevicesPage} from "../pages/editor/ManageDevices";
 import {ManageItemsPage} from "../pages/editor/ManageItems";
+import {ManageDeliveriesPage} from "../pages/editor/ManageDeliveries";
 
 // TODO Dynamic module import
 
@@ -51,6 +52,10 @@ export const router = createBrowserRouter(
                         <Route
                             path={EditorRoutes.manageItems}
                             element={<ManageItemsPage/>}
+                        />
+                        <Route
+                            path={EditorRoutes.manageDeliveries}
+                            element={<ManageDeliveriesPage/>}
                         />
                     </Route>
                     <Route element={<RequireAdmin/>}>

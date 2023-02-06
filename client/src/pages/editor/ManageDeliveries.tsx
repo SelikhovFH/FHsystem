@@ -4,26 +4,49 @@ import {ErrorsBlock} from "../../components/ErrorsBlock";
 import {AxiosError} from "axios/index";
 import {Gutter} from "../../components/Gutter";
 import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table} from "antd";
+import {Button, Card, DatePicker, Form, Input, Layout, Modal, Radio, Select, Table, Tag} from "antd";
 import {useMutation, useQuery} from "react-query";
 import {API, getRequestConfig} from "../../services/api";
 import {useAuth0} from "@auth0/auth0-react";
 import {queryClient} from "../../services/queryClient";
-import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
+import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import * as yup from 'yup'
 import {getYupRule} from "../../utils/yupRule";
 import styles from "./FormStyles.module.css"
 import {ColumnsType} from "antd/es/table";
 import {FormProps} from "../../utils/types";
-import {Item, ItemSize} from "../../shared/item.interface";
+import {Item} from "../../shared/item.interface";
+import {Delivery, DeliveryResponse, DeliveryStatus} from "../../shared/delivery.interface";
+import {UserSelect} from "../../components/form/UserSelect";
+import {ItemSelect} from "../../components/form/ItemSelect";
+import {DeviceSelect} from "../../components/form/DeviceSelect";
+import {formatDate} from "../../utils/dates";
+import {renderUserCell} from "../../components/table/RenderUserCell";
+import {Device} from "../../shared/device.interface";
+import dayjs from "dayjs";
 
 const {Content} = Layout;
 
+
 const schema = yup.object().shape({
-    name: yup.string().required(),
+    status: yup.string().required(),
+    deliverToId: yup.string().required(),
+    deliveryCode: yup.string(),
     description: yup.string(),
-    quantity: yup.number().min(0),
-    size: yup.string()
+    estimatedDeliveryTime: yup.string(),
+    itemId: yup.string().when('payload', {
+        is: (payload: string) => payload === 'item',
+        then: yup.string().required(),
+    }),
+    deviceId: yup.string().when('payload', {
+        is: (payload: string) => payload === 'device',
+        then: yup.string().required(),
+    }),
+    customItem: yup.string().when('payload', {
+        is: (payload: string) => !payload || payload === 'custom',
+        then: yup.string().required(),
+    }),
+    payload: yup.string(),
 });
 
 
@@ -31,28 +54,62 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
     useEffect(() => {
         form.resetFields()
     }, [form, initialValues])
-    return <Form className={styles.form} initialValues={initialValues} form={form} name="item"
+    const defaultPayloadValue = initialValues && (initialValues.itemId ? "item" : initialValues.deviceId && "device") || "custom"
+    return <Form className={styles.form} initialValues={{...initialValues, payload: defaultPayloadValue}} form={form}
+                 name="delivery"
                  layout={"vertical"}
                  onFinish={onFinish}
                  autoComplete="off">
-        <Form.Item rules={[getYupRule(schema)]} label="Name"
-                   name="name">
+        <Form.Item rules={[getYupRule(schema)]} label="Status"
+                   name="status">
+            <Select
+                options={Object.values(DeliveryStatus).map(v => ({value: v, label: v}))}
+            />
+        </Form.Item>
+        <Form.Item rules={[getYupRule(schema)]} label="Deliver to"
+                   name="deliverToId">
+            <UserSelect value={form.getFieldValue("deliverToId")}/>
+        </Form.Item>
+        <Form.Item rules={[getYupRule(schema)]} label="Delivery code"
+                   name="deliveryCode">
             <Input/>
         </Form.Item>
         <Form.Item rules={[getYupRule(schema)]} label="Description"
                    name="description">
-            <Input.TextArea rows={4}/>
+            <Input/>
         </Form.Item>
-        <Form.Item rules={[getYupRule(schema)]} label="Quantity"
-                   name="quantity">
-            <InputNumber min={0}/>
+        <Form.Item rules={[getYupRule(schema)]} label="Estimated delivery time"
+                   name="estimatedDeliveryTime">
+            <DatePicker/>
         </Form.Item>
-        <Form.Item rules={[getYupRule(schema)]} label="Size"
-                   name="size">
-            <Select
-                options={Object.values(ItemSize).map(v => ({value: v, label: v}))}
-            />
+
+        <Form.Item rules={[getYupRule(schema)]} label="Delivery payload" name={"payload"}>
+            <Radio.Group defaultValue={defaultPayloadValue}>
+                <Radio value="item">Item</Radio>
+                <Radio value="device">Device</Radio>
+                <Radio value="custom">Custom</Radio>
+            </Radio.Group>
         </Form.Item>
+        <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) => prevValues.payload !== currentValues.payload}
+        >
+            {({getFieldValue}) =>
+                getFieldValue('payload') === 'item' ? (
+                    <Form.Item name="itemId" label="Item" rules={[getYupRule(schema)]}>
+                        <ItemSelect/>
+                    </Form.Item>
+                ) : getFieldValue('payload') === 'device' ? (
+                        <Form.Item name="deviceId" label="Device" rules={[getYupRule(schema)]}>
+                            <DeviceSelect/>
+                        </Form.Item>)
+                    : (<Form.Item name="customItem" label="Custom item" rules={[getYupRule(schema)]}>
+                        <Input/>
+                    </Form.Item>)
+            }
+        </Form.Item>
+
+
         <Form.Item>
             <Button disabled={buttonDisabled} type="primary" htmlType="submit">
                 {buttonText}
@@ -61,14 +118,36 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
     </Form>
 }
 
-export const ManageItemsPage: FC = () => {
+export const ManageDeliveriesPage: FC = () => {
     const [addForm] = Form.useForm()
     const [editForm] = Form.useForm()
+
+    const addPayload = Form.useWatch('payload', addForm);
+    useEffect(() => {
+        if (addPayload === "item") {
+            addForm.resetFields(['deviceId', 'customItem'])
+        } else if (addPayload === "device") {
+            addForm.resetFields(['itemId', 'customItem'])
+        } else if (addPayload === "custom") {
+            addForm.resetFields(['itemId', 'deviceId'])
+        }
+    }, [addPayload])
+    const editPayload = Form.useWatch('payload', editForm);
+    useEffect(() => {
+        if (editPayload === "item") {
+            editForm.resetFields(['deviceId', 'customItem'])
+        } else if (editPayload === "device") {
+            editForm.resetFields(['itemId', 'customItem'])
+        } else if (editPayload === "custom") {
+            editForm.resetFields(['itemId', 'deviceId'])
+        }
+    }, [editPayload])
+
 
     const [isAddOpen, setIsAddOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
-    const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
+    const [itemToEdit, setItemToEdit] = useState<Delivery | null>(null);
 
     const showAddModal = () => {
         setIsAddOpen(true);
@@ -85,24 +164,24 @@ export const ManageItemsPage: FC = () => {
         setIsEditOpen(false);
     };
 
-    const requestMessages = useRequestMessages('ITEMS')
+    const requestMessages = useRequestMessages('DELIVERIES')
     const {getAccessTokenSilently} = useAuth0()
-    const items = useQuery<Item[]>("/items", async () => {
+    const deliveries = useQuery<DeliveryResponse[]>("/deliveries", async () => {
         const token = await getAccessTokenSilently()
-        const res = await API.get(`/items`, getRequestConfig(token))
+        const res = await API.get(`/deliveries`, getRequestConfig(token))
         return res.data.data
     })
 
     const addMutation = useMutation(async (data) => {
         const token = await getAccessTokenSilently()
         requestMessages.onLoad()
-        const res = await API.post('/items', data, getRequestConfig(token))
+        const res = await API.post('/deliveries', data, getRequestConfig(token))
         return res.data.data
     }, {
         onSuccess: async () => {
             requestMessages.onSuccess()
             addForm.resetFields()
-            await queryClient.invalidateQueries({queryKey: ['/items']})
+            await queryClient.invalidateQueries({queryKey: ['/deliveries']})
             setIsAddOpen(false);
         },
         onError: async () => {
@@ -114,12 +193,12 @@ export const ManageItemsPage: FC = () => {
         const token = await getAccessTokenSilently()
         requestMessages.onLoad()
         editForm.resetFields()
-        const res = await API.patch('/items', data, getRequestConfig(token))
+        const res = await API.patch('/deliveries', data, getRequestConfig(token))
         return res.data.data
     }, {
         onSuccess: async () => {
             requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/items']})
+            await queryClient.invalidateQueries({queryKey: ['/deliveries']})
             setIsEditOpen(false);
             setItemToEdit(null)
         },
@@ -131,40 +210,70 @@ export const ManageItemsPage: FC = () => {
     const deleteMutation = useMutation(async (id) => {
         const token = await getAccessTokenSilently()
         requestMessages.onLoad()
-        const res = await API.delete(`/items/${id}`, getRequestConfig(token))
+        const res = await API.delete(`/deliveries/${id}`, getRequestConfig(token))
         return res.data.data
     }, {
         onSuccess: async () => {
             requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/items']})
+            await queryClient.invalidateQueries({queryKey: ['/deliveries']})
         },
         onError: async () => {
             requestMessages.onError()
         },
     })
 
-    const onAddFinish = (values: any) => {
-        addMutation.mutate(values)
+    const onAddFinish = (_values: any) => {
+        const {payload, ...values} = _values
+        addMutation.mutate({...values, estimatedDeliveryTime: values.estimatedDeliveryTime.toISOString()})
     }
 
-    const onEditFinish = (values: any) => {
-        editMutation.mutate({_id: itemToEdit?._id, ...values})
+    const onEditFinish = (_values: any) => {
+        const {payload, ...values} = _values
+        editMutation.mutate({
+            _id: itemToEdit?._id, ...values,
+            estimatedDeliveryTime: values.estimatedDeliveryTime.toISOString()
+        })
     }
 
     const onDelete = (values: any) => {
         deleteMutation.mutate(values._id)
     }
 
-    const onEditClick = (item: Item) => {
-        setItemToEdit(item)
+    const onEditClick = (item: DeliveryResponse) => {
+        // @ts-ignore
+        setItemToEdit({...item, estimatedDeliveryTime: dayjs(item.estimatedDeliveryTime)})
         setIsEditOpen(true)
     }
 
-    const columns: ColumnsType<Item> = [
+    const columns: ColumnsType<DeliveryResponse> = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text: DeliveryStatus) => {
+                switch (text) {
+                    case DeliveryStatus.toSend:
+                        return <Tag color="default">To send</Tag>;
+                    case DeliveryStatus.sent:
+                        return <Tag color="processing">Sent</Tag>
+                    case DeliveryStatus.delivered:
+                        return <Tag color="success">Delivered</Tag>
+                    case DeliveryStatus.canceled:
+                        return <Tag color="error">Canceled</Tag>
+
+                }
+            },
+        },
+        {
+            title: 'Deliver to User',
+            dataIndex: 'deliverToUser',
+            key: 'deliverToUser',
+            render: renderUserCell
+        },
+        {
+            title: 'Delivery code',
+            dataIndex: 'deliveryCode',
+            key: 'deliveryCode',
         },
         {
             title: 'Description',
@@ -172,29 +281,41 @@ export const ManageItemsPage: FC = () => {
             key: 'description',
         },
         {
-            title: 'Quantity',
-            dataIndex: 'quantity',
-            key: 'quantity',
+            title: 'Estimated delivery time',
+            dataIndex: 'estimatedDeliveryTime',
+            key: 'estimatedDeliveryTime',
+            render: (text: string) => {
+                return formatDate(text)
+            },
         },
         {
-            title: 'Size',
-            dataIndex: 'size',
-            key: 'size',
+            title: 'Item',
+            dataIndex: 'item',
+            key: 'item',
+            render: (item: Item) => {
+                return item && `${item.name} ${item.size || ''}`
+            },
+        },
+        {
+            title: 'Device',
+            dataIndex: 'device',
+            key: 'device',
+            render: (device: Device) => {
+                return device && `${device.name}`
+            },
+        },
+        {
+            title: 'Custom item',
+            dataIndex: 'customItem',
+            key: 'customItem',
         },
         {
             title: 'Operations',
             dataIndex: 'operations',
             key: 'operations',
             render: (_, record) => {
-                return <Space>
-                    <Button onClick={() => onEditClick(record)} type={"primary"} icon={<EditOutlined/>}>
-                    </Button>
-                    <Button disabled={deleteMutation.isLoading} onClick={() => onDelete(record)} danger
-                            type={"primary"}
-                            icon={<DeleteOutlined/>}>
-                    </Button>
-
-                </Space>
+                return <Button disabled={record.status === DeliveryStatus.canceled} onClick={() => onEditClick(record)}
+                               type={"primary"} icon={<EditOutlined/>}/>
             },
 
         },
@@ -204,30 +325,30 @@ export const ManageItemsPage: FC = () => {
         <>
             {requestMessages.contextHolder}
 
-            <Modal footer={[]} title={"Update item"} open={isEditOpen}
+            <Modal footer={[]} title={"Update delivery"} open={isEditOpen}
                    onCancel={handleEditCancel}>
                 <AddOrUpdateForm
                     initialValues={itemToEdit}
                     form={editForm}
                     onFinish={onEditFinish}
                     buttonDisabled={editMutation.isLoading}
-                    buttonText={"Edit item"}/>
+                    buttonText={"Edit delivery"}/>
             </Modal>
-            <Modal footer={[]} title={"Add item"} open={isAddOpen}
+            <Modal footer={[]} title={"Add delivery"} open={isAddOpen}
                    onCancel={handleAddCancel}>
                 <AddOrUpdateForm
                     form={addForm}
                     onFinish={onAddFinish}
                     buttonDisabled={addMutation.isLoading}
-                    buttonText={"Add new item"}/>
+                    buttonText={"Add new delivery"}/>
             </Modal>
 
 
-            <AppHeader title={"Manage items"}/>
+            <AppHeader title={"Manage deliveries"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock
                     errors={[
-                        items.error as AxiosError,
+                        deliveries.error as AxiosError,
                         addMutation.error as AxiosError,
                         editMutation.error as AxiosError,
                         deleteMutation.error as AxiosError
@@ -235,12 +356,12 @@ export const ManageItemsPage: FC = () => {
                 <Gutter size={2}/>
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <Button onClick={showAddModal} type="primary" icon={<PlusOutlined/>}>
-                        Add item
+                        Add delivery
                     </Button>
                 </Card>
                 <Gutter size={2}/>
-                <Table scroll={{x: true}} loading={items.isLoading} dataSource={items.data} columns={columns}
-                       rowClassName={(record, index) => record.quantity <= 0 ? styles.dimmedRow : ''}/>
+                <Table scroll={{x: true}} loading={deliveries.isLoading} dataSource={deliveries.data}
+                       columns={columns}/>
             </Content>
         </>
     )

@@ -6,10 +6,10 @@ const deliverySchema: Schema = new Schema({
     type: String,
     enum: Object.values(DeliveryStatus),
   },
-  deliverToId: String,
+  deliverToId: Schema.Types.ObjectId,
   deliveryCode: String,
-  itemId: String,
-  deviceId: String,
+  itemId: Schema.Types.ObjectId,
+  deviceId: Schema.Types.ObjectId,
   customItem: String,
   description: String,
   estimatedDeliveryTime: Date

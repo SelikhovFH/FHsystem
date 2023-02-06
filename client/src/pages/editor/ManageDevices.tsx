@@ -19,6 +19,7 @@ import {DeviceTypeLabels} from "../../sections/devices";
 import {ColumnsType} from "antd/es/table";
 import {FormProps} from "../../utils/types";
 import {useIsAdmin} from "../../wrappers/RequireAdmin";
+import {renderUserCell} from "../../components/table/RenderUserCell";
 
 const {Content} = Layout;
 
@@ -212,7 +213,7 @@ export const ManageDevicesPage: FC = () => {
             dataIndex: 'screenSize',
             key: 'screenSize',
             render: (text: string) => {
-                return `${text} ″`
+                return text && `${text} ″`
             }
         },
         {
@@ -225,7 +226,7 @@ export const ManageDevicesPage: FC = () => {
             dataIndex: 'ram',
             key: 'ram',
             render: (text: string) => {
-                return `${text} GB`
+                return text && `${text} GB`
             }
         },
         {
@@ -233,7 +234,7 @@ export const ManageDevicesPage: FC = () => {
             dataIndex: 'storage',
             key: 'storage',
             render: (text: string) => {
-                return `${text} GB`
+                return text && `${text} GB`
             }
         },
         {
@@ -247,9 +248,10 @@ export const ManageDevicesPage: FC = () => {
             key: 'owner',
         },
         {
-            title: 'Assigned to Id',
-            dataIndex: 'assignedToId',
-            key: 'assignedToId',
+            title: 'Assigned to user',
+            dataIndex: 'assignedToUser',
+            key: 'assignedToUser',
+            render: renderUserCell
         },
         {
             title: 'Notes',

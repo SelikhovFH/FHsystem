@@ -13,7 +13,7 @@ const deviceSchema: Schema = new Schema({
   storage: Number,
   serialNumber: String,
   owner: String,
-  assignedToId: String,
+  assignedToId: Schema.Types.ObjectId,
   notes: String
 });
 const deviceModel = model<Device & Document>('Device', deviceSchema);

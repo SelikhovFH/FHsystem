@@ -19,7 +19,7 @@ class DeviceController {
   updateDevice = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const deviceData: UpdateDeviceDto = req.body;
-      const data = await this.deviceService.updateDevice(deviceData._id, deviceData)
+      const data = await this.deviceService.updateDevice(deviceData._id, deviceData, true)
       res.status(200).json({message: 'OK', data});
     } catch (error) {
       next(error);

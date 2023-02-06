@@ -9,7 +9,10 @@ class DeviceService {
     return this.device.create(data);
   }
 
-  public async updateDevice(_id: string, data: Partial<UpdateDeviceDto>): Promise<Device> {
+  public async updateDevice(_id: string, data: Partial<UpdateDeviceDto>, force?: boolean): Promise<Device> {
+    if (force) {
+      return this.device.findOneAndReplace({_id}, data);
+    }
     return this.device.findOneAndUpdate({_id}, data);
   }
 
@@ -22,12 +25,18 @@ class DeviceService {
   }
 
   public async getDevices(): Promise<Device[]> {
-    return this.device.aggregate().lookup({
-      from: "users",
-      as: "assignedToUser",
-      localField: "assignedToId",
-      foreignField: "_id"
-    }).exec()
+    return this.device.aggregate()
+      .lookup({
+        from: "users",
+        as: "assignedToUser",
+        localField: "assignedToId",
+        foreignField: "_id"
+      })
+      .unwind({
+        path: "$assignedToUser",
+        preserveNullAndEmptyArrays: true
+      })
+      .exec()
   }
 
 }

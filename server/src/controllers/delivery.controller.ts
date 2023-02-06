@@ -5,6 +5,7 @@ import ItemService from "@services/item.service";
 import DeviceService from "@services/device.service";
 import {HttpException} from "@exceptions/HttpException";
 import {DeliveryStatus} from "@interfaces/delivery.interface";
+import * as console from "console";
 
 
 class DeliveryController {
@@ -44,30 +45,53 @@ class DeliveryController {
       this.deliveryService.validateDelivery(deliveryData)
       const prevDelivery = await this.deliveryService.getDeliveryById(deliveryData._id)
 
-      if (deliveryData.status === DeliveryStatus.canceled && prevDelivery.status !== DeliveryStatus.canceled) {
-        await this.deviceService.updateDevice(deliveryData.deviceId, {assignedToId: null})
-        const item = await this.itemService.getItemById(deliveryData.itemId)
-        this.itemService.updateItem(deliveryData.itemId, {quantity: item.quantity + 1})
+      console.log("deliveryData", deliveryData)
+      console.log("prevDelivery", prevDelivery)
+
+
+      if (prevDelivery.status === DeliveryStatus.canceled) {
+        throw new HttpException(409, `Can't edit cancelled delivery`)
       }
 
-      if (deliveryData.itemId !== prevDelivery.itemId) {
-        const item = await this.itemService.getItemById(deliveryData.itemId)
-        if (item.quantity < 1) {
-          throw new HttpException(409, 'Item quantity is 0')
+
+      if (deliveryData.status === DeliveryStatus.canceled) {
+        if (prevDelivery.deviceId?.toString() === deliveryData.deviceId) {
+          await this.deviceService.updateDevice(deliveryData.deviceId, {assignedToId: null})
         }
-        const prevItem = await this.itemService.getItemById(prevDelivery.itemId)
-        this.itemService.updateItem(deliveryData.itemId, {quantity: item.quantity - 1})
-        this.itemService.updateItem(prevDelivery.itemId, {quantity: prevItem.quantity + 1})
-      } else if (deliveryData.deviceId !== prevDelivery.deviceId) {
-        const device = await this.deviceService.getDeviceById(deliveryData.deviceId)
-        if (device.assignedToId) {
-          throw new HttpException(409, 'Device is already assigned to user.')
+        if (prevDelivery.itemId?.toString() === deliveryData.itemId) {
+          const item = await this.itemService.getItemById(deliveryData.itemId)
+          this.itemService.updateItem(deliveryData.itemId, {quantity: item.quantity + 1})
         }
-        this.deviceService.updateDevice(deliveryData.deviceId, {assignedToId: deliveryData.deliverToId})
-        this.deviceService.updateDevice(prevDelivery._id, {assignedToId: null})
       }
 
-      const data = await this.deliveryService.updateDelivery(deliveryData._id, deliveryData)
+      if (deliveryData.itemId !== prevDelivery.itemId?.toString()) {
+        if (deliveryData.itemId) {
+          const item = await this.itemService.getItemById(deliveryData.itemId)
+          if (item.quantity < 1) {
+            throw new HttpException(409, 'Item quantity is 0')
+          }
+          this.itemService.updateItem(deliveryData.itemId, {quantity: item.quantity - 1})
+        }
+        if (prevDelivery.itemId) {
+          const prevItem = await this.itemService.getItemById(prevDelivery.itemId)
+          this.itemService.updateItem(prevDelivery.itemId, {quantity: prevItem.quantity + 1})
+        }
+      }
+
+      if (deliveryData.deviceId !== prevDelivery.deviceId?.toString()) {
+        if (deliveryData.deviceId) {
+          const device = await this.deviceService.getDeviceById(deliveryData.deviceId)
+          if (device.assignedToId) {
+            throw new HttpException(409, 'Device is already assigned to user.')
+          }
+          this.deviceService.updateDevice(deliveryData.deviceId, {assignedToId: deliveryData.deliverToId})
+        }
+        if (prevDelivery.deviceId) {
+          this.deviceService.updateDevice(prevDelivery.deviceId, {assignedToId: null})
+        }
+      }
+
+      const data = await this.deliveryService.updateDelivery(deliveryData._id, deliveryData, true)
       res.status(200).json({message: 'OK', data});
     } catch (error) {
       next(error);

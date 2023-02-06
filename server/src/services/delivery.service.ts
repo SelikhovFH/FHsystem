@@ -10,7 +10,10 @@ class DeliveryService {
     return this.delivery.create(data);
   }
 
-  public async updateDelivery(_id: string, data: Partial<UpdateDeliveryDto>): Promise<Delivery> {
+  public async updateDelivery(_id: string, data: Partial<UpdateDeliveryDto>, force?: boolean): Promise<Delivery> {
+    if (force) {
+      return this.delivery.findOneAndReplace({_id}, data);
+    }
     return this.delivery.findOneAndUpdate({_id}, data);
   }
 
@@ -19,12 +22,13 @@ class DeliveryService {
   }
 
   public async getDeliveries(): Promise<Delivery[]> {
-    return this.delivery.aggregate().lookup({
-      from: "users",
-      as: "deliverToUser",
-      localField: "deliverToId",
-      foreignField: "_id"
-    })
+    return this.delivery.aggregate()
+      .lookup({
+        from: "users",
+        as: "deliverToUser",
+        localField: "deliverToId",
+        foreignField: "_id"
+      })
       .lookup({
         from: "items",
         as: "item",
@@ -36,6 +40,18 @@ class DeliveryService {
         as: "device",
         localField: "deviceId",
         foreignField: "_id"
+      })
+      .unwind({
+        path: "$deliverToUser",
+        preserveNullAndEmptyArrays: true
+      })
+      .unwind({
+        path: "$item",
+        preserveNullAndEmptyArrays: true
+      })
+      .unwind({
+        path: "$device",
+        preserveNullAndEmptyArrays: true
       })
       .exec()
   }
@@ -57,6 +73,12 @@ class DeliveryService {
         localField: "deviceId",
         foreignField: "_id"
       })
+      .unwind({
+        path: "$item"
+      })
+      .unwind({
+        path: "$device"
+      })
       .exec()
   }
 
@@ -67,7 +89,7 @@ class DeliveryService {
     data.itemId && payloadCount++
     data.customItem && payloadCount++
 
-    if (payloadCount) {
+    if (payloadCount === 0) {
       throw new HttpException(400, 'No payload was assigned to delivery')
     }
 
