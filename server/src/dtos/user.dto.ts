@@ -8,3 +8,4 @@ export class CreateUserDto {
   @IsEnum(UserRole)
   public role: UserRole
 }
+

@@ -5,10 +5,15 @@ import {AppRoutes} from "../router/AppRoutes";
 import {UserRole} from "../shared/user.interface";
 
 
-const RequireAdmin: FC = () => {
+export const useIsAdmin = () => {
     const {user,} = useAuth0();
+    return user?.role === UserRole.admin
+}
+
+const RequireAdmin: FC = () => {
+    const isAdmin = useIsAdmin()
     const navigate = useNavigate()
-    if (user?.role !== UserRole.admin) {
+    if (!isAdmin) {
         navigate(AppRoutes.index);
         return null
     }

@@ -31,12 +31,17 @@ const items: MenuItem[] = [
     getItem('🏠 Homepage', AppRoutes.index,),
     getItem('📅 Book day off', AppRoutes.bookDayOff),
     getItem('👤 Profile', AppRoutes.profile,),
+    getItem('📦 My deliveries', AppRoutes.myDeliveries,),
+
 ];
 
 const editorItems = [
     getItem('Editor', 'editor', null, [
         getItem('✅ Confirm day off', EditorRoutes.confirmDayOff),
-        getItem('🎉 Holidays & celebrations', EditorRoutes.holidaysAndCelebrations)
+        getItem('🎉 Holidays & celebrations', EditorRoutes.holidaysAndCelebrations),
+        getItem('💻 Manage devices', EditorRoutes.manageDevices),
+        getItem('🪑 Manage items', EditorRoutes.manageItems),
+        getItem('🚚 Manage deliveries', EditorRoutes.manageDeliveries)
     ], 'group'),
 ]
 

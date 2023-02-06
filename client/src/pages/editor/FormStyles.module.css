@@ -1,0 +1,8 @@
+.form > div {
+    margin-bottom: 12px;
+}
+
+.dimmedRow {
+    opacity: 0.25;
+}
+

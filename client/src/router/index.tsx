@@ -11,6 +11,12 @@ import {RequireAuth} from "../wrappers/RequireAuth";
 import RequireAdmin from "../wrappers/RequireAdmin";
 import RequireEditor from "../wrappers/RequireEditor";
 import {HolidaysAndCelebrationsPage} from "../pages/editor/HolidaysAndCelebrations";
+import {ManageDevicesPage} from "../pages/editor/ManageDevices";
+import {ManageItemsPage} from "../pages/editor/ManageItems";
+import {ManageDeliveriesPage} from "../pages/editor/ManageDeliveries";
+import {MyDeliveriesPage} from "../pages/MyDeliveriesPage";
+
+// TODO Dynamic module import
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -31,6 +37,10 @@ export const router = createBrowserRouter(
                         path={AppRoutes.profile}
                         element={<ProfilePage/>}
                     />
+                    <Route
+                        path={AppRoutes.myDeliveries}
+                        element={<MyDeliveriesPage/>}
+                    />
                     <Route element={<RequireEditor/>}>
                         <Route
                             path={EditorRoutes.confirmDayOff}
@@ -39,6 +49,18 @@ export const router = createBrowserRouter(
                         <Route
                             path={EditorRoutes.holidaysAndCelebrations}
                             element={<HolidaysAndCelebrationsPage/>}
+                        />
+                        <Route
+                            path={EditorRoutes.manageDevices}
+                            element={<ManageDevicesPage/>}
+                        />
+                        <Route
+                            path={EditorRoutes.manageItems}
+                            element={<ManageItemsPage/>}
+                        />
+                        <Route
+                            path={EditorRoutes.manageDeliveries}
+                            element={<ManageDeliveriesPage/>}
                         />
                     </Route>
                     <Route element={<RequireAdmin/>}>
