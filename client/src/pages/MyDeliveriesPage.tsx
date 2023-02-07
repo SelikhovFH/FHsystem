@@ -1,5 +1,5 @@
 import {FC} from "react";
-import {Card, Layout, List, theme, Typography} from "antd";
+import {Card, Descriptions, Layout, List, theme, Typography} from "antd";
 import {Gutter} from "../components/Gutter";
 import {useQuery} from "react-query";
 import {API, getRequestConfig} from "../services/api";
@@ -27,7 +27,7 @@ export const MyDeliveriesPage: FC = (props) => {
 
     return (
         <>
-            <AppHeader title={"Book day off"}/>
+            <AppHeader title={"My deliveries"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock
                     errors={[
@@ -50,13 +50,19 @@ export const MyDeliveriesPage: FC = (props) => {
                             <List.Item>
                                 <List.Item.Meta
                                     title={<>
-                                        {renderDeliveryStatus(status)}
-                                        {`| ${deliveryCode} | ${estimatedDeliveryTime ? formatDate(estimatedDeliveryTime) : ''}`}
                                     </>}
                                     description={<>
-                                        {description}
-                                        <br/>
-                                        {item?.name || device?.name || customItem}
+                                        <Descriptions size={"small"} column={1} title="Delivery Info">
+                                            <Descriptions.Item
+                                                label="Status">{renderDeliveryStatus(status)}</Descriptions.Item>
+                                            <Descriptions.Item label="Delivery code">{deliveryCode}</Descriptions.Item>
+                                            <Descriptions.Item
+                                                label="Estimated delivery time">{formatDate(estimatedDeliveryTime)}</Descriptions.Item>
+                                            <Descriptions.Item label="Description">{description}</Descriptions.Item>
+                                            <Descriptions.Item label="Payload">
+                                                {item?.name || device?.name || customItem}
+                                            </Descriptions.Item>
+                                        </Descriptions>
                                     </>}
                                 />
                             </List.Item>
