@@ -1,6 +1,6 @@
 import deviceModel from "@models/device.model";
-import {CreateDeviceDto, UpdateDeviceDto} from "@dtos/device.dto";
-import {Device} from "@interfaces/device.interface";
+import { CreateDeviceDto, UpdateDeviceDto } from "@dtos/device.dto";
+import { Device } from "@interfaces/device.interface";
 
 class DeviceService {
   private device = deviceModel;
@@ -11,21 +11,22 @@ class DeviceService {
 
   public async updateDevice(_id: string, data: Partial<UpdateDeviceDto>, force?: boolean): Promise<Device> {
     if (force) {
-      return this.device.findOneAndReplace({_id}, data);
+      return this.device.findOneAndReplace({ _id }, data);
     }
-    return this.device.findOneAndUpdate({_id}, data);
+    return this.device.findOneAndUpdate({ _id }, data);
   }
 
   public async deleteDevice(_id: string) {
-    return this.device.findOneAndDelete({_id})
+    return this.device.findOneAndDelete({ _id });
   }
 
   public async getDeviceById(_id: string) {
-    return this.device.findOne({_id})
+    return this.device.findOne({ _id });
   }
 
   public async getDevices(): Promise<Device[]> {
-    return this.device.aggregate()
+    return this.device
+      .aggregate()
       .lookup({
         from: "users",
         as: "assignedToUser",
@@ -36,9 +37,8 @@ class DeviceService {
         path: "$assignedToUser",
         preserveNullAndEmptyArrays: true
       })
-      .exec()
+      .exec();
   }
-
 }
 
 export default DeviceService;

@@ -15,26 +15,28 @@ import {getYupRule} from "../../utils/yupRule";
 import styles from "./FormStyles.module.css"
 import {ColumnsType} from "antd/es/table";
 import {FormProps} from "../../utils/types";
-import {Item} from "../../shared/item.interface";
-import {Delivery, DeliveryResponse, DeliveryStatus} from "../../shared/delivery.interface";
-import {UserSelect} from "../../components/form/UserSelect";
-import {ItemSelect} from "../../components/form/ItemSelect";
-import {DeviceSelect} from "../../components/form/DeviceSelect";
-import {formatDate} from "../../utils/dates";
-import {renderUserCell} from "../../components/table/RenderUserCell";
-import {Device} from "../../shared/device.interface";
+import { Item } from "../../shared/item.interface";
+import { Delivery, DeliveryResponse, DeliveryStatus } from "../../shared/delivery.interface";
+import { UserSelect } from "../../components/form/UserSelect";
+import { ItemSelect } from "../../components/form/ItemSelect";
+import { DeviceSelect } from "../../components/form/DeviceSelect";
+import { formatDate } from "../../utils/dates";
+import { renderUserCell } from "../../components/table/RenderUserCell";
+import { Device } from "../../shared/device.interface";
 import dayjs from "dayjs";
-import {renderDeliveryStatus} from "../../sections/deliveries";
+import { renderDeliveryStatus } from "../../sections/deliveries";
+import { renderDeviceName } from "../../sections/devices";
+import { renderItemName } from "../../sections/items";
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 
 const schema = yup.object().shape({
-    status: yup.string().required(),
-    deliverToId: yup.string().required(),
-    deliveryCode: yup.string(),
-    description: yup.string(),
-    estimatedDeliveryTime: yup.string(),
+  status: yup.string().required(),
+  deliverToId: yup.string().required(),
+  deliveryCode: yup.string(),
+  description: yup.string(),
+  estimatedDeliveryTime: yup.string(),
     itemId: yup.string().when('payload', {
         is: (payload: string) => payload === 'item',
         then: yup.string().required(),
@@ -290,7 +292,7 @@ export const ManageDeliveriesPage: FC = () => {
             dataIndex: 'item',
             key: 'item',
             render: (item: Item) => {
-                return item && `${item.name} ${item.size || ''}`
+              return item && renderItemName(item);
             },
         },
         {
@@ -298,7 +300,7 @@ export const ManageDeliveriesPage: FC = () => {
             dataIndex: 'device',
             key: 'device',
             render: (device: Device) => {
-                return device && `${device.name}`
+              return device && renderDeviceName(device);
             },
         },
         {

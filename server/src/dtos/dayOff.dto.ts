@@ -1,15 +1,15 @@
-import {IsEnum, IsInt, IsString} from 'class-validator';
-import {DayOffStatus, DayOffType} from "@interfaces/dayOff.interface";
+import { IsDateString, IsEnum, IsInt, IsString } from "class-validator";
+import { DayOffStatus, DayOffType } from "@interfaces/dayOff.interface";
 
 export class CreateDayOffDto {
-  @IsString()
+  @IsDateString()
   public startDate: string;
 
-  @IsString()
-  public finishDate: string
+  @IsDateString()
+  public finishDate: string;
 
   @IsEnum(DayOffType)
-  public type: DayOffType
+  public type: DayOffType;
 }
 
 export class CreateDayOffBackendDto extends CreateDayOffDto {
@@ -17,14 +17,13 @@ export class CreateDayOffBackendDto extends CreateDayOffDto {
   public userId: string;
 
   @IsInt()
-  public dayCount: number
-
+  public dayCount: number;
 }
 
 export class ConfirmDayOffDto {
   @IsString()
-  id: string
+  id: string;
 
   @IsEnum(DayOffStatus)
-  status: DayOffStatus
+  status: DayOffStatus;
 }

@@ -1,11 +1,11 @@
-import {Document, model, Schema} from 'mongoose';
-import {Device, DeviceType} from "@interfaces/device.interface";
+import { Document, model, Schema } from "mongoose";
+import { Device, DeviceType } from "@interfaces/device.interface";
 
 const deviceSchema: Schema = new Schema({
   name: String,
   type: {
     type: String,
-    enum: Object.values(DeviceType),
+    enum: Object.values(DeviceType)
   },
   screenSize: Number,
   cpu: String,

@@ -1,5 +1,5 @@
-import {Document, model, Schema} from 'mongoose';
-import {CalendarEvent} from "@interfaces/calendarEvent.interface";
+import { Document, model, Schema } from "mongoose";
+import { CalendarEvent } from "@interfaces/calendarEvent.interface";
 
 const calendarEventSchema: Schema = new Schema({
   createdBy: String,
@@ -7,8 +7,8 @@ const calendarEventSchema: Schema = new Schema({
   description: String,
   date: Date,
   isDayOff: Boolean,
-  isRecurring: Boolean,
+  isRecurring: Boolean
 });
-const calendarEventModel = model<CalendarEvent & Document>('CalendarEvent', calendarEventSchema);
+const calendarEventModel = model<CalendarEvent & Document>("CalendarEvent", calendarEventSchema);
 
 export default calendarEventModel;

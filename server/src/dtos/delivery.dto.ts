@@ -1,44 +1,42 @@
-import {IsEnum, IsOptional, IsString} from 'class-validator';
-import {DeliveryStatus} from "@interfaces/delivery.interface";
+import { IsDateString, IsEnum, IsOptional, IsString } from "class-validator";
+import { DeliveryStatus } from "@interfaces/delivery.interface";
 
 export class CreateDeliveryDto {
   @IsEnum(DeliveryStatus)
-  status: DeliveryStatus
+  status: DeliveryStatus;
   @IsString()
-  deliverToId: string
-  @IsString()
-  @IsOptional()
-  deliveryCode?: string
+  deliverToId: string;
   @IsString()
   @IsOptional()
-  itemId?: string
+  deliveryCode?: string;
   @IsString()
   @IsOptional()
-  deviceId?: string
+  itemId?: string;
   @IsString()
   @IsOptional()
-  customItem?: string
+  deviceId?: string;
   @IsString()
   @IsOptional()
-  description?: string
+  customItem?: string;
   @IsString()
   @IsOptional()
-  estimatedDeliveryTime?: string
+  description?: string;
+  @IsDateString()
+  @IsOptional()
+  estimatedDeliveryTime?: string;
 }
 
 export class UpdateDeliveryDto extends CreateDeliveryDto {
   @IsString()
-  _id: string
-
+  _id: string;
 }
 
 export class GetDeliveryDto {
   @IsString()
   @IsOptional()
-  user: string
+  user: string;
 
   @IsEnum(DeliveryStatus)
   @IsOptional()
-  status: DeliveryStatus
-
+  status: DeliveryStatus;
 }
