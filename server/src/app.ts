@@ -54,6 +54,7 @@ class App {
       set('debug', true);
     }
 
+    //@ts-ignore
     connect(dbConnection.url, dbConnection.options);
   }
 

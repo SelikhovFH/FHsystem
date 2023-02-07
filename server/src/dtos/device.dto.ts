@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsInt, IsOptional, IsString } from "class-validator";
 import { deviceOwnerUnion, DeviceType } from "@interfaces/device.interface";
 
 export class CreateDeviceDto {
@@ -6,16 +6,16 @@ export class CreateDeviceDto {
   name: string;
   @IsEnum(DeviceType)
   type: DeviceType;
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   screenSize?: number;
   @IsString()
   @IsOptional()
   cpu?: string;
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   ram?: number;
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   storage?: number;
   @IsString()

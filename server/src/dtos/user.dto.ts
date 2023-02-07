@@ -10,7 +10,6 @@ import {
   ValidateNested
 } from "class-validator";
 import { UserRole, UserStatus } from "@interfaces/user.interface";
-import { Type } from "class-transformer";
 
 export class RegisterUserDto {
   @IsEmail()
@@ -67,6 +66,5 @@ export class UpdateUserAdminDto extends UpdateUserMyDto {
   @IsArray()
   @ValidateNested({ each: true })
   @ArrayMinSize(1)
-  @Type(() => SalaryRecord)
   salaryHistory: Array<SalaryRecord>;
 }
