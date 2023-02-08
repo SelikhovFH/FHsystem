@@ -4,7 +4,7 @@ import { DayOff, DayOffStatus, DayOffType } from "@interfaces/dayOff.interface";
 const dayOffSchema: Schema = new Schema({
   startDate: Date,
   finishDate: Date,
-  userId: String,
+  userId: Schema.Types.ObjectId,
   approvedById: String,
   dayCount: Number,
   status: {

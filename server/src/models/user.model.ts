@@ -35,7 +35,10 @@ const userSchema: Schema = new Schema({
     type: String,
     enum: Object.values(UserStatus)
   },
-  salaryHistory: [{ value: Number, date: Date }]
+  salaryHistory: {
+    type: [{ value: Number, date: Date }],
+    select: false
+  }
 
 });
 

@@ -26,9 +26,9 @@ class DayOffService {
         foreignField: "_id"
       })
       .unwind({
-        path: "$user",
-        preserveNullAndEmptyArrays: true
-      });
+        path: "$user"
+      })
+      .exec();
   }
 
   public async getUserDaysOff(userId: string): Promise<DayOff[]> {

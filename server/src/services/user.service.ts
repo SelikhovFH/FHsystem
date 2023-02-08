@@ -24,6 +24,22 @@ class UserService {
       .match({
         _id: new mongoose.Types.ObjectId(userId)
       })
+      .project({
+        _id: 1,
+        auth0id: 1,
+        email: 1,
+        role: 1,
+        name: 1,
+        surname: 1,
+        workStartDate: 1,
+        phone: 1,
+        emergencyContact: 1,
+        location: 1,
+        title: 1,
+        cvLink: 1,
+        status: 1,
+        salaryHistory: 1
+      })
       .lookup({
         from: "devices",
         as: "devices",
@@ -40,7 +56,7 @@ class UserService {
   }
 
   public async getUsers() {
-    return this.user.find();
+    return this.user.find().select("+salaryHistory");
   }
 
   public async getUsersDisplayInfo() {
