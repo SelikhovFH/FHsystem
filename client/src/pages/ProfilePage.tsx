@@ -14,7 +14,7 @@ export const ProfilePage: FC<Props> = (props) => {
   const {
     data: profile
   } = useApiFactory<User[], User>({
-    basePath: "/profile/my"
+    basePath: "/users/me"
   });
   return (
     <>

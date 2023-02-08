@@ -3,6 +3,7 @@ import dayOffModel from "@models/dayOff.model";
 import { DayOff, DayOffStatus, DayOffType } from "@interfaces/dayOff.interface";
 import { HttpException } from "@exceptions/HttpException";
 import { getStartOfCurrentYear, getWorkingDays, YearlyLimitsForDaysOffTypes } from "@utils/dayOff.helpers";
+import userService from "@services/user.service";
 
 class DayOffService {
   public dayOff = dayOffModel;
@@ -28,6 +29,7 @@ class DayOffService {
       .unwind({
         path: "$user"
       })
+      .project(userService.GET_PUBLIC_PROJECTION("user"))
       .exec();
   }
 

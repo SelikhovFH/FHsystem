@@ -6,6 +6,20 @@ import mongoose from "mongoose";
 class UserService {
   public user = userModel;
 
+  public static GET_PUBLIC_PROJECTION = (field: string) => ({
+    [`${field}.auth0id`]: 0,
+    [`${field}.role`]: 0,
+    [`${field}.workStartDate`]: 0,
+    [`${field}.phone`]: 0,
+    [`${field}.emergencyContact`]: 0,
+    [`${field}.location`]: 0,
+    [`${field}.title`]: 0,
+    [`${field}.cvLink`]: 0,
+    [`${field}.status`]: 0,
+    [`${field}.salaryHistory`]: 0,
+    [`${field}.birthDate`]: 0
+  });
+
   public async createUser(data: Partial<User>): Promise<User> {
     return this.user.create(data);
   }
@@ -23,23 +37,6 @@ class UserService {
       .aggregate()
       .match({
         _id: new mongoose.Types.ObjectId(userId)
-      })
-      .project({
-        _id: 1,
-        auth0id: 1,
-        email: 1,
-        role: 1,
-        name: 1,
-        surname: 1,
-        workStartDate: 1,
-        phone: 1,
-        emergencyContact: 1,
-        location: 1,
-        title: 1,
-        cvLink: 1,
-        status: 1,
-        salaryHistory: 1,
-        birthDate: 1
       })
       .lookup({
         from: "devices",

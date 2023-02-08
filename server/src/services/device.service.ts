@@ -1,6 +1,7 @@
 import deviceModel from "@models/device.model";
 import { CreateDeviceDto, UpdateDeviceDto } from "@dtos/device.dto";
 import { Device } from "@interfaces/device.interface";
+import userService from "@services/user.service";
 
 class DeviceService {
   private device = deviceModel;
@@ -37,6 +38,7 @@ class DeviceService {
         path: "$assignedToUser",
         preserveNullAndEmptyArrays: true
       })
+      .project(userService.GET_PUBLIC_PROJECTION("assignedToUser"))
       .exec();
   }
 }

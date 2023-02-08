@@ -3,6 +3,7 @@ import { CreateDeliveryDto, UpdateDeliveryDto } from "@dtos/delivery.dto";
 import { Delivery } from "@interfaces/delivery.interface";
 import { HttpException } from "@exceptions/HttpException";
 import * as mongoose from "mongoose";
+import userService from "@services/user.service";
 
 class DeliveryService {
   private delivery = deliveryModel;
@@ -59,6 +60,7 @@ class DeliveryService {
         path: "$device",
         preserveNullAndEmptyArrays: true
       })
+      .project(userService.GET_PUBLIC_PROJECTION("deliverToUser"))
       .exec();
   }
 
