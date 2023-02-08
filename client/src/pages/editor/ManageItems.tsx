@@ -1,23 +1,19 @@
-import {FC, useEffect, useState} from "react";
-import {AppHeader} from "../../layouts/Header";
-import {ErrorsBlock} from "../../components/ErrorsBlock";
-import {AxiosError} from "axios/index";
-import {Gutter} from "../../components/Gutter";
-import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table} from "antd";
-import {useMutation, useQuery} from "react-query";
-import {API, getRequestConfig} from "../../services/api";
-import {useAuth0} from "@auth0/auth0-react";
-import {queryClient} from "../../services/queryClient";
-import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
-import * as yup from 'yup'
-import {getYupRule} from "../../utils/yupRule";
-import styles from "./FormStyles.module.css"
-import {ColumnsType} from "antd/es/table";
-import {FormProps} from "../../utils/types";
-import {Item, ItemSize} from "../../shared/item.interface";
+import { FC, useEffect, useState } from "react";
+import { AppHeader } from "../../layouts/Header";
+import { ErrorsBlock } from "../../components/ErrorsBlock";
+import { AxiosError } from "axios/index";
+import { Gutter } from "../../components/Gutter";
+import { Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import * as yup from "yup";
+import { getYupRule } from "../../utils/yupRule";
+import styles from "./FormStyles.module.css";
+import { ColumnsType } from "antd/es/table";
+import { FormProps } from "../../utils/types";
+import { Item, ItemSize } from "../../shared/item.interface";
+import { useApiFactory } from "../../services/apiFactory";
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -29,8 +25,8 @@ const schema = yup.object().shape({
 
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {
     useEffect(() => {
-        form.resetFields()
-    }, [form, initialValues])
+        form.resetFields();
+    }, [])
     return <Form className={styles.form} initialValues={initialValues} form={form} name="item"
                  layout={"vertical"}
                  onFinish={onFinish}
@@ -62,86 +58,48 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
 }
 
 export const ManageItemsPage: FC = () => {
-    const [addForm] = Form.useForm()
-    const [editForm] = Form.useForm()
 
-    const [isAddOpen, setIsAddOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
 
+    const [isOpen, setIsOpen] = useState(false);
     const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
 
+    const {
+        data: items,
+        form,
+        addMutation,
+        deleteMutation,
+        editMutation,
+        messageContext
+    } = useApiFactory<Item[], Item>({
+        basePath: "/items",
+        add: {
+            onSuccess: () => {
+                setIsOpen(false);
+            }
+        },
+        edit: {
+            onSuccess: () => {
+                setIsOpen(false);
+                setItemToEdit(null);
+            }
+        }
+    });
+
     const showAddModal = () => {
-        setIsAddOpen(true);
+        setIsOpen(true);
     };
 
     const handleAddCancel = () => {
-        addForm.resetFields()
-        setIsAddOpen(false);
+        form.resetFields();
+        setIsOpen(false);
     };
 
     const handleEditCancel = () => {
-        setItemToEdit(null)
-        editForm.resetFields()
-        setIsEditOpen(false);
+        setItemToEdit(null);
+        form.resetFields();
+        setIsOpen(false);
     };
 
-    const requestMessages = useRequestMessages('ITEMS')
-    const {getAccessTokenSilently} = useAuth0()
-    const items = useQuery<Item[]>("/items", async () => {
-        const token = await getAccessTokenSilently()
-        const res = await API.get(`/items`, getRequestConfig(token))
-        return res.data.data
-    })
-
-    const addMutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently()
-        requestMessages.onLoad()
-        const res = await API.post('/items', data, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            addForm.resetFields()
-            await queryClient.invalidateQueries({queryKey: ['/items']})
-            setIsAddOpen(false);
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
-
-    const editMutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently()
-        requestMessages.onLoad()
-        editForm.resetFields()
-        const res = await API.patch('/items', data, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/items']})
-            setIsEditOpen(false);
-            setItemToEdit(null)
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
-
-    const deleteMutation = useMutation(async (id) => {
-        const token = await getAccessTokenSilently()
-        requestMessages.onLoad()
-        const res = await API.delete(`/items/${id}`, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/items']})
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
 
     const onAddFinish = (values: any) => {
         addMutation.mutate(values)
@@ -156,8 +114,8 @@ export const ManageItemsPage: FC = () => {
     }
 
     const onEditClick = (item: Item) => {
-        setItemToEdit(item)
-        setIsEditOpen(true)
+        setItemToEdit(item);
+        setIsOpen(true);
     }
 
     const columns: ColumnsType<Item> = [
@@ -202,24 +160,24 @@ export const ManageItemsPage: FC = () => {
 
     return (
         <>
-            {requestMessages.contextHolder}
+            {messageContext}
 
-            <Modal footer={[]} title={"Update item"} open={isEditOpen}
+            <Modal destroyOnClose footer={[]} title={"Update item"} open={isOpen && !!itemToEdit}
                    onCancel={handleEditCancel}>
                 <AddOrUpdateForm
-                    initialValues={itemToEdit}
-                    form={editForm}
-                    onFinish={onEditFinish}
-                    buttonDisabled={editMutation.isLoading}
-                    buttonText={"Edit item"}/>
+                  initialValues={itemToEdit}
+                  form={form}
+                  onFinish={onEditFinish}
+                  buttonDisabled={editMutation.isLoading}
+                  buttonText={"Edit item"} />
             </Modal>
-            <Modal footer={[]} title={"Add item"} open={isAddOpen}
+            <Modal destroyOnClose footer={[]} title={"Add item"} open={isOpen && !itemToEdit}
                    onCancel={handleAddCancel}>
                 <AddOrUpdateForm
-                    form={addForm}
-                    onFinish={onAddFinish}
-                    buttonDisabled={addMutation.isLoading}
-                    buttonText={"Add new item"}/>
+                  form={form}
+                  onFinish={onAddFinish}
+                  buttonDisabled={addMutation.isLoading}
+                  buttonText={"Add new item"} />
             </Modal>
 
 

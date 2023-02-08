@@ -24,13 +24,13 @@ type ConstructorProps<Response> = {
 }
 
 
-export const useApiFactory = <Response, Variables>({
-                                                     basePath,
-                                                     get,
-                                                     add,
-                                                     remove,
-                                                     edit
-                                                   }: ConstructorProps<Response>) => {
+export const useApiFactory = <Response = {}, Variables = {}>({
+                                                               basePath,
+                                                               get,
+                                                               add,
+                                                               remove,
+                                                               edit
+                                                             }: ConstructorProps<Response>) => {
   const [form] = Form.useForm();
   const requestMessages = useRequestMessages(basePath);
   const { getAccessTokenSilently } = useAuth0();

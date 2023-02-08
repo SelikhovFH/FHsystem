@@ -1,3 +1,5 @@
+import { User } from "@interfaces/user.interface";
+
 export interface DayOff {
   _id: string;
   startDate: string;
@@ -7,6 +9,10 @@ export interface DayOff {
   approvedById: string;
   status: DayOffStatus;
   type: DayOffType;
+}
+
+export interface DayOffResponse extends DayOff {
+  user: User;
 }
 
 export enum DayOffStatus {

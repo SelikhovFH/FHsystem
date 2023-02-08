@@ -1,9 +1,6 @@
-import {FC} from "react";
-import {Card, Descriptions, Layout, List, theme, Typography} from "antd";
+import { FC } from "react";
+import { Card, Descriptions, Layout, List, Typography } from "antd";
 import { Gutter } from "../components/Gutter";
-import { useQuery } from "react-query";
-import { API, getRequestConfig } from "../services/api";
-import { useAuth0 } from "@auth0/auth0-react";
 import { ErrorsBlock } from "../components/ErrorsBlock";
 import { AxiosError } from "axios";
 import { AppHeader } from "../layouts/Header";
@@ -12,30 +9,28 @@ import { formatDate } from "../utils/dates";
 import { renderDeliveryStatus } from "../sections/deliveries";
 import { renderDeviceName } from "../sections/devices";
 import { renderItemName } from "../sections/items";
+import { useApiFactory } from "../services/apiFactory";
 
 
 const { Content } = Layout;
 const { Text } = Typography;
 
 export const MyDeliveriesPage: FC = (props) => {
-  const { token } = theme.useToken();
-  const { getAccessTokenSilently } = useAuth0();
+  const {
+    data: myDeliveries
+  } = useApiFactory<DeliveryResponse[]>({
+    basePath: "/deliveries/my"
+  });
 
-  const myDeliveries = useQuery<DeliveryResponse[]>("/deliveries/my", async () => {
-        const token = await getAccessTokenSilently()
-        const res = await API.get(`/deliveries/my`, getRequestConfig(token))
-        return res.data.data
-    })
-
-    return (
-        <>
-            <AppHeader title={"My deliveries"}/>
-            <Content style={{margin: 32}}>
-                <ErrorsBlock
-                    errors={[
-                        myDeliveries.error as AxiosError,
-                    ]}/>
-                <Gutter size={2}/>
+  return (
+    <>
+      <AppHeader title={"My deliveries"} />
+      <Content style={{ margin: 32 }}>
+        <ErrorsBlock
+          errors={[
+            myDeliveries.error as AxiosError
+          ]} />
+        <Gutter size={2} />
                 <Card bordered={false} style={{boxShadow: "none", borderRadius: 4}}>
                     <List
                         itemLayout="horizontal"

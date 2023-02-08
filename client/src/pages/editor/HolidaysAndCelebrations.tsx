@@ -1,24 +1,21 @@
-import {FC, useState} from "react";
-import {AppHeader} from "../../layouts/Header";
-import {ErrorsBlock} from "../../components/ErrorsBlock";
-import {AxiosError} from "axios/index";
-import {Gutter} from "../../components/Gutter";
-import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Alert, Button, Card, Checkbox, Form, Input, Layout, Popover, Space} from "antd";
-import {useMutation, useQuery} from "react-query";
-import {API, getRequestConfig} from "../../services/api";
-import {useAuth0} from "@auth0/auth0-react";
-import {queryClient} from "../../services/queryClient";
-import {Dayjs} from "dayjs";
-import {CalendarEvent} from "../../shared/calendarEvent.interface";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
-import * as yup from 'yup'
-import {getYupRule} from "../../utils/yupRule";
-import {formatDate} from "../../utils/dates";
-import styles from './HolidaysAndCelebrations.module.css'
-import {Event} from "../../components/calendar/Event";
-import {AppCalendar} from "../../components/calendar/AppCalendar";
-import {FormProps} from "../../utils/types";
+import { FC, useState } from "react";
+import { AppHeader } from "../../layouts/Header";
+import { ErrorsBlock } from "../../components/ErrorsBlock";
+import { AxiosError } from "axios/index";
+import { Gutter } from "../../components/Gutter";
+import { Alert, Button, Card, Checkbox, Form, Input, Layout, Popover, Space } from "antd";
+import { Dayjs } from "dayjs";
+import { CalendarEvent } from "../../shared/calendarEvent.interface";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import * as yup from "yup";
+import { getYupRule } from "../../utils/yupRule";
+import { formatDate } from "../../utils/dates";
+import styles from "./HolidaysAndCelebrations.module.css";
+import { Event } from "../../components/calendar/Event";
+import { AppCalendar } from "../../components/calendar/AppCalendar";
+import { FormProps } from "../../utils/types";
+import { useApiFactory } from "../../services/apiFactory";
+import { FormInstance } from "antd/es/form/hooks/useForm";
 
 type EventProps = {
     event: CalendarEvent
@@ -26,6 +23,7 @@ type EventProps = {
 
     isLoading: boolean
     onFinish: (values: any) => void
+    form: FormInstance
 }
 
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {
@@ -55,18 +53,17 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
     </Form>
 }
 
-export const EventWithControls: FC<EventProps> = ({event, onDelete, onFinish, isLoading}) => {
-    const [showEditForm, setShowEditForm] = useState(false)
-    const [form] = Form.useForm()
-    const toggleShowEditForm = () => setShowEditForm(!showEditForm)
+export const EventWithControls: FC<EventProps> = ({ event, onDelete, onFinish, isLoading, form }) => {
+    const [showEditForm, setShowEditForm] = useState(false);
+    const toggleShowEditForm = () => setShowEditForm(!showEditForm);
     return (
-        <Event event={event} popoverContent={<div>
-            {showEditForm ? <AddOrUpdateForm form={form} initialValues={{
-                ...event
-            }} onFinish={(v) => {
-                onFinish({
-                    ...v,
-                    _id: event._id,
+      <Event event={event} popoverContent={<div>
+          {showEditForm ? <AddOrUpdateForm form={form} initialValues={{
+              ...event
+          }} onFinish={(v) => {
+              onFinish({
+                  ...v,
+                  _id: event._id,
                     date: event.date
                 })
                 setShowEditForm(false)
@@ -106,68 +103,25 @@ const schema = yup.object().shape({
 });
 
 export const HolidaysAndCelebrationsPage: FC = () => {
-    const [form] = Form.useForm()
+    const {
+        data: calendarEvents,
+        form,
+        addMutation,
+        deleteMutation,
+        editMutation,
+        messageContext
+    } = useApiFactory<CalendarEvent[], CalendarEvent>({
+        basePath: "/calendar_events"
+    });
+
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>();
     const onSelect = (newValue: Dayjs) => {
         setSelectedDate(newValue);
     };
-    const requestMessages = useRequestMessages('CALENDAR_EVENTS')
-    const {getAccessTokenSilently} = useAuth0()
-    const calendarEvents = useQuery<CalendarEvent[]>("/calendar_events", async () => {
-        const token = await getAccessTokenSilently()
-        const res = await API.get(`/calendar_events`, getRequestConfig(token))
-        return res.data.data
-    })
-
-    const addMutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently({scope: 'editor:editor'})
-        requestMessages.onLoad()
-        const res = await API.post('/calendar_events', data, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            form.resetFields()
-            await queryClient.invalidateQueries({queryKey: ['/calendar_events']})
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
-
-    const editMutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently({scope: 'editor:editor'})
-        requestMessages.onLoad()
-        const res = await API.patch('/calendar_events', data, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/calendar_events']})
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
-
-    const deleteMutation = useMutation(async (id) => {
-        const token = await getAccessTokenSilently({scope: 'editor:editor'})
-        requestMessages.onLoad()
-        const res = await API.delete(`/calendar_events/${id}`, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/calendar_events']})
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
 
     const onAddFinish = (values: any) => {
-        addMutation.mutate({...values, date: selectedDate?.toISOString()})
-    }
+        addMutation.mutate({ ...values, date: selectedDate?.toISOString() });
+    };
 
     const onEditFinish = (values: any) => {
         editMutation.mutate({...values})
@@ -175,7 +129,7 @@ export const HolidaysAndCelebrationsPage: FC = () => {
 
     return (
         <>
-            {requestMessages.contextHolder}
+            {messageContext}
             <AppHeader title={"Holidays & celebrations"}/>
             <Content style={{margin: 32}}>
                 <ErrorsBlock
@@ -195,10 +149,10 @@ export const HolidaysAndCelebrationsPage: FC = () => {
                         onSelect={onSelect}
                         events={calendarEvents.data}
                         renderEvent={e => (
-                            <EventWithControls key={e._id} event={e}
-                                               onDelete={(id: string) => deleteMutation.mutate(id as any)}
-                                               isLoading={deleteMutation.isLoading || editMutation.isLoading}
-                                               onFinish={onEditFinish}/>)}
+                          <EventWithControls form={form} key={e._id} event={e}
+                                             onDelete={(id: string) => deleteMutation.mutate(id as any)}
+                                             isLoading={deleteMutation.isLoading || editMutation.isLoading}
+                                             onFinish={onEditFinish} />)}
                         renderDateCell={(value, children) => {
                             return (
                                 <Popover placement={'left'}

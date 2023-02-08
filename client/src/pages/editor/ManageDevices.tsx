@@ -1,27 +1,23 @@
-import {FC, useEffect, useState} from "react";
-import {AppHeader} from "../../layouts/Header";
-import {ErrorsBlock} from "../../components/ErrorsBlock";
-import {AxiosError} from "axios/index";
-import {Gutter} from "../../components/Gutter";
-import {useRequestMessages} from "../../hooks/useRequestMessages";
-import {Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table, Tooltip} from "antd";
-import {useMutation, useQuery} from "react-query";
-import {API, getRequestConfig} from "../../services/api";
-import {useAuth0} from "@auth0/auth0-react";
-import {queryClient} from "../../services/queryClient";
-import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
-import * as yup from 'yup'
-import {getYupRule} from "../../utils/yupRule";
-import {Device, DeviceType} from "../../shared/device.interface";
-import {UserSelect} from "../../components/form/UserSelect";
-import styles from "./FormStyles.module.css"
-import {DeviceTypeLabels} from "../../sections/devices";
-import {ColumnsType} from "antd/es/table";
-import {FormProps} from "../../utils/types";
-import {useIsAdmin} from "../../wrappers/RequireAdmin";
-import {renderUserCell} from "../../components/table/RenderUserCell";
+import { FC, useEffect, useState } from "react";
+import { AppHeader } from "../../layouts/Header";
+import { ErrorsBlock } from "../../components/ErrorsBlock";
+import { AxiosError } from "axios/index";
+import { Gutter } from "../../components/Gutter";
+import { Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table, Tooltip } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import * as yup from "yup";
+import { getYupRule } from "../../utils/yupRule";
+import { Device, DeviceType } from "../../shared/device.interface";
+import { UserSelect } from "../../components/form/UserSelect";
+import styles from "./FormStyles.module.css";
+import { DeviceTypeLabels } from "../../sections/devices";
+import { ColumnsType } from "antd/es/table";
+import { FormProps } from "../../utils/types";
+import { useIsAdmin } from "../../wrappers/RequireAdmin";
+import { renderUserCell } from "../../components/table/RenderUserCell";
+import { useApiFactory } from "../../services/apiFactory";
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -38,8 +34,8 @@ const schema = yup.object().shape({
 
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {
     useEffect(() => {
-        form.resetFields()
-    }, [form, initialValues])
+        form.resetFields();
+    }, [])
     return <Form className={styles.form} initialValues={initialValues} form={form} name="device"
                  layout={"vertical"}
                  onFinish={onFinish}
@@ -95,87 +91,48 @@ const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonT
 }
 
 export const ManageDevicesPage: FC = () => {
-    const isAdmin = useIsAdmin()
-    const [addForm] = Form.useForm()
-    const [editForm] = Form.useForm()
+    const isAdmin = useIsAdmin();
 
-    const [isAddOpen, setIsAddOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
-
+    const [isOpen, setIsOpen] = useState(false);
     const [deviceToEdit, setDeviceToEdit] = useState<Device | null>(null);
 
+    const {
+        data: devices,
+        form,
+        addMutation,
+        deleteMutation,
+        editMutation,
+        messageContext
+    } = useApiFactory<Device[], Device>({
+        basePath: "/devices",
+        add: {
+            onSuccess: () => {
+                setIsOpen(false);
+            }
+        },
+        edit: {
+            onSuccess: () => {
+                setIsOpen(false);
+                setDeviceToEdit(null);
+            }
+        }
+    });
+
     const showAddModal = () => {
-        setIsAddOpen(true);
+        setIsOpen(true);
     };
 
     const handleAddCancel = () => {
-        addForm.resetFields()
-        setIsAddOpen(false);
+        form.resetFields();
+        setIsOpen(false);
     };
 
     const handleEditCancel = () => {
-        setDeviceToEdit(null)
-        editForm.resetFields()
-        setIsEditOpen(false);
+        setDeviceToEdit(null);
+        form.resetFields();
+        setIsOpen(false);
     };
 
-    const requestMessages = useRequestMessages('DEVICES')
-    const {getAccessTokenSilently} = useAuth0()
-    const devices = useQuery<Device[]>("/devices", async () => {
-        const token = await getAccessTokenSilently()
-        const res = await API.get(`/devices`, getRequestConfig(token))
-        return res.data.data
-    })
-
-    const addMutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently()
-        requestMessages.onLoad()
-        const res = await API.post('/devices', data, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            addForm.resetFields()
-            await queryClient.invalidateQueries({queryKey: ['/devices']})
-            setIsAddOpen(false);
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
-
-    const editMutation = useMutation(async (data) => {
-        const token = await getAccessTokenSilently()
-        requestMessages.onLoad()
-        editForm.resetFields()
-        const res = await API.patch('/devices', data, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/devices']})
-            setIsEditOpen(false);
-            setDeviceToEdit(null)
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
-
-    const deleteMutation = useMutation(async (id) => {
-        const token = await getAccessTokenSilently()
-        requestMessages.onLoad()
-        const res = await API.delete(`/devices/${id}`, getRequestConfig(token))
-        return res.data.data
-    }, {
-        onSuccess: async () => {
-            requestMessages.onSuccess()
-            await queryClient.invalidateQueries({queryKey: ['/devices']})
-        },
-        onError: async () => {
-            requestMessages.onError()
-        },
-    })
 
     const onAddFinish = (values: any) => {
         addMutation.mutate(values)
@@ -190,8 +147,8 @@ export const ManageDevicesPage: FC = () => {
     }
 
     const onEditClick = (device: Device) => {
-        setDeviceToEdit(device)
-        setIsEditOpen(true)
+        setDeviceToEdit(device);
+        setIsOpen(true);
     }
 
     const columns: ColumnsType<Device> = [
@@ -292,24 +249,24 @@ export const ManageDevicesPage: FC = () => {
 
     return (
         <>
-            {requestMessages.contextHolder}
+            {messageContext}
 
-            <Modal footer={[]} title={"Update device"} open={isEditOpen}
+            <Modal footer={[]} title={"Update device"} open={isOpen && !!deviceToEdit}
                    onCancel={handleEditCancel}>
                 <AddOrUpdateForm
-                    initialValues={deviceToEdit}
-                    form={editForm}
-                    onFinish={onEditFinish}
-                    buttonDisabled={editMutation.isLoading}
-                    buttonText={"Edit device"}/>
+                  initialValues={deviceToEdit}
+                  form={form}
+                  onFinish={onEditFinish}
+                  buttonDisabled={editMutation.isLoading}
+                  buttonText={"Edit device"} />
             </Modal>
-            <Modal footer={[]} title={"Add device"} open={isAddOpen}
+            <Modal footer={[]} title={"Add device"} open={isOpen && !deviceToEdit}
                    onCancel={handleAddCancel}>
                 <AddOrUpdateForm
-                    form={addForm}
-                    onFinish={onAddFinish}
-                    buttonDisabled={addMutation.isLoading}
-                    buttonText={"Add new device"}/>
+                  form={form}
+                  onFinish={onAddFinish}
+                  buttonDisabled={addMutation.isLoading}
+                  buttonText={"Add new device"} />
             </Modal>
 
 
