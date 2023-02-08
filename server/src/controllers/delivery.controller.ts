@@ -48,10 +48,10 @@ class DeliveryController {
       }
 
       if (deliveryData.status === DeliveryStatus.canceled) {
-        if (prevDelivery.deviceId?.toString() === deliveryData.deviceId) {
+        if (prevDelivery.deviceId && prevDelivery.deviceId.toString() === deliveryData.deviceId) {
           await this.deviceService.updateDevice(deliveryData.deviceId, { assignedToId: null });
         }
-        if (prevDelivery.itemId?.toString() === deliveryData.itemId) {
+        if (prevDelivery.itemId && prevDelivery.itemId.toString() === deliveryData.itemId) {
           const item = await this.itemService.getItemById(deliveryData.itemId);
           this.itemService.updateItem(deliveryData.itemId, { quantity: item.quantity + 1 });
         }
