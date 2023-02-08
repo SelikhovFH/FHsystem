@@ -4,7 +4,6 @@ import { ConfirmDayOffDto, CreateDayOffDto } from "@dtos/dayOff.dto";
 import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
 import CalendarEventService from "@services/calendarEvent.service";
-import * as console from "console";
 
 class DayOffController {
   private dayOffService = new DayOffService();
@@ -29,7 +28,6 @@ class DayOffController {
   getPendingDaysOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const pendingDaysOff = await this.dayOffService.getPendingDaysOff();
-      console.log(pendingDaysOff);
       //I assume that we won't have too many concurrent pending days off, so code is  simple but not optimized here
       const promises = pendingDaysOff.map(async dayOff => {
         const dayOffExceedsLimit = await this.dayOffService.dayOffExceedsLimit(dayOff);

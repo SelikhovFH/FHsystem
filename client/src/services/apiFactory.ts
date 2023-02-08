@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery } from "react-query";
 import { API, getRequestConfig } from "./api";
 import { queryClient } from "./queryClient";
+import { AxiosError } from "axios";
 
 type Mutation = {
   path?: string
@@ -35,7 +36,7 @@ export const useApiFactory = <Response = {}, Variables = {}>({
   const requestMessages = useRequestMessages(basePath);
   const { getAccessTokenSilently } = useAuth0();
 
-  const data = useQuery<Response>(get?.queryKeys ?? basePath, async () => {
+  const data = useQuery<Response, AxiosError>(get?.queryKeys ?? basePath, async () => {
     const token = await getAccessTokenSilently();
     const requestConfig = getRequestConfig(token);
     if (get?.fetcher) {
@@ -45,7 +46,7 @@ export const useApiFactory = <Response = {}, Variables = {}>({
     return res.data.data;
   });
 
-  const addMutation = useMutation<any, any, Variables>(async (data) => {
+  const addMutation = useMutation<any, AxiosError, Variables>(async (data) => {
     const token = await getAccessTokenSilently();
     const requestConfig = getRequestConfig(token);
     requestMessages.onLoad();
@@ -68,7 +69,7 @@ export const useApiFactory = <Response = {}, Variables = {}>({
     }
   });
 
-  const editMutation = useMutation<any, any, Variables>(async (data) => {
+  const editMutation = useMutation<any, AxiosError, Variables>(async (data) => {
     const token = await getAccessTokenSilently();
     const requestConfig = getRequestConfig(token);
     requestMessages.onLoad();
@@ -91,7 +92,7 @@ export const useApiFactory = <Response = {}, Variables = {}>({
     }
   });
 
-  const deleteMutation = useMutation<any, any, string>(async (id) => {
+  const deleteMutation = useMutation<any, AxiosError, string>(async (id) => {
     const token = await getAccessTokenSilently();
     const requestConfig = getRequestConfig(token);
     requestMessages.onLoad();

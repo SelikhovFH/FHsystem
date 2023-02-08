@@ -38,7 +38,8 @@ const userSchema: Schema = new Schema({
   salaryHistory: {
     type: [{ value: Number, date: Date }],
     select: false
-  }
+  },
+  birthDate: Date
 
 });
 

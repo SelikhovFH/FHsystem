@@ -15,7 +15,6 @@ import { Delivery, DeliveryResponse, DeliveryStatus } from "../../shared/deliver
 import { UserSelect } from "../../components/form/UserSelect";
 import { ItemSelect } from "../../components/form/ItemSelect";
 import { DeviceSelect } from "../../components/form/DeviceSelect";
-import { formatDate } from "../../utils/dates";
 import { renderUserCell } from "../../components/table/RenderUserCell";
 import { Device } from "../../shared/device.interface";
 import dayjs from "dayjs";
@@ -24,6 +23,7 @@ import { renderDeviceName } from "../../sections/devices";
 import { renderItemName } from "../../sections/items";
 import { useApiFactory } from "../../services/apiFactory";
 import { API } from "../../services/api";
+import { renderDateCell } from "../../components/table/RenderDateCell";
 
 const { Content } = Layout;
 
@@ -53,7 +53,7 @@ const schema = yup.object().shape({
 const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, buttonText, initialValues }) => {
   useEffect(() => {
     form.resetFields();
-  }, []);
+  }, [initialValues]);
   const defaultPayloadValue = initialValues && (initialValues.itemId ? "item" : initialValues.deviceId && "device") || "custom";
   return <Form className={styles.form} initialValues={{ ...initialValues, payload: defaultPayloadValue }} form={form}
                name="delivery"
@@ -168,7 +168,6 @@ export const ManageDeliveriesPage: FC = () => {
     }
   }, [payload]);
 
-  console.log(itemToEdit);
 
   const showModal = () => {
     setIsOpen(true);
@@ -226,9 +225,7 @@ export const ManageDeliveriesPage: FC = () => {
       title: "Estimated delivery time",
       dataIndex: "estimatedDeliveryTime",
       key: "estimatedDeliveryTime",
-      render: (text: string) => {
-        return formatDate(text);
-      }
+      render: renderDateCell
     },
     {
       title: "Item",

@@ -1,7 +1,7 @@
-import {FC, ReactNode} from "react";
-import {Popover, theme, Typography} from "antd";
-import {formatDate} from "../../utils/dates";
-import {CalendarEvent} from "../../shared/calendarEvent.interface";
+import { FC, ReactNode } from "react";
+import { Popover, theme, Typography } from "antd";
+import { formatDate } from "../../utils/formatters";
+import { CalendarEvent } from "../../shared/calendarEvent.interface";
 
 const {Text} = Typography
 

@@ -1,3 +1,7 @@
+import { DayOff } from "./dayOff.interface";
+import { Delivery } from "./delivery.interface";
+import { Device } from "./device.interface";
+
 export interface User {
   _id: string;
   auth0id: string;
@@ -10,9 +14,15 @@ export interface User {
   emergencyContact: string;
   location: string;
   title: string;
-  salaryHistory: Array<{ value: number; date: Date }>;
+  salaryHistory: Array<SalaryRecord>;
   cvLink: string;
   status: UserStatus;
+  birthDate: string;
+}
+
+export interface SalaryRecord {
+  value: number;
+  date: string;
 }
 
 export enum UserStatus {
@@ -25,4 +35,10 @@ export enum UserRole {
   user = "user",
   editor = "editor",
   admin = "admin",
+}
+
+export interface UserProfile extends User {
+  devices: Device[];
+  deliveries: Delivery[];
+  daysOff: DayOff[];
 }

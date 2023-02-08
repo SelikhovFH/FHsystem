@@ -3,11 +3,12 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Avatar, Button, Card, Layout, List, Tag, Typography } from "antd";
+import { Button, Card, Layout, List, Tag, Typography } from "antd";
 import { DayOff, DayOffResponse, DayOffStatus } from "../../shared/dayOff.interface";
 import { TypeLabels } from "../../sections/dayOff";
-import { formatDate } from "../../utils/dates";
+import { formatDate } from "../../utils/formatters";
 import { useApiFactory } from "../../services/apiFactory";
+import { renderUserCell } from "../../components/table/RenderUserCell";
 
 type Props = {}
 const { Content } = Layout;
@@ -59,9 +60,7 @@ export const ConfirmDayOffPage: FC<Props> = (props) => {
                           type="link">Approve</Button>]}
               >
                 <List.Item.Meta
-                  avatar={<Avatar src={item.user.name} />}
-                  title={<a
-                    href="https://ant.design">{`${item.user.name} ${item.user.surname} (${item.user.email})`}</a>}
+                  title={renderUserCell(item.user)}
                   description={<span>
                                         {TypeLabels[item.type]}
                     {" "}

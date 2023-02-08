@@ -35,7 +35,7 @@ const schema = yup.object().shape({
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {
     useEffect(() => {
         form.resetFields();
-    }, [])
+    }, [initialValues])
     return <Form className={styles.form} initialValues={initialValues} form={form} name="device"
                  layout={"vertical"}
                  onFinish={onFinish}

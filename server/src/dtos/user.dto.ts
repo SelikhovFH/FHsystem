@@ -1,14 +1,4 @@
-import {
-  ArrayMinSize,
-  IsArray,
-  IsDateString,
-  IsEmail,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  ValidateNested
-} from "class-validator";
+import { IsArray, IsDateString, IsEmail, IsEnum, IsInt, IsOptional, IsString } from "class-validator";
 import { UserRole, UserStatus } from "@interfaces/user.interface";
 
 export class RegisterUserDto {
@@ -43,6 +33,9 @@ export class UpdateUserMyDto {
   @IsString()
   @IsOptional()
   cvLink: string;
+  @IsDateString()
+  @IsOptional()
+  birthDate: string;
 }
 
 export class SalaryRecord {
@@ -64,7 +57,6 @@ export class UpdateUserAdminDto extends UpdateUserMyDto {
   status: UserStatus;
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @ArrayMinSize(1)
+  @IsOptional()
   salaryHistory: Array<SalaryRecord>;
 }

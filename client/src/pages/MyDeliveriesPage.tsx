@@ -5,7 +5,7 @@ import { ErrorsBlock } from "../components/ErrorsBlock";
 import { AxiosError } from "axios";
 import { AppHeader } from "../layouts/Header";
 import { DeliveryResponse } from "../shared/delivery.interface";
-import { formatDate } from "../utils/dates";
+import { formatDate } from "../utils/formatters";
 import { renderDeliveryStatus } from "../sections/deliveries";
 import { renderDeviceName } from "../sections/devices";
 import { renderItemName } from "../sections/items";

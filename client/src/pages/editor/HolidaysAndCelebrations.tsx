@@ -9,7 +9,7 @@ import { CalendarEvent } from "../../shared/calendarEvent.interface";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
-import { formatDate } from "../../utils/dates";
+import { formatDate } from "../../utils/formatters";
 import styles from "./HolidaysAndCelebrations.module.css";
 import { Event } from "../../components/calendar/Event";
 import { AppCalendar } from "../../components/calendar/AppCalendar";

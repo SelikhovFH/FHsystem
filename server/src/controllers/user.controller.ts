@@ -13,7 +13,10 @@ class UserController {
     try {
       const userData: RegisterUserDto = req.body;
       const mongoUserId = new mongoose.Types.ObjectId();
-      const { user_id } = await this.authOService.createUser({ ...userData, dbId: mongoUserId.toString() });
+      const { user_id, family_name, given_name, phone_number } = await this.authOService.createUser({
+        ...userData,
+        dbId: mongoUserId.toString()
+      });
 
       if (userData.role !== UserRole.user) {
         const permissions = ["editor:editor"] as ("admin:admin" | "editor:editor")[];
@@ -22,9 +25,14 @@ class UserController {
         }
         await this.authOService.assignPermissions(user_id, permissions);
       }
-      await this.authOService.sendSignupInvitation(user_id);
+      const data = await this.authOService.sendSignupInvitation(user_id);
 
-      const data = await this.userService.createUser({ ...userData, _id: mongoUserId.toString() });
+      await this.userService.createUser({
+        ...userData,
+        auth0id: user_id,
+        _id: mongoUserId.toString(),
+        phone: phone_number
+      });
       res.status(201).json({ message: "created", data });
     } catch (error) {
       next(error);

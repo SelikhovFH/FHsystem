@@ -1,13 +1,13 @@
-import {FC} from "react";
-import {Alert} from "antd";
-import {AxiosError} from "axios";
+import { FC } from "react";
+import { Alert } from "antd";
+import { AxiosError } from "axios";
 
 type Props = {
-    errors: AxiosError[]
+    errors: (AxiosError | null | undefined)[]
 }
 
 export const ErrorsBlock: FC<Props> = (props) => {
-    const errors = props.errors.filter(Boolean)
+  const errors = props.errors.filter(Boolean) as AxiosError[];
     return (
         <div>
             {errors.map(e => {

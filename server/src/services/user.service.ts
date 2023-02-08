@@ -1,12 +1,12 @@
 import { User } from "@interfaces/user.interface";
 import userModel from "@models/user.model";
-import { RegisterUserDto, UpdateUserAdminDto } from "@dtos/user.dto";
+import { UpdateUserAdminDto } from "@dtos/user.dto";
 import mongoose from "mongoose";
 
 class UserService {
   public user = userModel;
 
-  public async createUser(data: RegisterUserDto & { _id: string }): Promise<User> {
+  public async createUser(data: Partial<User>): Promise<User> {
     return this.user.create(data);
   }
 
@@ -38,7 +38,8 @@ class UserService {
         title: 1,
         cvLink: 1,
         status: 1,
-        salaryHistory: 1
+        salaryHistory: 1,
+        birthDate: 1
       })
       .lookup({
         from: "devices",
@@ -51,6 +52,12 @@ class UserService {
         as: "daysOff",
         localField: "_id",
         foreignField: "userId"
+      })
+      .lookup({
+        from: "deliveries",
+        as: "deliveries",
+        localField: "_id",
+        foreignField: "deliverToId"
       })
       .exec();
   }
