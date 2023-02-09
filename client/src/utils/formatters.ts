@@ -10,3 +10,12 @@ export const formatDate = (date?: string | Date | Dayjs) => {
 export const formatMoney = (value: number) => {
   return `$${value}`;
 };
+
+export const formatMemory = (value: number) => {
+  return `${value} GB`;
+};
+
+export const formatScreenSize = (value: number) => {
+  return `${value} ″`;
+};
+

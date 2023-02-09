@@ -12,3 +12,7 @@
 .day:hover {
     background: rgba(0, 0, 0, 0.04);
 }
+
+.small .day {
+    min-height: 96px;
+}

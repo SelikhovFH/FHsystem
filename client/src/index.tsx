@@ -1,14 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import 'antd/dist/reset.css';
-import reportWebVitals from './reportWebVitals';
-import {RouterProvider} from "react-router-dom";
-import {router} from "./router";
-import {Auth0Provider} from "@auth0/auth0-react";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "antd/dist/reset.css";
+import "@ant-design/flowchart/dist/index.css";
+import reportWebVitals from "./reportWebVitals";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
+import { Auth0Provider } from "@auth0/auth0-react";
 import Auth0Ready from "./wrappers/Auth0Ready";
-import {QueryClientProvider} from "react-query";
-import {queryClient} from "./services/queryClient";
-import * as dayjs from 'dayjs'
+import { QueryClientProvider } from "react-query";
+import { queryClient } from "./services/queryClient";
+import * as dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 

@@ -33,7 +33,7 @@ class UserService {
   }
 
   public async getUserProfile(userId: string) {
-    return this.user
+    const res = await this.user
       .aggregate()
       .match({
         _id: new mongoose.Types.ObjectId(userId)
@@ -57,6 +57,7 @@ class UserService {
         foreignField: "deliverToId"
       })
       .exec();
+    return res[0];
   }
 
   public async getUsers() {

@@ -2,7 +2,6 @@ export enum AppRoutes {
     index = "/",
     bookDayOff = "/book_day_off",
     profile = "/profile",
-    myDeliveries = "/my_deliveries"
 }
 
 export enum EditorRoutes {

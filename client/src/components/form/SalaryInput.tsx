@@ -19,7 +19,10 @@ export const SalaryInput: FC<Props> = (props) => {
     if (!value || !date) {
       return;
     }
-    setValues([...values, { date: date.toISOString(), value }]);
+    const sortedValues = [...values, { date: date.toISOString(), value }].sort(function(a, b) {
+      return +(new Date(b.date)) - +(new Date(a.date));
+    });
+    setValues(sortedValues);
     setValue(null);
     setDate(null);
   };
@@ -32,6 +35,7 @@ export const SalaryInput: FC<Props> = (props) => {
     props.onChange && props.onChange(values);
   }, [values]);
 
+
   return (
     <div>
       <Space>
@@ -40,7 +44,6 @@ export const SalaryInput: FC<Props> = (props) => {
           value={value}
           min={0}
           onChange={v => setValue(v)}
-          // style={{ width: 100 }}
         />
         <DatePicker
           value={date}
