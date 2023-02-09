@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { SalaryRecord } from "../../shared/user.interface";
-import { Col, Empty, List, Row, Statistic, Typography } from "antd";
+import { Col, Empty, List, Row, Segmented, Statistic, Typography } from "antd";
 import { formatDate, formatMoney } from "../../utils/formatters";
 import { Gutter } from "../Gutter";
 import { Line, LineConfig } from "@ant-design/charts";
@@ -11,6 +11,8 @@ type Props = {
 }
 
 export const SalaryTab: FC<Props> = ({ salaryHistory }) => {
+  const [mode, setMode] = useState<string | number>("List");
+  const showChart = mode === "Chart";
   if (!salaryHistory?.length) {
     return <Empty description={"No salary data"} />;
   }
@@ -25,7 +27,7 @@ export const SalaryTab: FC<Props> = ({ salaryHistory }) => {
   };
 
   return (
-    <div>
+    <>
       <Row gutter={16}>
         <Col span={4}>
           <Statistic title="Current salary" value={formatMoney(salaryHistory[0].value)} />
@@ -35,7 +37,9 @@ export const SalaryTab: FC<Props> = ({ salaryHistory }) => {
         </Col>
       </Row>
       <Gutter size={2} />
-      <List
+      <Segmented options={["List", "Chart"]} value={mode} onChange={setMode} />
+      <Gutter size={2} />
+      {!showChart && <List
         header={<Text>Salary history</Text>}
         size={"small"}
         itemLayout="horizontal"
@@ -48,9 +52,8 @@ export const SalaryTab: FC<Props> = ({ salaryHistory }) => {
             />
           </List.Item>
         )}
-      />
-      <Gutter size={4} />
-      <Line {...config} />
-    </div>
+      />}
+      {showChart && <Line {...config} />}
+    </>
   );
 };

@@ -231,12 +231,6 @@ export const ManageUsersPage: FC = () => {
 
   const columns: ColumnsType<User> = [
     // {
-    //     title: 'Avatar',
-    //     dataIndex: 'picture',
-    //     key: 'avatar',
-    //     render: (text: string) => <Avatar src={text}/>
-    // },
-    // {
     //     title: 'Email verified & password changed',
     //     dataIndex: 'email_verified',
     //     key: 'email_verified',

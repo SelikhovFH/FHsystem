@@ -18,9 +18,6 @@ export class UpdateUserMyDto {
   name: string;
   @IsString()
   surname: string;
-  @IsDateString()
-  @IsOptional()
-  workStartDate: string;
   @IsString()
   @IsOptional()
   phone: string;
@@ -30,9 +27,6 @@ export class UpdateUserMyDto {
   @IsString()
   @IsOptional()
   location: string;
-  @IsString()
-  @IsOptional()
-  cvLink: string;
   @IsDateString()
   @IsOptional()
   birthDate: string;
@@ -55,8 +49,13 @@ export class UpdateUserAdminDto extends UpdateUserMyDto {
   @IsEnum(UserStatus)
   @IsOptional()
   status: UserStatus;
-
   @IsArray()
   @IsOptional()
   salaryHistory: Array<SalaryRecord>;
+  @IsDateString()
+  @IsOptional()
+  workStartDate: string;
+  @IsString()
+  @IsOptional()
+  cvLink: string;
 }
