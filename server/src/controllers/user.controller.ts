@@ -4,10 +4,13 @@ import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
 import * as mongoose from "mongoose";
 import { UserRole } from "@interfaces/user.interface";
+import DeliveryService from "@services/delivery.service";
 
 class UserController {
   private authOService = new Auth0Service();
   private userService = new UserService();
+  private deliveryService = new DeliveryService();
+
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -60,7 +63,9 @@ class UserController {
   getMyProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.auth.payload.db_id as string;
-      const data = await this.userService.getUserProfile(userId);
+      const _data = await this.userService.getUserProfile(userId);
+      const deliveries = await this.deliveryService.getUserDeliveries(userId);
+      const data = { ..._data, deliveries };
       res.status(200).json({ data, message: "OK" });
     } catch (error) {
       next(error);
@@ -81,7 +86,9 @@ class UserController {
   getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const data = await this.userService.getUserProfile(id);
+      const _data = await this.userService.getUserProfile(id);
+      const deliveries = await this.deliveryService.getUserDeliveries(id);
+      const data = { ..._data, deliveries };
       res.status(200).json({ data, message: "OK" });
     } catch (error) {
       next(error);

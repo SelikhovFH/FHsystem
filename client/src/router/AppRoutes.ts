@@ -13,9 +13,10 @@ export enum EditorRoutes {
 }
 
 export enum AdminRoutes {
-    manageUsers = "/manage_users"
+    manageUsers = "/manage_users",
+    user = "/user/:id"
 }
 
 export const getUserProfileRoute = (userId: string) => {
-    return `${AppRoutes.profile}/${userId}`;
+    return `/user/${userId}`;
 };

@@ -5,15 +5,15 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AppHeader } from "../layouts/Header";
 import { useApiFactory } from "../services/apiFactory";
 import { User, UserProfile } from "../shared/user.interface";
-import { DeliveryResponse } from "../shared/delivery.interface";
 import { Profile } from "../components/profile/Profile";
 import dayjs from "dayjs";
 import { UpdateMyProfileForm } from "../components/profile/UpdateMyProfileForm";
+import { ErrorsBlock } from "../components/ErrorsBlock";
 
 type Props = {}
 
 
-export const ProfilePage: FC<Props> = (props) => {
+export const MyProfilePage: FC<Props> = (props) => {
   const { logout } = useAuth0();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,11 +29,6 @@ export const ProfilePage: FC<Props> = (props) => {
         setIsOpen(false);
       }
     }
-  });
-  const {
-    data: myDeliveries
-  } = useApiFactory<DeliveryResponse[]>({
-    basePath: "/deliveries/my"
   });
 
   const onEditFinish = (_values: User) => {
@@ -66,7 +61,8 @@ export const ProfilePage: FC<Props> = (props) => {
         />
       </Modal>
       <AppHeader title={"My profile"} />
-      <Profile profile={profile.data} deliveries={myDeliveries.data} isLoading={profile.isLoading}
+      <ErrorsBlock errors={[profile.error, editMutation.error]} />
+      <Profile profile={profile.data} isLoading={profile.isLoading}
                myProfileAddon={<Space>
                  <Button onClick={onEditClick} icon={<EditOutlined />}>
                    Edit profile

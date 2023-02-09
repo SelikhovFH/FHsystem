@@ -5,18 +5,16 @@ import { DevicesTab } from "./DevicesTab";
 import { DeliveriesTab } from "./DeliveriesTab";
 import { DaysOffTab } from "./DaysOffTab";
 import { SalaryTab } from "./SalaryTab";
-import { DeliveryResponse } from "../../shared/delivery.interface";
 import { UserInfoCard } from "./UserInfoCard";
 import { Content } from "antd/es/layout/layout";
 
 type Props = {
   profile?: UserProfile
-  deliveries?: DeliveryResponse[]
   myProfileAddon?: ReactNode
   isLoading?: boolean
 }
 
-export const Profile: FC<Props> = ({ profile, myProfileAddon, isLoading, deliveries }) => {
+export const Profile: FC<Props> = ({ profile, myProfileAddon, isLoading }) => {
 
   const items: TabsProps["items"] = [
     {
@@ -27,7 +25,7 @@ export const Profile: FC<Props> = ({ profile, myProfileAddon, isLoading, deliver
     {
       key: "2",
       label: `📦 Deliveries`,
-      children: <DeliveriesTab deliveries={deliveries} />
+      children: <DeliveriesTab deliveries={profile?.deliveries} />
     },
     {
       key: "3",

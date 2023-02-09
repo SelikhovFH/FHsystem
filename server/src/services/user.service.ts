@@ -50,12 +50,6 @@ class UserService {
         localField: "_id",
         foreignField: "userId"
       })
-      .lookup({
-        from: "deliveries",
-        as: "deliveries",
-        localField: "_id",
-        foreignField: "deliverToId"
-      })
       .exec();
     return res[0];
   }
