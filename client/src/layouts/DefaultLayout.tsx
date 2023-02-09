@@ -73,8 +73,9 @@ export const DefaultLayout: FC<Props> = (props) => {
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                 <Title style={{margin: 16, color: token.colorWhite}} level={3}>{collapsed ? "FH" : "FHSystem"}</Title>
                 <Menu theme="dark" onSelect={e => {
-                    navigate(e.key)
+                    navigate(e.key);
                 }}
+                      selectedKeys={[location.pathname]}
                       defaultSelectedKeys={[location.pathname]} mode="inline"
                       items={getMenuItemsByRole(user?.role)}/>
             </Sider>
