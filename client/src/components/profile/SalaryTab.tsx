@@ -27,12 +27,12 @@ export const SalaryTab: FC<Props> = ({ salaryHistory }) => {
   };
 
   return (
-    <>
+    <div>
       <Row gutter={16}>
-        <Col span={4}>
+        <Col sm={8} xl={6} xxl={4}>
           <Statistic title="Current salary" value={formatMoney(salaryHistory[0].value)} />
         </Col>
-        <Col span={4}>
+        <Col sm={8} xl={6} xxl={4}>
           <Statistic title="Last salary update" value={formatDate(salaryHistory[0].date)!} />
         </Col>
       </Row>
@@ -54,6 +54,6 @@ export const SalaryTab: FC<Props> = ({ salaryHistory }) => {
         )}
       />}
       {showChart && <Line {...config} />}
-    </>
+    </div>
   );
 };

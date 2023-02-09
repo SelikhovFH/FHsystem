@@ -60,7 +60,7 @@ export const ConfirmDayOffPage: FC<Props> = (props) => {
                           type="link">Approve</Button>]}
               >
                 <List.Item.Meta
-                  description={<Space size={"large"}>
+                  description={<Space direction={"vertical"} size={"small"}>
                     {renderUserCell(item.user)}
                     <span>
                       {TypeLabels[item.type]}

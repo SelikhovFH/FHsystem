@@ -17,7 +17,7 @@ export const DeliveriesTab: FC<Props> = ({ deliveries }) => {
 
   return (
     <Row gutter={[16, 16]}>
-      {deliveries.map(delivery => (<Col span={8} key={delivery._id}>
+      {deliveries.map(delivery => (<Col xxl={8} xl={12} sm={24} key={delivery._id}>
         <Card title={`Delivery #${delivery.deliveryCode}`} style={{ height: "100%" }} size={"small"}>
           <Descriptions size={"small"} column={1}>
             <Descriptions.Item

@@ -16,7 +16,7 @@ export const DevicesTab: FC<Props> = ({ devices }) => {
 
   return (
     <Row gutter={[16, 16]}>
-      {devices.map(device => (<Col span={12} key={device._id}>
+      {devices.map(device => (<Col xxl={12} sm={24} key={device._id}>
         <Card title={device.name} style={{ height: "100%" }} size={"small"}>
           <Descriptions size={"small"} bordered column={2}>
             <Descriptions.Item label="Type">{DeviceTypeLabels[device.type]}</Descriptions.Item>
