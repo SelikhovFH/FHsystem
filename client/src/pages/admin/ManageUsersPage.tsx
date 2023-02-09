@@ -244,7 +244,8 @@ export const ManageUsersPage: FC = () => {
       key: "user",
       render: (_, record) => {
         return renderUserCell(record);
-      }
+      },
+      fixed: "left"
     },
     {
       title: "Role",
@@ -335,7 +336,8 @@ export const ManageUsersPage: FC = () => {
           </Button>
 
         </Space>;
-      }
+      },
+      fixed: "right"
     }
 
   ];

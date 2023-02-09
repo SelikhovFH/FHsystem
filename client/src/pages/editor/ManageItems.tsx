@@ -154,7 +154,7 @@ export const ManageItemsPage: FC = () => {
 
                 </Space>
             },
-
+            fixed: "right"
         },
     ];
 

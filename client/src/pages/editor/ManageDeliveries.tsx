@@ -255,7 +255,8 @@ export const ManageDeliveriesPage: FC = () => {
       render: (_, record) => {
         return <Button disabled={record.status === DeliveryStatus.canceled} onClick={() => onEditClick(record)}
                        type={"primary"} icon={<EditOutlined />} />;
-      }
+      },
+      fixed: "right"
 
     }
   ];

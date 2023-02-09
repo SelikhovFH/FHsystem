@@ -243,8 +243,8 @@ export const ManageDevicesPage: FC = () => {
           </Button>
 
         </Space>;
-      }
-
+      },
+      fixed: "right"
     }
   ];
 

@@ -3,7 +3,7 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Button, Card, Layout, List, Tag, Typography } from "antd";
+import { Button, Card, Layout, List, Space, Tag, Typography } from "antd";
 import { DayOff, DayOffResponse, DayOffStatus } from "../../shared/dayOff.interface";
 import { TypeLabels } from "../../sections/dayOff";
 import { formatDate } from "../../utils/formatters";
@@ -60,16 +60,18 @@ export const ConfirmDayOffPage: FC<Props> = (props) => {
                           type="link">Approve</Button>]}
               >
                 <List.Item.Meta
-                  title={renderUserCell(item.user)}
-                  description={<span>
-                                        {TypeLabels[item.type]}
-                    {" "}
-                    <b>{formatDate(item.startDate)}</b>
-                    {" "}
-                    -
-                    {" "}
-                    <b>{formatDate(item.finishDate)}</b>
-                                    </span>}
+                  description={<Space size={"large"}>
+                    {renderUserCell(item.user)}
+                    <span>
+                      {TypeLabels[item.type]}
+                      {" "}
+                      <b>{formatDate(item.startDate)}</b>
+                      {" "}
+                      -
+                      {" "}
+                      <b>{formatDate(item.finishDate)}</b>
+                     </span>
+                  </Space>}
                 />
                 {item.dayOffExceedsLimit && <Tag color="warning">Day off exceeds user limit</Tag>}
 
