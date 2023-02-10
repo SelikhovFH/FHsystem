@@ -1,24 +1,23 @@
-import {IsEnum, IsInt, IsOptional, IsString} from 'class-validator';
-import {ItemSize} from "@interfaces/item.interface";
+import { IsEnum, IsInt, IsOptional, IsString } from "class-validator";
+import { ItemSize } from "@interfaces/item.interface";
 
 export class CreateItemDto {
   @IsString()
-  name: string
+  name: string;
 
   @IsString()
   @IsOptional()
-  description?: string
+  description?: string;
 
   @IsInt()
-  quantity: number
+  quantity: number;
 
   @IsEnum(ItemSize)
   @IsOptional()
-  size?: ItemSize
+  size?: ItemSize;
 }
 
 export class UpdateItemDto extends CreateItemDto {
   @IsString()
-  _id: string
-
+  _id: string;
 }

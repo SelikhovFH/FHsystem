@@ -1,39 +1,37 @@
-import {IsEnum, IsNumber, IsOptional, IsString} from 'class-validator';
-import {deviceOwnerUnion, DeviceType} from "@interfaces/device.interface";
+import { IsEnum, IsInt, IsOptional, IsString } from "class-validator";
+import { deviceOwnerUnion, DeviceType } from "@interfaces/device.interface";
 
 export class CreateDeviceDto {
-
   @IsString()
-  name: string
+  name: string;
   @IsEnum(DeviceType)
-  type: DeviceType
-  @IsNumber()
+  type: DeviceType;
+  @IsInt()
   @IsOptional()
-  screenSize?: number
+  screenSize?: number;
   @IsString()
   @IsOptional()
-  cpu?: string
-  @IsNumber()
+  cpu?: string;
+  @IsInt()
   @IsOptional()
-  ram?: number
-  @IsNumber()
+  ram?: number;
+  @IsInt()
   @IsOptional()
-  storage?: number
+  storage?: number;
   @IsString()
   @IsOptional()
-  serialNumber?: string
+  serialNumber?: string;
   @IsString()
-  owner: deviceOwnerUnion
-  @IsString()
-  @IsOptional()
-  assignedToId: string | null
+  owner: deviceOwnerUnion;
   @IsString()
   @IsOptional()
-  notes?: string
+  assignedToId: string | null;
+  @IsString()
+  @IsOptional()
+  notes?: string;
 }
 
 export class UpdateDeviceDto extends CreateDeviceDto {
   @IsString()
-  _id: string
-
+  _id: string;
 }

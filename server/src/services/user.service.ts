@@ -1,32 +1,66 @@
-import {User} from '@interfaces/user.interface';
-import userModel from '@models/user.model';
+import { User } from "@interfaces/user.interface";
+import userModel from "@models/user.model";
+import { UpdateUserAdminDto } from "@dtos/user.dto";
+import mongoose from "mongoose";
 
 class UserService {
   public user = userModel;
 
-  public async findUserById(userId: string): Promise<User> {
-    const findUser: User = await this.user.findOne({_id: userId});
-    return findUser;
+  public static GET_PUBLIC_PROJECTION = (field: string) => ({
+    [`${field}.auth0id`]: 0,
+    [`${field}.role`]: 0,
+    [`${field}.workStartDate`]: 0,
+    [`${field}.phone`]: 0,
+    [`${field}.emergencyContact`]: 0,
+    [`${field}.location`]: 0,
+    [`${field}.title`]: 0,
+    [`${field}.cvLink`]: 0,
+    [`${field}.status`]: 0,
+    [`${field}.salaryHistory`]: 0,
+    [`${field}.birthDate`]: 0
+  });
+
+  public async createUser(data: Partial<User>): Promise<User> {
+    return this.user.create(data);
   }
 
-  public async createUser(data: { auth0id: string; _id: string; }): Promise<User> {
-    const createUserData: User = await this.user.create(data);
-    return createUserData;
+  public async updateUser(_id: string, data: Partial<UpdateUserAdminDto>): Promise<User> {
+    return this.user.findOneAndUpdate({ _id }, data);
   }
 
-  // public async updateUser(userId: string, userData: CreateUserDto): Promise<User> {
-  //
-  //   const updateUserById: User = await this.users.findByIdAndUpdate(userId, {userData});
-  //   if (!updateUserById) throw new HttpException(409, "User doesn't exist");
-  //
-  //   return updateUserById;
-  // }
+  public async deleteUser(_id: string) {
+    return this.user.findOneAndDelete({ _id });
+  }
 
-  // public async deleteUser(userId: string): Promise<User> {
-  //   const deleteUserById: User = await this.users.findByIdAndDelete(userId);
-  //   if (!deleteUserById) throw new HttpException(409, "User doesn't exist");
-  //   return deleteUserById;
-  // }
+  public async getUserProfile(userId: string) {
+    const res = await this.user
+      .aggregate()
+      .match({
+        _id: new mongoose.Types.ObjectId(userId)
+      })
+      .lookup({
+        from: "devices",
+        as: "devices",
+        localField: "_id",
+        foreignField: "assignedToId"
+      })
+      .lookup({
+        from: "dayoffs",
+        as: "daysOff",
+        localField: "_id",
+        foreignField: "userId"
+      })
+      .exec();
+    return res[0];
+  }
+
+  public async getUsers() {
+    return this.user.find().select("+salaryHistory");
+  }
+
+  public async getUsersDisplayInfo() {
+    return this.user.find().select("name surname email");
+  }
 }
 
 export default UserService;

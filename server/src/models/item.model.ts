@@ -1,5 +1,5 @@
-import {Document, model, Schema} from 'mongoose';
-import {Item, ItemSize} from "@interfaces/item.interface";
+import { Document, model, Schema } from "mongoose";
+import { Item, ItemSize } from "@interfaces/item.interface";
 
 const itemSchema: Schema = new Schema({
   name: String,
@@ -7,7 +7,7 @@ const itemSchema: Schema = new Schema({
   quantity: Number,
   size: {
     type: String,
-    enum: Object.values(ItemSize),
+    enum: Object.values(ItemSize)
   }
 });
 const itemModel = model<Item & Document>('Item', itemSchema);

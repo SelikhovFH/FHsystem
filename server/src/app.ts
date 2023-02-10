@@ -1,23 +1,23 @@
-import compression from 'compression';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import express from 'express';
-import helmet from 'helmet';
-import hpp from 'hpp';
-import morgan from 'morgan';
-import {connect, set} from 'mongoose';
-import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import {CREDENTIALS, LOG_FORMAT, NODE_ENV, ORIGIN, PORT} from '@config';
-import {dbConnection} from '@databases';
-import {Routes} from '@interfaces/routes.interface';
-import errorMiddleware from '@middlewares/error.middleware';
-import {logger, stream} from '@utils/logger';
-import {authMiddleware} from "@middlewares/auth.middleware";
-import dayjs from 'dayjs';
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+import helmet from "helmet";
+import hpp from "hpp";
+import morgan from "morgan";
+import { connect, set } from "mongoose";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import { CREDENTIALS, LOG_FORMAT, NODE_ENV, ORIGIN, PORT } from "@config";
+import { dbConnection } from "@databases";
+import { Routes } from "@interfaces/routes.interface";
+import errorMiddleware from "@middlewares/error.middleware";
+import { logger, stream } from "@utils/logger";
+import { authMiddleware } from "@middlewares/auth.middleware";
+import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 
-dayjs.extend(isBetween)
+dayjs.extend(isBetween);
 
 class App {
   public app: express.Application;
@@ -54,6 +54,7 @@ class App {
       set('debug', true);
     }
 
+    //@ts-ignore
     connect(dbConnection.url, dbConnection.options);
   }
 
@@ -66,7 +67,7 @@ class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    this.app.use(authMiddleware)
+    this.app.use(authMiddleware);
   }
 
   private initializeRoutes(routes: Routes[]) {

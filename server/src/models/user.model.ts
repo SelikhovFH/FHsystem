@@ -1,15 +1,48 @@
-import {Document, model, Schema} from 'mongoose';
-import {User} from '@interfaces/user.interface';
+import { Document, model, Schema } from "mongoose";
+import { User, UserRole, UserStatus } from "@interfaces/user.interface";
 
-//Domain specific information should be stored in mongo. Other non specific info (email, avatar, password, etc) is handled by auth0
 const userSchema: Schema = new Schema({
   auth0id: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  role: {
+    type: String,
+    enum: Object.values(UserRole),
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  surname: {
+    type: String,
+    required: true
+  },
+  workStartDate: Date,
+  phone: String,
+  emergencyContact: String,
+  location: String,
+  title: String,
+  cvLink: String,
+  status: {
+    type: String,
+    enum: Object.values(UserStatus)
+  },
+  salaryHistory: {
+    type: [{ value: Number, date: Date }],
+    select: false
+  },
+  birthDate: Date
+
 });
 
-const userModel = model<User & Document>('User', userSchema);
+const userModel = model<User & Document>("User", userSchema);
 
 export default userModel;

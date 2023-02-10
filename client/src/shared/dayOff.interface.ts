@@ -1,23 +1,31 @@
+import { User } from "./user.interface";
+
+
 export interface DayOff {
   _id: string;
   startDate: string;
   finishDate: string;
-  dayCount: number
+  dayCount: number;
   userId: string;
   approvedById: string;
-  status: DayOffStatus
-  type: DayOffType
+  status: DayOffStatus;
+  type: DayOffType;
+}
+
+export interface DayOffResponse extends DayOff {
+  user: User;
+  dayOffExceedsLimit: boolean;
 }
 
 export enum DayOffStatus {
-  pending = 'pending',
-  approved = 'approved',
-  declined = 'declined'
+  pending = "pending",
+  approved = "approved",
+  declined = "declined",
 }
 
 export enum DayOffType {
-  vacation = 'vacation',
-  sickLeave = 'sickLeave',
-  unpaid = 'unpaid',
-  dayOff = 'dayOff'
+  vacation = "vacation",
+  sickLeave = "sickLeave",
+  unpaid = "unpaid",
+  dayOff = "dayOff",
 }
