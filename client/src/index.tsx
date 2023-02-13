@@ -13,30 +13,31 @@ import * as dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayOfYear from "dayjs/plugin/dayOfYear";
 
-dayjs.extend(dayOfYear)
-dayjs.extend(isBetween)
+dayjs.extend(dayOfYear);
+dayjs.extend(isBetween);
+
 
 const root = ReactDOM.createRoot(
-    document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 root.render(
-    <React.StrictMode>
-        <Auth0Provider
-            domain={process.env.REACT_APP_AUTH0_DOMAIN!}
-            clientId={process.env.REACT_APP_AUTH0_CLIENTID!}
-            audience={process.env.REACT_APP_AUTH0_AUDIENCE!}
-            redirectUri={process.env.REACT_APP_ATH0_REDIRECT_URI!}
-            scope="openid profile email admin:admin editor:editor"
-            useRefreshTokens={true}
-            cacheLocation={"localstorage"}
-        >
-            <QueryClientProvider client={queryClient}>
-                <Auth0Ready>
-                    <RouterProvider router={router}/>
-                </Auth0Ready>
-            </QueryClientProvider>
-        </Auth0Provider>
-    </React.StrictMode>
+  <React.StrictMode>
+    <Auth0Provider
+      domain={process.env.REACT_APP_AUTH0_DOMAIN!}
+      clientId={process.env.REACT_APP_AUTH0_CLIENTID!}
+      audience={process.env.REACT_APP_AUTH0_AUDIENCE!}
+      redirectUri={process.env.REACT_APP_ATH0_REDIRECT_URI!}
+      scope="openid profile email admin:admin editor:editor"
+      useRefreshTokens={true}
+      cacheLocation={"localstorage"}
+    >
+      <QueryClientProvider client={queryClient}>
+        <Auth0Ready>
+          <RouterProvider router={router} />
+        </Auth0Ready>
+      </QueryClientProvider>
+    </Auth0Provider>
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
