@@ -6,16 +6,16 @@ phases:
       nodejs: latest
     commands:
       - npm install -g yarn typescript
-      - yarn install
+      - cd server && yarn install
   build:
     commands:
-      - yarn build
+      - cd server && yarn build
 
 artifacts:
   files:
-    - yarn.lock
-    - package.json
-    - 'build/**/*'
-    - '.platform/**/*' # AWS Elastic Beanstalk configuration files
-    - '.ebextensions/**/*' # AWS Elastic Beanstalk configuration files
+    - 'server/yarn.lock'
+    - 'server/package.json'
+    - 'server/build/**/*'
+    - 'server/.platform/**/*' # AWS Elastic Beanstalk configuration files
+    - 'server/.ebextensions/**/*' # AWS Elastic Beanstalk configuration files
   discard-paths: no
