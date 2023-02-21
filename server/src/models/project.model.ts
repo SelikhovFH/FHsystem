@@ -1,3 +1,4 @@
+import { Project } from "@/interfaces/project.interface";
 import { Document, model, Schema } from "mongoose";
 
 const projectSchema: Schema = new Schema({

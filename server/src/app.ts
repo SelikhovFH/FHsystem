@@ -16,8 +16,12 @@ import { logger, stream } from "@utils/logger";
 import { authMiddleware } from "@middlewares/auth.middleware";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import dayjsBusinessDays from "dayjs-business-days";
+import minMax from "dayjs/plugin/minMax";
 
 dayjs.extend(isBetween);
+dayjs.extend(dayjsBusinessDays);
+dayjs.extend(minMax);
 
 class App {
   public app: express.Application;
@@ -26,7 +30,7 @@ class App {
 
   constructor(routes: Routes[]) {
     this.app = express();
-    this.env = NODE_ENV || 'development';
+    this.env = NODE_ENV || "development";
     this.port = PORT || 3000;
 
     this.initializeSwagger();
