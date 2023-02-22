@@ -1,5 +1,5 @@
-import { User } from "@interfaces/user.interface";
-import { Project } from "@interfaces/project.interface";
+import { User } from "./user.interface";
+import { Project } from "./project.interface";
 
 export interface TimeTrack {
   _id: string;

@@ -1,6 +1,6 @@
 import timeTrackModel from "@models/timeTrack.model";
 import { CreateTimeTrackDto, UpdateTimeTrackDto } from "@dtos/timeTrack.dto";
-import { TimeTrack } from "@interfaces/timeTrack.interface";
+import { CreateTrackPrefill, TimeTrack, WorkingDaysInfo } from "@interfaces/timeTrack.interface";
 import userModel from "@models/user.model";
 import userService from "@services/user.service";
 import dayjs from "dayjs";
@@ -28,8 +28,25 @@ class TimeTrackService {
     return this.timeTrack.findOneAndDelete({ _id });
   }
 
-  public async getUserTimeTracks(userId: string) {
-    return this.timeTrack.find({ userId });
+  public async getUserTimeTracks(userId: string, date: Date) {
+    const start = dayjs(date).startOf("month").toDate();
+    const finish = dayjs(date).endOf("month").toDate();
+    return this.timeTrack.aggregate().match({
+      date: {
+        $gte: start,
+        $lte: finish
+      }
+    }).lookup({
+      from: "projects",
+      localField: "projectId",
+      foreignField: "_id",
+      as: "project"
+    })
+      .unwind({
+        path: "$project",
+        preserveNullAndEmptyArrays: true
+      })
+      .exec();
   }
 
   public async getTimeTrackById(_id: string) {
@@ -51,8 +68,18 @@ class TimeTrackService {
       foreignField: "_id",
       as: "user"
     })
+      .lookup({
+        from: "projects",
+        localField: "projectId",
+        foreignField: "_id",
+        as: "project"
+      })
       .unwind({
         path: "$user",
+        preserveNullAndEmptyArrays: true
+      })
+      .unwind({
+        path: "$project",
         preserveNullAndEmptyArrays: true
       })
       .project(userService.GET_PUBLIC_PROJECTION("user"))
@@ -62,19 +89,26 @@ class TimeTrackService {
       .exec();
   }
 
-  public async getCreateTrackPrefill(userId: string, date: Date) {
+  public async getCreateTrackPrefill(userId: string, date: Date): Promise<CreateTrackPrefill> {
     const workingHours = await this.getWorkingDays(date);
     const userDaysOff = await this.getUserDaysOff(userId, date);
-    const daysOffDays = Object.values(userDaysOff).reduce((acc, v) => acc + v, 0);
+    const start = dayjs(date).startOf("month").toDate();
+    const finish = dayjs(date).endOf("month").toDate();
+    const timeTracksForUserForMonth = await this.timeTrack.find({
+      userId,
+      date: {
+        $gte: start,
+        $lte: finish
+      }
+    });
+    const trackedHours = timeTracksForUserForMonth.reduce((acc, v) => acc + v.hours, 0);
+    const dayOffDays = Object.values(userDaysOff).reduce((acc, v) => acc + v, 0);
     return {
       ...workingHours,
-      dayOffDays: daysOffDays,
-      resultHours: (workingHours.workingDays - workingHours.eventsDays - daysOffDays) * 8,
-      comment: `
-      ${userDaysOff.dayOff && `Days off: ${userDaysOff.dayOff}`}
-      ${userDaysOff.sickLeave && `Sick leaves: ${userDaysOff.sickLeave}`}
-      ${userDaysOff.vacation && `Vacations: ${userDaysOff.vacation}`}
-      ${userDaysOff.unpaid && `Unpaid days off: ${userDaysOff.unpaid}`}
+      trackedHours,
+      dayOffDays,
+      totalUserHours: (workingHours.workingDays - workingHours.eventsDays - dayOffDays) * 8,
+      comment: `${userDaysOff.dayOff ? `Days off: ${userDaysOff.dayOff}\n` : ""}${userDaysOff.sickLeave ? `Sick leaves: ${userDaysOff.sickLeave}\n` : ""}${userDaysOff.vacation ? `Vacations: ${userDaysOff.vacation}\n` : ""}${userDaysOff.unpaid ? `Unpaid days off: ${userDaysOff.unpaid}\n` : ""}
       `
     };
   }
@@ -100,13 +134,12 @@ class TimeTrackService {
         }
       ]
     });
-
     return intersectingDaysOff.reduce((acc, dayOff) => {
       const newAcc = { ...acc };
       const limitedDayOffStart = dayjs.max(dayjs(dayOff.startDate), start);
       const limitedDayOffFinish = dayjs.min(dayjs(dayOff.finishDate), finish);
       // @ts-ignore
-      const limitedBusinessDays = limitedDayOffStart.businessDiff(limitedDayOffFinish);
+      const limitedBusinessDays = Math.abs(limitedDayOffStart.businessDiff(limitedDayOffFinish)) + 1;
 
       newAcc[dayOff.type] += limitedBusinessDays;
 
@@ -115,11 +148,11 @@ class TimeTrackService {
 
   }
 
-  public async getWorkingDays(date: Date) {
+  public async getWorkingDays(date: Date): Promise<WorkingDaysInfo> {
     const start = dayjs(date).startOf("month").toDate();
     const finish = dayjs(date).endOf("month").toDate();
     // @ts-ignore
-    const workingDays = dayjs(monthForTracks).businessDaysInMonth().length;
+    const workingDays = dayjs(date).businessDaysInMonth().length;
     const holidayCalendarEventsForMonth = await this.calendarEvent.find({
       isDayOff: true, $or: [
         { date: { $gte: start, $lte: finish } },
@@ -135,9 +168,11 @@ class TimeTrackService {
       // @ts-ignore
       return dayjs(event.date).isBusinessDay();
     });
+    const eventsDays = calendarEventsOnBusinessDays.length;
     return {
       workingDays: workingDays,
-      eventsDays: calendarEventsOnBusinessDays.length
+      eventsDays: eventsDays,
+      totalHours: (workingDays - eventsDays) * 8
     };
   }
 

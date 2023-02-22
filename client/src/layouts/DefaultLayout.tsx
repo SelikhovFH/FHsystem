@@ -28,18 +28,21 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('🏠 Homepage', AppRoutes.index,),
-    getItem('📅 Book day off', AppRoutes.bookDayOff),
-    getItem('👤 Profile', AppRoutes.profile,),
+  getItem("🏠 Homepage", AppRoutes.index),
+  getItem("📅 Book day off", AppRoutes.bookDayOff),
+  getItem("⏱️ Track time", AppRoutes.timeTrack),
+  getItem("👤 Profile", AppRoutes.profile)
 ];
 
 const editorItems = [
     getItem('Editor', 'editor', null, [
-        getItem('✅ Confirm day off', EditorRoutes.confirmDayOff),
-        getItem('🎉 Holidays & celebrations', EditorRoutes.holidaysAndCelebrations),
-        getItem('💻 Manage devices', EditorRoutes.manageDevices),
-        getItem('🪑 Manage items', EditorRoutes.manageItems),
-        getItem('🚚 Manage deliveries', EditorRoutes.manageDeliveries)
+      getItem("✅ Confirm day off", EditorRoutes.confirmDayOff),
+      getItem("🕒 Time tracking overview", EditorRoutes.timeTrackOverview),
+      getItem("🎉 Holidays & celebrations", EditorRoutes.holidaysAndCelebrations),
+      getItem("💻 Manage devices", EditorRoutes.manageDevices),
+      getItem("🪑 Manage items", EditorRoutes.manageItems),
+      getItem("🚚 Manage deliveries", EditorRoutes.manageDeliveries),
+      getItem("🚧 Manage projects", EditorRoutes.manageProjects)
     ], 'group'),
 ]
 

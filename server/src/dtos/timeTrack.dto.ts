@@ -14,6 +14,7 @@ export class CreateTimeTrackDto {
   projectId: string;
 
   @IsBoolean()
+  @IsOptional()
   isMonthTrack: boolean;
 
   @IsString()

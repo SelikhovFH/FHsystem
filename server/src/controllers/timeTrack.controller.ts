@@ -3,6 +3,7 @@ import { CreateTimeTrackDto, GetTimeTrackDto, UpdateTimeTrackDto } from "@dtos/t
 import TimeTrackService from "@services/timeTrack.service";
 import UserService from "@services/user.service";
 import { HttpException } from "@exceptions/HttpException";
+import * as console from "console";
 
 
 class TimeTrackController {
@@ -26,7 +27,7 @@ class TimeTrackController {
       const userId = req.auth.payload.db_id as string;
       const timeTrackData: UpdateTimeTrackDto = req.body;
       const prevTimeTrack = await this.timeTrackService.getTimeTrackById(timeTrackData._id);
-      if (userId !== prevTimeTrack.userId) {
+      if (userId !== prevTimeTrack.userId.toString()) {
         throw new HttpException(400, "Can't update another user time track");
       }
       await this.timeTrackService.validateTimeTrack(timeTrackData);
@@ -42,7 +43,10 @@ class TimeTrackController {
       const { id } = req.params;
       const userId = req.auth.payload.db_id as string;
       const prevTimeTrack = await this.timeTrackService.getTimeTrackById(id);
-      if (userId !== prevTimeTrack.userId) {
+      console.log("userId", userId);
+      console.log("prevTimeTrack", prevTimeTrack);
+
+      if (userId !== prevTimeTrack.userId.toString()) {
         throw new HttpException(400, "Can't delete another user time track");
       }
       const data = await this.timeTrackService.deleteTimeTrack(id);
@@ -54,8 +58,10 @@ class TimeTrackController {
 
   getMyTimeTracks = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { date } = req.query as unknown as GetTimeTrackDto;
+      const parsedDate = date ? new Date(date) : new Date();
       const userId = req.auth.payload.db_id as string;
-      const data = await this.timeTrackService.getUserTimeTracks(userId);
+      const data = await this.timeTrackService.getUserTimeTracks(userId, parsedDate);
       res.status(200).json({ message: "ok", data });
     } catch (error) {
       next(error);
@@ -69,10 +75,7 @@ class TimeTrackController {
       const timeTracks = await this.timeTrackService.getTimeTracks(parsedDate);
       const users = await this.userService.getUsersDisplayInfo();
       const workingDays = await this.timeTrackService.getWorkingDays(parsedDate);
-      const usersWithNoTracks = users.filter(user => !timeTracks.find(track => track.userId === user._id)).map(user => ({
-        ...user,
-        noTracks: true
-      }));
+      const usersWithNoTracks = users.filter(user => !timeTracks.find(track => track.userId === user._id));
       res.status(200).json({ message: "ok", data: { timeTracks, usersWithNoTracks, workingDays } });
     } catch (error) {
       next(error);

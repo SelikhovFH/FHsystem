@@ -16,11 +16,11 @@ class ItemsRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/my`, this.timeTrackController.getMyTimeTracks);
+    this.router.get(`${this.path}/my`, validationMiddleware(GetTimeTrackDto, "query"), this.timeTrackController.getMyTimeTracks);
     this.router.post(`${this.path}/my`, validationMiddleware(CreateTimeTrackDto, "body"), this.timeTrackController.createTimeTrack);
     this.router.delete(`${this.path}/my/:id`, validationMiddleware(DeleteDto, "params"), this.timeTrackController.deleteTimeTrack);
     this.router.patch(`${this.path}/my`, validationMiddleware(UpdateTimeTrackDto, "body"), this.timeTrackController.updateTimeTrack);
-    this.router.patch(`${this.path}/my/prefill`, this.timeTrackController.getCreateTrackPrefill);
+    this.router.get(`${this.path}/my/prefill`, this.timeTrackController.getCreateTrackPrefill);
     this.router.get(`${this.path}`, isEditorMiddleware, validationMiddleware(GetTimeTrackDto, "query"), this.timeTrackController.getTimeTracks);
   }
 }

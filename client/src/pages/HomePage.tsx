@@ -68,6 +68,7 @@ export const HomePage: FC = (props) => {
         </Title>
         <Space wrap size={"middle"}>
           <ActivityCard title={"Book day off"} link={AppRoutes.bookDayOff} icon={"📅"} />
+          <ActivityCard title={"Track time"} link={AppRoutes.timeTrack} icon={"⏱"} />
           <ActivityCard title={"Profile"} link={AppRoutes.profile} icon={"👤"} />
           <ActivityCard title={"Report a bug"} link={""} icon={"🐛"} onClick={showModal} />
         </Space>
@@ -78,10 +79,13 @@ export const HomePage: FC = (props) => {
           </Title>
           <Space wrap size={"middle"}>
             <ActivityCard title={"Confirm day off"} link={EditorRoutes.confirmDayOff} icon={"✅"} />
+            <ActivityCard title={"Time tracking"} link={EditorRoutes.confirmDayOff} icon={"🕒"} />
             <ActivityCard title={"Celebrations"} link={EditorRoutes.holidaysAndCelebrations} icon={"🎉"} />
             <ActivityCard title={"Manage devices"} link={EditorRoutes.manageDevices} icon={"💻"} />
             <ActivityCard title={"Manage items"} link={EditorRoutes.manageItems} icon={"🪑"} />
             <ActivityCard title={"Manage deliveries"} link={EditorRoutes.manageDeliveries} icon={"🚚"} />
+            <ActivityCard title={"Manage projects"} link={EditorRoutes.manageProjects} icon={"🚧"} />
+
           </Space>
         </>}
         {isAdmin && <>
