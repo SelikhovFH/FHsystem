@@ -1,204 +1,173 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Button, Card, Form, Input, InputNumber, Layout, Modal, Select, Space, Table } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import * as yup from "yup";
-import { getYupRule } from "../../utils/yupRule";
-import styles from "../FormStyles.module.css";
-import { ColumnsType } from "antd/es/table";
-import { FormProps } from "../../utils/types";
-import { Item, ItemSize } from "../../shared/item.interface";
+import {
+  Badge,
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Descriptions,
+  Layout,
+  List,
+  Popover,
+  Row,
+  Statistic,
+  Typography
+} from "antd";
 import { useApiFactory } from "../../services/apiFactory";
+import { GetTimeTracksResponse } from "../../shared/timeTrack.interface";
+import dayjs from "dayjs";
+import { API } from "../../services/api";
+import { formatBoolean, formatDate, formatMonth } from "../../utils/formatters";
+import { renderUserCell } from "../../components/table/RenderUserCell";
+import { Link } from "react-router-dom";
+import { EditorRoutes } from "../../router/AppRoutes";
+import { User } from "../../shared/user.interface";
 
 const { Content } = Layout;
+const { Title, Text } = Typography;
 
-const schema = yup.object().shape({
-  name: yup.string().required(),
-  description: yup.string(),
-  quantity: yup.number().min(0),
-  size: yup.string()
-});
-
-
-const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, buttonText, initialValues }) => {
-  useEffect(() => {
-    form.resetFields();
-  }, [initialValues]);
-  return <Form className={styles.form} initialValues={initialValues} form={form} name="item"
-               layout={"vertical"}
-               onFinish={onFinish}
-               autoComplete="off">
-    <Form.Item rules={[getYupRule(schema)]} label="Name"
-               name="name">
-      <Input />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Description"
-               name="description">
-      <Input.TextArea rows={4} />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Quantity"
-               name="quantity">
-      <InputNumber min={0} />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Size"
-               name="size">
-      <Select
-        options={Object.values(ItemSize).map(v => ({ value: v, label: v }))}
-      />
-    </Form.Item>
-    <Form.Item>
-      <Button disabled={buttonDisabled} type="primary" htmlType="submit">
-        {buttonText}
-      </Button>
-    </Form.Item>
-  </Form>;
+const getRibbonProps = (totalHours: number, userHours: number) => {
+  if (userHours === totalHours) {
+    return { text: "Normal hours", color: "" };
+  } else if (userHours > totalHours) {
+    return { text: "Overtime hours", color: "green" };
+  } else if (userHours < totalHours) {
+    return { text: "Insufficient hours", color: "orange" };
+  }
 };
 
 export const TimeTrackOverviewPage: FC = () => {
-
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState(dayjs());
 
   const {
-    data: items,
-    form,
-    addMutation,
-    deleteMutation,
-    editMutation,
-    messageContext
-  } = useApiFactory<Item[], Item>({
-    basePath: "/items",
-    add: {
-      onSuccess: () => {
-        setIsOpen(false);
-      }
-    },
-    edit: {
-      onSuccess: () => {
-        setIsOpen(false);
-        setItemToEdit(null);
+    data: timeTrackData
+  } = useApiFactory<GetTimeTracksResponse>({
+    basePath: "/time_tracks",
+    get: {
+      queryKeys: ["/time_tracks/my", selectedMonth],
+      fetcher: async (config) => {
+        const params = new URLSearchParams({
+          date: selectedMonth.toISOString()
+        });
+        const res = await API.get(`/time_tracks/?${params.toString()}`, config);
+        return res.data.data as GetTimeTracksResponse;
       }
     }
   });
-
-  const showAddModal = () => {
-    setIsOpen(true);
-  };
-
-  const handleAddCancel = () => {
-    form.resetFields();
-    setIsOpen(false);
-  };
-
-  const handleEditCancel = () => {
-    setItemToEdit(null);
-    form.resetFields();
-    setIsOpen(false);
-  };
-
-
-  const onAddFinish = (values: any) => {
-    addMutation.mutate(values);
-  };
-
-  const onEditFinish = (values: any) => {
-    editMutation.mutate({ _id: itemToEdit?._id, ...values });
-  };
-
-  const onDelete = (values: any) => {
-    deleteMutation.mutate(values._id);
-  };
-
-  const onEditClick = (item: Item) => {
-    setItemToEdit(item);
-    setIsOpen(true);
-  };
-
-  const columns: ColumnsType<Item> = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name"
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description"
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity"
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size"
-    },
-    {
-      title: "Operations",
-      dataIndex: "operations",
-      key: "operations",
-      render: (_, record) => {
-        return <Space>
-          <Button onClick={() => onEditClick(record)} type={"primary"} icon={<EditOutlined />}>
-          </Button>
-          <Button disabled={deleteMutation.isLoading} onClick={() => onDelete(record)} danger
-                  type={"primary"}
-                  icon={<DeleteOutlined />}>
-          </Button>
-
-        </Space>;
-      },
-      fixed: "right"
-    }
-  ];
+  const { data, isLoading } = timeTrackData;
+  const usersTracked = data?.timeTracks.length;
+  console.log(usersTracked);
+  const totalUsers = (usersTracked ?? 0) + (data?.usersWithNoTracks.length ?? 0);
+  console.log(totalUsers);
 
   return (
     <>
-      {messageContext}
-
-      <Modal destroyOnClose footer={[]} title={"Update item"} open={isOpen && !!itemToEdit}
-             onCancel={handleEditCancel}>
-        <AddOrUpdateForm
-          initialValues={itemToEdit}
-          form={form}
-          onFinish={onEditFinish}
-          buttonDisabled={editMutation.isLoading}
-          buttonText={"Edit item"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add item"} open={isOpen && !itemToEdit}
-             onCancel={handleAddCancel}>
-        <AddOrUpdateForm
-          form={form}
-          onFinish={onAddFinish}
-          buttonDisabled={addMutation.isLoading}
-          buttonText={"Add new item"} />
-      </Modal>
-
-
-      <AppHeader title={"Manage items"} />
+      <AppHeader title={"Time tracks overview"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock
           errors={[
-            items.error as AxiosError,
-            addMutation.error as AxiosError,
-            editMutation.error as AxiosError,
-            deleteMutation.error as AxiosError
+            timeTrackData.error as AxiosError
           ]} />
         <Gutter size={2} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
-          <Button onClick={showAddModal} type="primary" icon={<PlusOutlined />}>
-            Add item
-          </Button>
+          <Title level={4}>Time tracking statistics in {formatMonth(selectedMonth)}</Title>
+          <Gutter size={1} />
+          <Row gutter={16}>
+            <Col span={6}>
+              <Statistic title="Users with time tracked / total users" value={usersTracked} suffix={`/ ${totalUsers}`}
+                         loading={isLoading} />
+            </Col>
+            <Col span={6}>
+              <Statistic title="Hours to be tracked" value={data?.workingDays.totalHours} loading={isLoading} />
+            </Col>
+            <Col span={6}>
+              <Statistic title="Working days in this months (excluding holidays and days off)"
+                         value={data?.workingDays.workingDays} loading={isLoading} />
+            </Col>
+            <Col span={6}>
+              <Statistic title="Holidays & celebrations with day off in this month"
+                         value={data?.workingDays.eventsDays}
+                         loading={isLoading} />
+              <Link to={EditorRoutes.holidaysAndCelebrations}>
+                <Button style={{ marginTop: 16 }} type="default">
+                  Add celebration
+                </Button>
+              </Link>
+            </Col>
+          </Row>
         </Card>
         <Gutter size={2} />
-        <Table scroll={{ x: true }} loading={items.isLoading} dataSource={items.data} columns={columns}
-               rowClassName={(record, index) => record.quantity <= 0 ? styles.dimmedRow : ""} />
+        <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
+          <DatePicker allowClear={false} value={selectedMonth} onChange={v => setSelectedMonth(v!)} picker="month" />
+        </Card>
+        <Gutter size={2} />
+        <List
+          loading={timeTrackData.isLoading}
+          grid={{
+            gutter: 0,
+            xs: 1,
+            sm: 2,
+            md: 2,
+            lg: 3,
+            xl: 4,
+            xxl: 4
+          }}
+          // @ts-ignore
+          dataSource={data?.timeTracks.concat(data?.usersWithNoTracks)}
+          renderItem={(item) => {
+            if (!item.tracks) {
+              return <List.Item style={{ height: "100%" }}>
+                <Badge.Ribbon color={"red"} text={"No tracked hours"}>
+                  <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4, height: "100%" }}
+                  >
+                    {renderUserCell(item as unknown as User)}
+                    <Gutter size={4} />
+                  </Card>
+                </Badge.Ribbon>
+              </List.Item>;
+            }
+
+            return (
+              <List.Item>
+                <Badge.Ribbon {...getRibbonProps(data?.workingDays.totalHours ?? 0, item.totalHours)}>
+                  <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}
+                  >
+                    {renderUserCell(item.user)}
+                    <Text strong>
+                      Total hours: {item.totalHours}
+                    </Text>
+                    <Popover showArrow={false} content={<div style={{ width: 800 }}><List
+                      size="small"
+                      grid={{ gutter: 16, column: 4 }}
+                      dataSource={item.tracks}
+                      renderItem={(record) => <List.Item>
+                        <List.Item.Meta title={formatDate(record.date)} description={
+                          <Descriptions size={"small"} column={1}>
+                            <Descriptions.Item label="Hours">{record.hours}</Descriptions.Item>
+                            <Descriptions.Item
+                              label="Is month track">{formatBoolean(record.isMonthTrack)}</Descriptions.Item>
+                            <Descriptions.Item label="Project">{record.project.name}</Descriptions.Item>
+                            {record.comment && <Descriptions.Item label="Comment">{record.comment}</Descriptions.Item>}
+                          </Descriptions>
+                        } />
+                      </List.Item>}
+                    /></div>}
+                             title="Details" trigger="click">
+                      <Button type="link">
+                        Details
+                      </Button>
+                    </Popover>
+
+                  </Card>
+                </Badge.Ribbon>
+              </List.Item>
+            );
+          }}
+        />
       </Content>
     </>
   );

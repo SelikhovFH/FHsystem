@@ -75,7 +75,7 @@ class TimeTrackController {
       const timeTracks = await this.timeTrackService.getTimeTracks(parsedDate);
       const users = await this.userService.getUsersDisplayInfo();
       const workingDays = await this.timeTrackService.getWorkingDays(parsedDate);
-      const usersWithNoTracks = users.filter(user => !timeTracks.find(track => track.userId === user._id));
+      const usersWithNoTracks = users.filter(user => !timeTracks.find(track => track.userId.toString() === user._id.toString()));
       res.status(200).json({ message: "ok", data: { timeTracks, usersWithNoTracks, workingDays } });
     } catch (error) {
       next(error);

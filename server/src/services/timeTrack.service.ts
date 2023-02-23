@@ -57,17 +57,13 @@ class TimeTrackService {
   public async getTimeTracks(date: Date) {
     const start = dayjs(date).startOf("month").toDate();
     const finish = dayjs(date).endOf("month").toDate();
-    return this.timeTrack.aggregate().match({
-      date: {
-        $gte: start,
-        $lte: finish
-      }
-    }).lookup({
-      from: "users",
-      localField: "userId",
-      foreignField: "_id",
-      as: "user"
-    })
+    return this.timeTrack.aggregate()
+      .match({
+        date: {
+          $gte: start,
+          $lte: finish
+        }
+      })
       .lookup({
         from: "projects",
         localField: "projectId",
@@ -75,17 +71,26 @@ class TimeTrackService {
         as: "project"
       })
       .unwind({
-        path: "$user",
-        preserveNullAndEmptyArrays: true
-      })
-      .unwind({
         path: "$project",
         preserveNullAndEmptyArrays: true
       })
-      .project(userService.GET_PUBLIC_PROJECTION("user"))
       .group({
-        _id: "userId"
+        _id: "userId",
+        userId: { "$first": "$userId" },
+        totalHours: { "$sum": "$hours" },
+        tracks: { $push: "$$ROOT" }
       })
+      .lookup({
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "user"
+      })
+      .unwind({
+        path: "$user",
+        preserveNullAndEmptyArrays: true
+      })
+      .project(userService.GET_PUBLIC_PROJECTION("user"))
       .exec();
   }
 

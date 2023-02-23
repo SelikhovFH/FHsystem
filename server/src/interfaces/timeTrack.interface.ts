@@ -12,7 +12,6 @@ export interface TimeTrack {
 }
 
 export interface TimeTrackResponse extends TimeTrack {
-  user: User;
   project: Project;
 }
 
@@ -30,7 +29,12 @@ export interface CreateTrackPrefill extends WorkingDaysInfo {
 }
 
 export interface GetTimeTracksResponse {
-  timeTracks: { userId: string, timeTracks: TimeTrackResponse[] }[],
+  timeTracks: {
+    userId: string,
+    user: User;
+    totalHours: number;
+    tracks: TimeTrackResponse[]
+  }[],
   usersWithNoTracks: User[],
   workingDays: WorkingDaysInfo
 }

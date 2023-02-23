@@ -256,6 +256,8 @@ export const TimeTrackPage: FC = () => {
           ]} />
         <Gutter size={2} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
+          <Title level={4}>Your time tracking statistics in {formatMonth(dayjs())}</Title>
+          <Gutter size={1} />
           <Row gutter={16}>
             <Col span={6}>
               <Statistic title="Hours tracked / must be time-tracked" value={createTrackPrefill?.trackedHours}
@@ -288,6 +290,7 @@ export const TimeTrackPage: FC = () => {
         <Gutter size={2} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
           <DatePicker allowClear={false} value={selectedMonth} onChange={v => setSelectedMonth(v!)} picker="month" />
+          <Gutter size={1} />
           <List
             style={{ background: "white" }}
             loading={tracks.isLoading || deleteMutation.isLoading || editMutation.isLoading}
