@@ -42,7 +42,9 @@ const editorItems = [
       getItem("💻 Manage devices", EditorRoutes.manageDevices),
       getItem("🪑 Manage items", EditorRoutes.manageItems),
       getItem("🚚 Manage deliveries", EditorRoutes.manageDeliveries),
-      getItem("🚧 Manage projects", EditorRoutes.manageProjects)
+      getItem("🚧 Manage projects", EditorRoutes.manageProjects),
+      getItem("🤹 Manage skill tags", EditorRoutes.manageSkillTags)
+
     ], 'group'),
 ]
 
