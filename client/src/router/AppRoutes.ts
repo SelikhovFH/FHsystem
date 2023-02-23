@@ -12,7 +12,8 @@ export enum EditorRoutes {
   manageItems = "/manage_items",
   manageDeliveries = "/manage_deliveries",
   manageProjects = "/manage_projects",
-  timeTrackOverview = "/time_track_overview"
+  timeTrackOverview = "/time_tracks_overview",
+  userTimeTracks = "/time_tracks/:id"
 }
 
 export enum AdminRoutes {
@@ -21,5 +22,9 @@ export enum AdminRoutes {
 }
 
 export const getUserProfileRoute = (userId: string) => {
-    return `/user/${userId}`;
+  return `/user/${userId}`;
+};
+
+export const getUserTracksRoute = (userId: string) => {
+  return `/time_tracks/${userId}`;
 };

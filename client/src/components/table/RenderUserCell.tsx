@@ -1,37 +1,39 @@
 import { User } from "../../shared/user.interface";
 import { FC, ReactNode } from "react";
-import { Typography } from "antd";
+import { theme, Typography } from "antd";
 import { Link as NavLink } from "react-router-dom";
 import { getUserProfileRoute } from "../../router/AppRoutes";
 import { useIsAdmin } from "../../wrappers/RequireAdmin";
 
-const { Link, Text } = Typography;
+const { Link, Text, Title } = Typography;
 
 
-const UserCell: FC<{ user: User }> = ({ user }) => {
+export const UserCell: FC<{ user: User, title?: boolean }> = ({ user, title }) => {
+  const userName = `${user.name} ${user.surname}`;
+  const { token } = theme.useToken();
   const isAdmin = useIsAdmin();
   if (isAdmin) {
     return (
       <NavLink to={getUserProfileRoute(user._id)}>
         <Link>
-          {user.name}
-          {" "}
-          {user.surname}
-          <div style={{ fontSize: "0.75em", whiteSpace: "nowrap" }}>({user.email})</div>
+          {title ? <Title style={{ color: token.colorLink }} level={3}>{userName}</Title> : <>
+            {userName}
+
+            <div style={{ fontSize: "0.75em", whiteSpace: "nowrap" }}>({user.email})</div>
+          </>}
+
         </Link>
       </NavLink>
     );
   }
-  return <Text>
-    {user.name}
-    {" "}
-    {user.surname}
+  return title ? <Title level={3}>{userName}</Title> : <Text>
+    {userName}
     <div style={{ fontSize: "0.75em", whiteSpace: "nowrap" }}>({user.email})</div>
   </Text>;
 
 };
 
-export const renderUserCell = (user: User): ReactNode => {
+export const renderUserCell = (user?: User): ReactNode => {
   if (!user) {
     return null;
   }

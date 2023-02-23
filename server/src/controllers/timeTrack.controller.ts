@@ -93,6 +93,22 @@ class TimeTrackController {
     }
   };
 
+  getUserTimeTracks = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { date } = req.query as unknown as GetTimeTrackDto;
+      const { userId } = req.params;
+      const parsedDate = date ? new Date(date) : new Date();
+
+      const timeTracks = await this.timeTrackService.getUserTimeTracksGroupedByProject(userId, parsedDate);
+      const info = await this.timeTrackService.getCreateTrackPrefill(userId, parsedDate);
+      const user = await this.userService.getUserDisplayInfoById(userId);
+
+      res.status(200).json({ message: "ok", data: { timeTracks, info, user } });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 
 }
 

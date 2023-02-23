@@ -31,3 +31,8 @@ export class GetTimeTrackDto {
   @IsDateString()
   date: string;
 }
+
+export class GetUserTracksDto {
+  @IsString()
+  userId: string;
+}

@@ -267,7 +267,7 @@ export const TimeTrackPage: FC = () => {
               </Button>
             </Col>
             <Col span={6}>
-              <Statistic title="Working days in this months (excluding holidays and days off)"
+              <Statistic title="Business days in this months (excluding holidays and days off)"
                          value={createTrackPrefill?.workingDays} loading={isLoading} />
             </Col>
             <Col span={6}>

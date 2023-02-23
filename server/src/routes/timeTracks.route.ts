@@ -4,7 +4,7 @@ import validationMiddleware from "@middlewares/validation.middleware";
 import { isEditorMiddleware } from "@middlewares/auth.middleware";
 import { DeleteDto } from "@dtos/common.dto";
 import TimeTrackController from "@controllers/timeTrack.controller";
-import { CreateTimeTrackDto, GetTimeTrackDto, UpdateTimeTrackDto } from "@dtos/timeTrack.dto";
+import { CreateTimeTrackDto, GetTimeTrackDto, GetUserTracksDto, UpdateTimeTrackDto } from "@dtos/timeTrack.dto";
 
 class ItemsRoute implements Routes {
   public path = "/time_tracks";
@@ -22,6 +22,8 @@ class ItemsRoute implements Routes {
     this.router.patch(`${this.path}/my`, validationMiddleware(UpdateTimeTrackDto, "body"), this.timeTrackController.updateTimeTrack);
     this.router.get(`${this.path}/my/prefill`, this.timeTrackController.getCreateTrackPrefill);
     this.router.get(`${this.path}`, isEditorMiddleware, validationMiddleware(GetTimeTrackDto, "query"), this.timeTrackController.getTimeTracks);
+    this.router.get(`${this.path}/:userId`, isEditorMiddleware, validationMiddleware(GetUserTracksDto, "params"), validationMiddleware(GetTimeTrackDto, "query"), this.timeTrackController.getUserTimeTracks);
+
   }
 }
 

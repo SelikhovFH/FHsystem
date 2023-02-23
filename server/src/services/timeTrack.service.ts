@@ -49,6 +49,35 @@ class TimeTrackService {
       .exec();
   }
 
+  public async getUserTimeTracksGroupedByProject(userId: string, date: Date) {
+    const start = dayjs(date).startOf("month").toDate();
+    const finish = dayjs(date).endOf("month").toDate();
+    return this.timeTrack.aggregate().match({
+      date: {
+        $gte: start,
+        $lte: finish
+      }
+    })
+      .group({
+        _id: "$projectId",
+        projectId: { "$first": "$projectId" },
+        totalHours: { "$sum": "$hours" },
+        tracks: { $push: "$$ROOT" }
+      })
+      .lookup({
+        from: "projects",
+        localField: "projectId",
+        foreignField: "_id",
+        as: "project"
+      })
+      .unwind({
+        path: "$project",
+        preserveNullAndEmptyArrays: true
+      })
+      .exec();
+  }
+
+
   public async getTimeTrackById(_id: string) {
     return this.timeTrack.findOne({ _id });
   }

@@ -39,3 +39,9 @@ export interface GetTimeTracksResponse {
   workingDays: WorkingDaysInfo
 }
 
+export interface GetUserTimeTracks {
+  user: User;
+  info: CreateTrackPrefill;
+  timeTracks: { project: Project; tracks: TimeTrack[] }[];
+}
+

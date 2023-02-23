@@ -61,6 +61,10 @@ class UserService {
   public async getUsersDisplayInfo(): Promise<{ _id: string; name: string; surname: string; email: string }[]> {
     return this.user.find().select("name surname email");
   }
+
+  public async getUserDisplayInfoById(_id: string): Promise<{ _id: string; name: string; surname: string; email: string }> {
+    return this.user.findOne({ _id }).select("name surname email");
+  }
 }
 
 export default UserService;

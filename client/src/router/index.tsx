@@ -18,6 +18,7 @@ import { UserProfilePage } from "../pages/admin/UserProfilePage";
 import { TimeTrackPage } from "../pages/TimeTrack";
 import { TimeTrackOverviewPage } from "../pages/editor/TimeTrackOverview";
 import { ManageProjectsPage } from "../pages/editor/ManageProjects";
+import { UserTimeTracksPage } from "../pages/editor/UserTimeTracks";
 
 // TODO Dynamic module import
 
@@ -52,6 +53,10 @@ export const router = createBrowserRouter(
             <Route
               path={EditorRoutes.timeTrackOverview}
               element={<TimeTrackOverviewPage />}
+            />
+            <Route
+              path={EditorRoutes.userTimeTracks}
+              element={<UserTimeTracksPage />}
             />
             <Route
               path={EditorRoutes.holidaysAndCelebrations}

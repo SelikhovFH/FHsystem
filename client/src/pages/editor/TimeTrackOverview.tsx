@@ -3,28 +3,15 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Descriptions,
-  Layout,
-  List,
-  Popover,
-  Row,
-  Statistic,
-  Typography
-} from "antd";
+import { Badge, Button, Card, Col, DatePicker, Layout, List, Row, Statistic, Typography } from "antd";
 import { useApiFactory } from "../../services/apiFactory";
 import { GetTimeTracksResponse } from "../../shared/timeTrack.interface";
 import dayjs from "dayjs";
 import { API } from "../../services/api";
-import { formatBoolean, formatDate, formatMonth } from "../../utils/formatters";
+import { formatMonth } from "../../utils/formatters";
 import { renderUserCell } from "../../components/table/RenderUserCell";
 import { Link } from "react-router-dom";
-import { EditorRoutes } from "../../router/AppRoutes";
+import { EditorRoutes, getUserTracksRoute } from "../../router/AppRoutes";
 import { User } from "../../shared/user.interface";
 
 const { Content } = Layout;
@@ -60,9 +47,7 @@ export const TimeTrackOverviewPage: FC = () => {
   });
   const { data, isLoading } = timeTrackData;
   const usersTracked = data?.timeTracks.length;
-  console.log(usersTracked);
   const totalUsers = (usersTracked ?? 0) + (data?.usersWithNoTracks.length ?? 0);
-  console.log(totalUsers);
 
   return (
     <>
@@ -85,7 +70,7 @@ export const TimeTrackOverviewPage: FC = () => {
               <Statistic title="Hours to be tracked" value={data?.workingDays.totalHours} loading={isLoading} />
             </Col>
             <Col span={6}>
-              <Statistic title="Working days in this months (excluding holidays and days off)"
+              <Statistic title="Business days in this months (excluding holidays and days off)"
                          value={data?.workingDays.workingDays} loading={isLoading} />
             </Col>
             <Col span={6}>
@@ -140,27 +125,11 @@ export const TimeTrackOverviewPage: FC = () => {
                     <Text strong>
                       Total hours: {item.totalHours}
                     </Text>
-                    <Popover showArrow={false} content={<div style={{ width: 800 }}><List
-                      size="small"
-                      grid={{ gutter: 16, column: 4 }}
-                      dataSource={item.tracks}
-                      renderItem={(record) => <List.Item>
-                        <List.Item.Meta title={formatDate(record.date)} description={
-                          <Descriptions size={"small"} column={1}>
-                            <Descriptions.Item label="Hours">{record.hours}</Descriptions.Item>
-                            <Descriptions.Item
-                              label="Is month track">{formatBoolean(record.isMonthTrack)}</Descriptions.Item>
-                            <Descriptions.Item label="Project">{record.project.name}</Descriptions.Item>
-                            {record.comment && <Descriptions.Item label="Comment">{record.comment}</Descriptions.Item>}
-                          </Descriptions>
-                        } />
-                      </List.Item>}
-                    /></div>}
-                             title="Details" trigger="click">
+                    <Link to={getUserTracksRoute(item.user._id)}>
                       <Button type="link">
                         Details
                       </Button>
-                    </Popover>
+                    </Link>
 
                   </Card>
                 </Badge.Ribbon>
