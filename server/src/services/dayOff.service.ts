@@ -8,6 +8,7 @@ import userService from "@services/user.service";
 class DayOffService {
   public dayOff = dayOffModel;
 
+
   public async createDayOff(data: CreateDayOffBackendDto): Promise<DayOff> {
     return this.dayOff.create({ ...data, finishDate: new Date(data.finishDate), startDate: new Date(data.startDate) });
   }

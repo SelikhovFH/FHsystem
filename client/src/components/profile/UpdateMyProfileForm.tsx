@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react";
 import { FormProps } from "../../utils/types";
 import { Button, DatePicker, Form, Input } from "antd";
-import styles from "../../pages/editor/FormStyles.module.css";
+import styles from "../../pages/FormStyles.module.css";
 import { getYupRule } from "../../utils/yupRule";
 import * as yup from "yup";
 

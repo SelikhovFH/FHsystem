@@ -58,8 +58,12 @@ class UserService {
     return this.user.find().select("+salaryHistory");
   }
 
-  public async getUsersDisplayInfo() {
+  public async getUsersDisplayInfo(): Promise<{ _id: string; name: string; surname: string; email: string }[]> {
     return this.user.find().select("name surname email");
+  }
+
+  public async getUserDisplayInfoById(_id: string): Promise<{ _id: string; name: string; surname: string; email: string }> {
+    return this.user.findOne({ _id }).select("name surname email");
   }
 }
 

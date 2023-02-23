@@ -7,6 +7,13 @@ export const formatDate = (date?: string | Date | Dayjs) => {
   return dayjs(date).format("DD.MM.YYYY");
 };
 
+export const formatMonth = (date?: string | Date | Dayjs) => {
+  if (!date) {
+    return null;
+  }
+  return dayjs(date).format("MMMM YYYY");
+};
+
 export const formatMoney = (value: number) => {
   return `$${value}`;
 };
@@ -18,4 +25,6 @@ export const formatMemory = (value: number) => {
 export const formatScreenSize = (value: number) => {
   return `${value} ″`;
 };
+
+export const formatBoolean = (value: boolean) => value ? "✅" : "❌";
 

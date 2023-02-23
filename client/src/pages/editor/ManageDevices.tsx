@@ -9,7 +9,7 @@ import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
 import { Device, DeviceType } from "../../shared/device.interface";
 import { UserSelect } from "../../components/form/UserSelect";
-import styles from "./FormStyles.module.css";
+import styles from "../FormStyles.module.css";
 import { DeviceTypeLabels } from "../../sections/devices";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";

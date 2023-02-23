@@ -25,7 +25,7 @@ import { useApiFactory } from "../../services/apiFactory";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
-import styles from "../editor/FormStyles.module.css";
+import styles from "../FormStyles.module.css";
 import dayjs from "dayjs";
 import { SalaryInput } from "../../components/form/SalaryInput";
 import { formatDate, formatMoney } from "../../utils/formatters";
@@ -235,7 +235,7 @@ export const ManageUsersPage: FC = () => {
     //     dataIndex: 'email_verified',
     //     key: 'email_verified',
     //     render: (text: string) => {
-    //         return text ? '✅' : '❌';
+    //         return formatBoolean
     //     }
     // },
     {

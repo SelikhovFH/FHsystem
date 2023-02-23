@@ -7,7 +7,7 @@ import { Button, Card, DatePicker, Form, Input, Layout, Modal, Radio, Select, Sp
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
-import styles from "./FormStyles.module.css";
+import styles from "../FormStyles.module.css";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
 import { Item } from "../../shared/item.interface";
