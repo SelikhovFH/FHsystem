@@ -42,6 +42,7 @@ export const HomePage: FC = (props) => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   return (
     <>
       <Modal title="Report a bug" open={isModalOpen} footer={[]} onCancel={handleCancel}>
@@ -85,7 +86,7 @@ export const HomePage: FC = (props) => {
             <ActivityCard title={"Manage items"} link={EditorRoutes.manageItems} icon={"🪑"} />
             <ActivityCard title={"Manage deliveries"} link={EditorRoutes.manageDeliveries} icon={"🚚"} />
             <ActivityCard title={"Manage projects"} link={EditorRoutes.manageProjects} icon={"🚧"} />
-
+            <ActivityCard title={"Manage skill tags"} link={EditorRoutes.manageSkillTags} icon={"🤹"} />
           </Space>
         </>}
         {isAdmin && <>

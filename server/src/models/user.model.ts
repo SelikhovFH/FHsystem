@@ -39,7 +39,8 @@ const userSchema: Schema = new Schema({
     type: [{ value: Number, date: Date }],
     select: false
   },
-  birthDate: Date
+  birthDate: Date,
+  skills: [{ type: Schema.Types.ObjectId, ref: "SkillTag" }]
 
 });
 

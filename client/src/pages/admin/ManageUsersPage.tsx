@@ -32,6 +32,8 @@ import { formatDate, formatMoney } from "../../utils/formatters";
 import { renderDateCell } from "../../components/table/RenderDateCell";
 import { renderUserCell } from "../../components/table/RenderUserCell";
 import { UserRolesLabels, UserStatusLabels } from "../../sections/users";
+import { SkillTagsSelect } from "../../components/form/SkillTagsSelect";
+import { SkillTag } from "../../shared/skillTag.interface";
 
 const { Content } = Layout;
 const { Paragraph } = Typography;
@@ -55,7 +57,8 @@ const updateSchema = registerSchema.shape({
     date: yup.string().required()
   })).required(),
   cvLink: yup.string(),
-  status: yup.string().required()
+  status: yup.string().required(),
+  skills: yup.array()
 });
 
 const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ form, onFinish, buttonDisabled }) => {
@@ -144,6 +147,10 @@ const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonD
                name="title">
       <Input />
     </Form.Item>
+    <Form.Item rules={[getYupRule(updateSchema)]} label="Skills"
+               name="skills">
+      <SkillTagsSelect />
+    </Form.Item>
     <Form.Item rules={[getYupRule(updateSchema)]} label="Salary"
                name="salaryHistory">
       <SalaryInput />
@@ -216,7 +223,8 @@ export const ManageUsersPage: FC = () => {
 
   const onEditFinish = (_values: User) => {
     const { auth0id, role, email, ...values } = _values;
-    editMutation.mutate({ ...values, _id: userToEdit?._id });
+    // @ts-ignore
+    editMutation.mutate({ ...values, _id: userToEdit?._id, skills: _values.skills.map(skill => skill._id) });
   };
 
   const onDelete = (values: any) => {
@@ -303,6 +311,16 @@ export const ManageUsersPage: FC = () => {
       title: "Location (time zone)",
       dataIndex: "location",
       key: "location"
+    },
+    {
+      title: "Skills",
+      dataIndex: "skills",
+      key: "skills",
+      render: (values: SkillTag[]) => {
+        return <Space>
+          {values.map((v, idx) => <Tag color={v.color} key={idx}>{v.name}</Tag>)}
+        </Space>;
+      }
     },
     {
       title: "Salary history",

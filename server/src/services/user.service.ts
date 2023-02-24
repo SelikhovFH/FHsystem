@@ -50,12 +50,18 @@ class UserService {
         localField: "_id",
         foreignField: "userId"
       })
+      .lookup({
+        from: "skilltags",
+        foreignField: "_id",
+        localField: "skills",
+        as: "skills"
+      })
       .exec();
     return res[0];
   }
 
   public async getUsers() {
-    return this.user.find().select("+salaryHistory");
+    return this.user.find().select("+salaryHistory").populate("skills");
   }
 
   public async getUsersDisplayInfo(): Promise<{ _id: string; name: string; surname: string; email: string }[]> {

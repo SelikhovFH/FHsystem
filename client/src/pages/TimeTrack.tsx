@@ -83,7 +83,7 @@ const AddOrUpdateForm: FC<FormProps & { isEditForm?: boolean }> = ({
     </Form.Item>
     <Form.Item rules={[getYupRule(schema)]} label="Date"
                name="date">
-      <DatePicker defaultValue={dayjs()} disabledDate={(date: Dayjs) => {
+      <DatePicker disabledDate={(date: Dayjs) => {
         if (date.toDate() > new Date()) {
           return true;
         }
@@ -239,6 +239,7 @@ export const TimeTrackPage: FC = () => {
              onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
+          initialValues={{ date: dayjs() }}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new time track"} />

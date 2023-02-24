@@ -35,8 +35,17 @@ export const MyProfilePage: FC<Props> = (props) => {
     if (!profile.data) {
       return;
     }
-    const { name, surname, birthDate, location, phone, emergencyContact } = _values;
-    editMutation.mutate({ name, surname, birthDate, location, phone, emergencyContact });
+    const { name, surname, birthDate, location, phone, emergencyContact, skills } = _values;
+    editMutation.mutate({
+      name,
+      surname,
+      birthDate,
+      location,
+      phone,
+      emergencyContact,
+      // @ts-ignore
+      skills: skills.map(skill => skill._id)
+    });
   };
 
   const handleEditCancel = () => {

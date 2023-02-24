@@ -12,6 +12,7 @@ export enum EditorRoutes {
   manageItems = "/manage_items",
   manageDeliveries = "/manage_deliveries",
   manageProjects = "/manage_projects",
+  manageSkillTags = "/manage_skill_tags",
   timeTrackOverview = "/time_tracks_overview",
   userTimeTracks = "/time_tracks/:id"
 }
