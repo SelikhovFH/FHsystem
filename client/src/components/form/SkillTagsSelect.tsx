@@ -23,27 +23,36 @@ export const SkillTagsSelect: FC<Props> = (props) => {
       event.preventDefault();
       event.stopPropagation();
     };
+    const [name, color] = (label as string)?.split(":") ?? [];
     return (
       <Tag
-        color={value}
+        color={color}
         onMouseDown={onPreventMouseDown}
         closable={closable}
         onClose={onClose}
         style={{ marginRight: 3 }}
       >
-        {label}
+        {name}
       </Tag>
     );
   };
+
+  const selected = (props.value as Array<{ _id: string }>)?.map(v => v._id);
   return (
     <Select
       mode={"multiple"}
-      {...props}
       loading={isLoading}
       allowClear
+      onChange={(v, opt) => {
+        const values = v.map(id => data?.find(item => item._id === id));
+        props.onChange && props.onChange(values, opt);
+      }
+      }
+      value={selected}
+      optionLabelProp="label"
       tagRender={tagRender}
     >
-      {data?.map(item => <Select.Option key={item._id} value={item._id} label={item.name}>
+      {data?.map(item => <Select.Option key={item._id} value={item._id} label={`${item.name}:${item.color}`}>
         <Tag color={item.color}>{item.name}</Tag>
       </Select.Option>)}
 

@@ -58,7 +58,7 @@ const updateSchema = registerSchema.shape({
   })).required(),
   cvLink: yup.string(),
   status: yup.string().required(),
-  skills: yup.array().of(yup.string())
+  skills: yup.array()
 });
 
 const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ form, onFinish, buttonDisabled }) => {
@@ -223,7 +223,8 @@ export const ManageUsersPage: FC = () => {
 
   const onEditFinish = (_values: User) => {
     const { auth0id, role, email, ...values } = _values;
-    editMutation.mutate({ ...values, _id: userToEdit?._id });
+    // @ts-ignore
+    editMutation.mutate({ ...values, _id: userToEdit?._id, skills: _values.skills.map(skill => skill._id) });
   };
 
   const onDelete = (values: any) => {

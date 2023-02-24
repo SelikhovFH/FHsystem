@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { User } from "../../shared/user.interface";
-import { Avatar, Descriptions, Divider, theme, Typography } from "antd";
+import { Avatar, Descriptions, Divider, Space, Tag, theme, Typography } from "antd";
 import { formatDate } from "../../utils/formatters";
 import { UserRolesLabels, UserStatusLabels } from "../../sections/users";
 
@@ -41,6 +41,11 @@ export const UserInfoCard: FC<Props> = ({ user }) => {
         <Descriptions.Item label="Birth date">{formatDate(user.birthDate)}</Descriptions.Item>
         <Descriptions.Item label="Location">{user.location}</Descriptions.Item>
         <Descriptions.Item label="CV link"><a href={user.cvLink} target={"_blank"}>{user.cvLink}</a></Descriptions.Item>
+        <Descriptions.Item label="Skills">
+          <Space>
+            {user.skills.map((v, idx) => <Tag color={v.color} key={idx}>{v.name}</Tag>)}
+          </Space>
+        </Descriptions.Item>
 
       </Descriptions>
     </>

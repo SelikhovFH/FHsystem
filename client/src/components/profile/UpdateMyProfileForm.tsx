@@ -4,6 +4,7 @@ import { Button, DatePicker, Form, Input } from "antd";
 import styles from "../../pages/FormStyles.module.css";
 import { getYupRule } from "../../utils/yupRule";
 import * as yup from "yup";
+import { SkillTagsSelect } from "../form/SkillTagsSelect";
 
 const updateSchema = yup.object().shape({
     name: yup.string().required(),
@@ -11,7 +12,8 @@ const updateSchema = yup.object().shape({
     phone: yup.string().required(),
     emergencyContact: yup.string(),
     location: yup.string().required(),
-    birthDate: yup.string().required()
+    birthDate: yup.string().required(),
+    skills: yup.array()
 });
 
 export const UpdateMyProfileForm: FC<Omit<FormProps, "buttonText">> = ({
@@ -52,6 +54,10 @@ export const UpdateMyProfileForm: FC<Omit<FormProps, "buttonText">> = ({
         <Form.Item rules={[getYupRule(updateSchema)]} label="Location (time zone)"
                    name="location">
             <Input />
+        </Form.Item>
+        <Form.Item rules={[getYupRule(updateSchema)]} label="Skills"
+                   name="skills">
+            <SkillTagsSelect />
         </Form.Item>
         <Form.Item>
             <Button disabled={buttonDisabled} type="primary" htmlType="submit">
