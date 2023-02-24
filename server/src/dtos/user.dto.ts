@@ -1,4 +1,4 @@
-import { IsArray, IsDateString, IsEmail, IsEnum, IsInt, IsOptional, IsString } from "class-validator";
+import { IsArray, IsDateString, IsEmail, IsEnum, IsInt, IsOptional, IsString, MaxLength } from "class-validator";
 import { UserRole, UserStatus } from "@interfaces/user.interface";
 
 export class RegisterUserDto {
@@ -30,6 +30,11 @@ export class UpdateUserMyDto {
   @IsDateString()
   @IsOptional()
   birthDate: string;
+  @IsArray()
+  @MaxLength(50, {
+    each: true
+  })
+  skills: string[];
 }
 
 export class SalaryRecord {
@@ -58,4 +63,9 @@ export class UpdateUserAdminDto extends UpdateUserMyDto {
   @IsString()
   @IsOptional()
   cvLink: string;
+  @IsArray()
+  @MaxLength(50, {
+    each: true
+  })
+  skills: string[];
 }

@@ -37,7 +37,7 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
     <Form.Item rules={[getYupRule(schema)]} label="Color"
                name="color">
       <Select>
-        {Object.values(SkillTagColor).map(v => <Select.Option value={v} label={v}>
+        {Object.values(SkillTagColor).map(v => <Select.Option key={v} value={v} label={v}>
           <Tag color={v}>{v}</Tag>
         </Select.Option>)}
 

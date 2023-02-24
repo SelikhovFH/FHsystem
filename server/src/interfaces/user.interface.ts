@@ -1,6 +1,7 @@
 import { Device } from "@interfaces/device.interface";
 import { Delivery } from "@interfaces/delivery.interface";
 import { DayOff } from "@interfaces/dayOff.interface";
+import { SkillTag } from "@interfaces/skillTag.interface";
 
 export interface User {
   _id: string;
@@ -18,6 +19,7 @@ export interface User {
   cvLink: string;
   status: UserStatus;
   birthDate: string;
+  skills: SkillTag[];
 }
 
 export interface SalaryRecord {
