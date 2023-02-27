@@ -60,7 +60,7 @@ const AddOrUpdateForm: FC<FormProps & { isEditForm?: boolean }> = ({
                                                                    }) => {
   useEffect(() => {
     form.resetFields();
-  }, [initialValues]);
+  }, []);
 
   return <Form className={styles.form} initialValues={initialValues} form={form} name="timeTrack"
                layout={"vertical"}
