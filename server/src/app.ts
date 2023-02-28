@@ -1,7 +1,7 @@
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
+import express, { Router } from "express";
 import helmet from "helmet";
 import hpp from "hpp";
 import morgan from "morgan";
@@ -34,6 +34,7 @@ class App {
     this.port = PORT || 3000;
 
     this.initializeSwagger();
+    this.initializeCertChallenge();
     this.connectToDatabase();
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
@@ -76,7 +77,14 @@ class App {
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
-      this.app.use('/', route.router);
+      this.app.use("/", route.router);
+    });
+  }
+
+  private initializeCertChallenge() {
+    const router = Router();
+    router.get("/.well-known/acme-challenge/HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4", (req, res) => {
+      return res.status(200).send("HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4.TY-sdxBgzkm-s_HcB-gGJYbxv1ApqdvMTeVydFg7820");
     });
   }
 
@@ -84,10 +92,10 @@ class App {
     const options = {
       swaggerDefinition: {
         info: {
-          title: 'REST API',
-          version: '1.0.0',
-          description: 'Example docs',
-        },
+          title: "REST API",
+          version: "1.0.0",
+          description: "Example docs"
+        }
       },
       apis: ['swagger.yaml'],
     };
