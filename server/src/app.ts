@@ -1,7 +1,7 @@
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express, { Router } from "express";
+import express from "express";
 import helmet from "helmet";
 import hpp from "hpp";
 import morgan from "morgan";
@@ -82,8 +82,7 @@ class App {
   }
 
   private initializeCertChallenge() {
-    const router = Router();
-    router.get("/.well-known/acme-challenge/HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4", (req, res) => {
+    this.app.use("/.well-known/acme-challenge/HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4", (req, res) => {
       return res.status(200).send("HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4.TY-sdxBgzkm-s_HcB-gGJYbxv1ApqdvMTeVydFg7820");
     });
   }
