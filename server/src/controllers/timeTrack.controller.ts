@@ -3,7 +3,6 @@ import { CreateTimeTrackDto, GetTimeTrackDto, UpdateTimeTrackDto } from "@dtos/t
 import TimeTrackService from "@services/timeTrack.service";
 import UserService from "@services/user.service";
 import { HttpException } from "@exceptions/HttpException";
-import * as console from "console";
 
 
 class TimeTrackController {
@@ -43,8 +42,7 @@ class TimeTrackController {
       const { id } = req.params;
       const userId = req.auth.payload.db_id as string;
       const prevTimeTrack = await this.timeTrackService.getTimeTrackById(id);
-      console.log("userId", userId);
-      console.log("prevTimeTrack", prevTimeTrack);
+
 
       if (userId !== prevTimeTrack.userId.toString()) {
         throw new HttpException(400, "Can't delete another user time track");

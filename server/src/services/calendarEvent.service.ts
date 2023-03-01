@@ -2,9 +2,6 @@ import calendarEventModel from "@models/calendarEvent.model";
 import { CreateCalendarEventBackendDto, UpdateCalendarEventDto } from "@dtos/calendarEvent.dto";
 import { CalendarEvent } from "@interfaces/calendarEvent.interface";
 import { getStartOfCurrentYear } from "@utils/dayOff.helpers";
-import { CreateDayOffDto } from "@dtos/dayOff.dto";
-import { HttpException } from "@exceptions/HttpException";
-import dayjs from "dayjs";
 
 class CalendarEventService {
   public calendarEvent = calendarEventModel;
@@ -52,17 +49,6 @@ class CalendarEventService {
     });
   }
 
-  public async validateDayOff(data: CreateDayOffDto): Promise<boolean> {
-    const holidays = await this.getHolidaysForCurrentYear();
-    const dayOffYear = dayjs(data.startDate).year();
-
-    const isIntersecting = holidays.find(h => dayjs(h.date).set("year", dayOffYear).isBetween(data.startDate, data.finishDate, "day", "[]"));
-
-    if (isIntersecting) {
-      throw new HttpException(409, "New day off intersects with calendar event that is day off");
-    }
-    return true;
-  }
 }
 
 export default CalendarEventService;

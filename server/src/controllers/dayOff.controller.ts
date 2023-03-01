@@ -15,7 +15,6 @@ class DayOffController {
     try {
       const userId = req.auth.payload.db_id as string;
       const dayOffData: CreateDayOffDto = req.body;
-      await this.calendarEventService.validateDayOff(dayOffData);
       await this.dayOffService.validateDayOff(userId, dayOffData);
       const dayCount = this.dayOffService.calculateDayOffDayCount(dayOffData);
       const data = await this.dayOffService.createDayOff({ ...dayOffData, userId, dayCount });
@@ -28,9 +27,10 @@ class DayOffController {
   getPendingDaysOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const pendingDaysOff = await this.dayOffService.getPendingDaysOff();
+      const holidaysForCurrentYear = await this.calendarEventService.getHolidaysForCurrentYear();
       //I assume that we won't have too many concurrent pending days off, so code is  simple but not optimized here
       const promises = pendingDaysOff.map(async dayOff => {
-        const dayOffExceedsLimit = await this.dayOffService.dayOffExceedsLimit(dayOff);
+        const dayOffExceedsLimit = await this.dayOffService.dayOffExceedsLimit(holidaysForCurrentYear, dayOff);
         return {
           ...dayOff,
           dayOffExceedsLimit

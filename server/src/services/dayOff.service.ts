@@ -2,11 +2,20 @@ import { CreateDayOffBackendDto, CreateDayOffDto } from "@dtos/dayOff.dto";
 import dayOffModel from "@models/dayOff.model";
 import { DayOff, DayOffStatus, DayOffType } from "@interfaces/dayOff.interface";
 import { HttpException } from "@exceptions/HttpException";
-import { getStartOfCurrentYear, getWorkingDays, YearlyLimitsForDaysOffTypes } from "@utils/dayOff.helpers";
+import {
+  getDayOffBusinessDaysWithCalendarEvents,
+  getStartOfCurrentYear,
+  getWorkingDays,
+  YearlyLimitsForDaysOffTypes
+} from "@utils/dayOff.helpers";
 import userService from "@services/user.service";
+import CalendarEventService from "@services/calendarEvent.service";
+import { CalendarEvent } from "@interfaces/calendarEvent.interface";
+import mongoose from "mongoose";
 
 class DayOffService {
   public dayOff = dayOffModel;
+  public calendarEventService = new CalendarEventService();
 
 
   public async createDayOff(data: CreateDayOffBackendDto): Promise<DayOff> {
@@ -43,7 +52,7 @@ class DayOffService {
     });
   }
 
-  public async dayOffExceedsLimit(dayOff: DayOff): Promise<boolean> {
+  public async dayOffExceedsLimit(holidaysForCurrentYear: CalendarEvent[], dayOff: DayOff): Promise<boolean> {
     const userDaysOffOfType = await this.dayOff.find({
       userId: dayOff.userId,
       status: { $ne: DayOffStatus.declined },
@@ -54,9 +63,9 @@ class DayOffService {
       type: dayOff.type
     });
     const currentLimit = YearlyLimitsForDaysOffTypes[dayOff.type]();
-    const limitUsed = userDaysOffOfType.reduce((acc, val) => acc + val.dayCount, 0) ?? 0;
+    const limitUsed = userDaysOffOfType.reduce((acc, val) => acc + this.getDayOffBusinessDaysWithCalendarEvents(holidaysForCurrentYear, val), 0) ?? 0;
     const limitLeft = currentLimit - limitUsed;
-    const limitRequired = this.calculateDayOffDayCount(dayOff);
+    const limitRequired = this.getDayOffBusinessDaysWithCalendarEvents(holidaysForCurrentYear, dayOff);
     if (limitLeft < limitRequired) {
       return true;
     }
@@ -92,20 +101,38 @@ class DayOffService {
     return getWorkingDays(new Date(data.startDate), new Date(data.finishDate));
   }
 
+  private getDayOffBusinessDaysWithCalendarEvents = (holidaysForCurrentYear: CalendarEvent[], dayOff: DayOff) => {
+    return getDayOffBusinessDaysWithCalendarEvents(holidaysForCurrentYear, dayOff);
+  };
+
   public async getUserDaysOffUsage(userId: string): Promise<Record<DayOffType, { used: number; limit: number }>> {
-    const aggregatedDaysOff = await this.dayOff
+    const aggregatedDaysOff: Array<{ _id: DayOffType, daysOff: DayOff[] }> = await this.dayOff
       .aggregate()
-      .match({ userId })
+      .match({
+        userId: new mongoose.Types.ObjectId(userId),
+        finishDate: {
+          $gte: getStartOfCurrentYear()
+        }
+      })
       .group({
         _id: "$type",
-        count: { $sum: "$dayCount" }
-      });
+        daysOff: { $push: "$$ROOT" }
+      })
+      .exec();
+    const holidaysForCurrentYear = await this.calendarEventService.getHolidaysForCurrentYear();
+    // console.log("holidays", holidaysForCurrentYear)
     return Object.fromEntries(
       Object.values(DayOffType).map(type => {
+        const data = aggregatedDaysOff.find(({ _id }) => _id === type);
+
+        const used = data?.daysOff.reduce((acc, dayOff) => {
+          return acc + this.getDayOffBusinessDaysWithCalendarEvents(holidaysForCurrentYear, dayOff);
+        }, 0) ?? 0;
+
         return [
           type,
           {
-            used: aggregatedDaysOff.find(({ _id }) => _id === type)?.count || 0,
+            used,
             limit: YearlyLimitsForDaysOffTypes[type]()
           }
         ];

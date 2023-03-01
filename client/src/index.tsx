@@ -12,7 +12,10 @@ import { queryClient } from "./services/queryClient";
 import * as dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayOfYear from "dayjs/plugin/dayOfYear";
+// @ts-ignore
+import dayjsBusinessDays from "dayjs-business-days";
 
+dayjs.extend(dayjsBusinessDays);
 dayjs.extend(dayOfYear);
 dayjs.extend(isBetween);
 
