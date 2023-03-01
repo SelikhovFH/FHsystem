@@ -11,14 +11,14 @@ import styles from "../FormStyles.module.css";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
 import { useApiFactory } from "../../services/apiFactory";
-import { SkillTag, SkillTagColor } from "../../shared/skillTag.interface";
-import { renderColorCell } from "../../components/table/RenderColorCell";
+import { SkillTag, SkillTagCategory } from "../../shared/skillTag.interface";
+import { SkillTagCategoryToColor } from "../../sections/skillTag";
 
 const { Content } = Layout;
 
 const schema = yup.object().shape({
   name: yup.string().required(),
-  color: yup.string().required()
+  category: yup.string().required()
 });
 
 
@@ -34,11 +34,11 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
                name="name">
       <Input />
     </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Color"
-               name="color">
+    <Form.Item rules={[getYupRule(schema)]} label="Category"
+               name="category">
       <Select>
-        {Object.values(SkillTagColor).map(v => <Select.Option key={v} value={v} label={v}>
-          <Tag color={v}>{v}</Tag>
+        {Object.values(SkillTagCategory).map(v => <Select.Option key={v} value={v} label={v}>
+          <Tag color={SkillTagCategoryToColor[v]}>{v}</Tag>
         </Select.Option>)}
 
       </Select>
@@ -118,10 +118,12 @@ export const ManageSkillTagsPage: FC = () => {
       key: "name"
     },
     {
-      title: "Color",
-      dataIndex: "color",
-      key: "color",
-      render: renderColorCell
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      render: (category: SkillTagCategory) => {
+        return <Tag color={SkillTagCategoryToColor[category]}>{category}</Tag>;
+      }
     },
     {
       title: "Operations",

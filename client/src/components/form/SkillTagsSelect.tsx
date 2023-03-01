@@ -3,8 +3,9 @@ import { Select, Tag } from "antd";
 import { useQuery } from "react-query";
 import { API, getRequestConfig } from "../../services/api";
 import { useAuth0 } from "@auth0/auth0-react";
-import { SkillTag } from "../../shared/skillTag.interface";
+import { SkillTag, SkillTagCategory } from "../../shared/skillTag.interface";
 import type { CustomTagProps } from "rc-select/lib/BaseSelect";
+import { SkillTagCategoryToColor } from "../../sections/skillTag";
 
 type Props = ComponentProps<typeof Select>
 
@@ -23,16 +24,16 @@ export const SkillTagsSelect: FC<Props> = (props) => {
       event.preventDefault();
       event.stopPropagation();
     };
-    const [name, color] = (label as string)?.split(":") ?? [];
+    const [name, category] = (label as string)?.split(":") ?? [];
     return (
       <Tag
-        color={color}
+        color={SkillTagCategoryToColor[category as SkillTagCategory]}
         onMouseDown={onPreventMouseDown}
         closable={closable}
         onClose={onClose}
         style={{ marginRight: 3 }}
       >
-        {name}
+        {`${category} | ${name}`}
       </Tag>
     );
   };
@@ -52,8 +53,8 @@ export const SkillTagsSelect: FC<Props> = (props) => {
       optionLabelProp="label"
       tagRender={tagRender}
     >
-      {data?.map(item => <Select.Option key={item._id} value={item._id} label={`${item.name}:${item.color}`}>
-        <Tag color={item.color}>{item.name}</Tag>
+      {data?.map(item => <Select.Option key={item._id} value={item._id} label={`${item.name}:${item.category}`}>
+        <Tag color={SkillTagCategoryToColor[item.category]}>{`${item.category} | ${item.name}`}</Tag>
       </Select.Option>)}
 
     </Select>
