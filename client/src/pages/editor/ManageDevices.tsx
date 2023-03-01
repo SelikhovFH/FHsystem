@@ -287,9 +287,7 @@ export const ManageDevicesPage: FC = () => {
           </Button>
         </Card>
         <Gutter size={2} />
-        <Table scroll={{ x: true }} loading={devices.isLoading} dataSource={devices.data} columns={columns}
-
-        />
+        <Table scroll={{ x: true }} loading={devices.isLoading} dataSource={devices.data} columns={columns} />
       </Content>
     </>
   );
