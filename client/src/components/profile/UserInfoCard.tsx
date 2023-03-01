@@ -3,6 +3,7 @@ import { User } from "../../shared/user.interface";
 import { Avatar, Descriptions, Divider, Space, Tag, theme, Typography } from "antd";
 import { formatDate } from "../../utils/formatters";
 import { UserRolesLabels, UserStatusLabels } from "../../sections/users";
+import { SkillTagCategoryToColor } from "../../sections/skillTag";
 
 const { Title, Text } = Typography;
 
@@ -43,7 +44,8 @@ export const UserInfoCard: FC<Props> = ({ user }) => {
         <Descriptions.Item label="CV link"><a href={user.cvLink} target={"_blank"}>{user.cvLink}</a></Descriptions.Item>
         <Descriptions.Item label="Skills">
           <Space>
-            {user.skills.map((v, idx) => <Tag color={v.color} key={idx}>{v.name}</Tag>)}
+            {user.skills.map((v, idx) => <Tag color={SkillTagCategoryToColor[v.category]}
+                                              key={idx}>{`${v.category} | ${v.name}`}</Tag>)}
           </Space>
         </Descriptions.Item>
 

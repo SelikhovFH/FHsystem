@@ -1,5 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-import { SkillTag, SkillTagColor } from "@interfaces/skillTag.interface";
+import { SkillTag, SkillTagCategory } from "@interfaces/skillTag.interface";
 
 const skillTagSchema: Schema = new Schema({
   name: {
@@ -7,10 +7,10 @@ const skillTagSchema: Schema = new Schema({
     required: true,
     unique: true
   },
-  color: {
+  category: {
     type: String,
-    enum: Object.values(SkillTagColor),
-    default: SkillTagColor.default
+    enum: Object.values(SkillTagCategory),
+    default: SkillTagCategory.default
   }
 });
 

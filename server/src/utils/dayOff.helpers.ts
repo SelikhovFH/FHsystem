@@ -1,9 +1,11 @@
-import { DayOffType } from "@interfaces/dayOff.interface";
+import { DayOff, DayOffType } from "@interfaces/dayOff.interface";
+import dayjs from "dayjs";
+import { CalendarEvent } from "@interfaces/calendarEvent.interface";
 
 export const getStartOfCurrentYear = () => new Date(new Date().getFullYear(), 0, 1);
 
 //://stackoverflow.com/questions/4413590/javascript-get-array-of-dates-between-2-dates
-export const getDaysArray = function (s: Date, e: Date) {
+export const getDaysArray = function(s: Date, e: Date) {
   const a = [];
   const d = new Date(s);
   for (; d <= new Date(e); d.setDate(d.getDate() + 1)) {
@@ -36,4 +38,14 @@ export const getWorkingDays = (d1: Date, d2: Date) => {
     return !isWeekend;
   });
   return dayListWithoutWeekends.length;
+};
+
+export const getDayOffBusinessDaysWithCalendarEvents = (holidaysForCurrentYear: CalendarEvent[], dayOff: DayOff): number => {
+  const dayOffDaysCoveredByHolidays = holidaysForCurrentYear
+    .filter(h => {
+      const holidayDate = dayjs(h.date).set("year", dayjs().year());
+      // @ts-ignore
+      return holidayDate.isBetween(dayjs(dayOff.startDate), dayjs(dayOff.finishDate), "day", "[]") && holidayDate.isBusinessDay();
+    }).length;
+  return dayOff.dayCount - dayOffDaysCoveredByHolidays;
 };

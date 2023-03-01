@@ -1,20 +1,18 @@
 export interface SkillTag {
   _id: string;
   name: string;
-  color: SkillTagColor;
+  category: SkillTagCategory;
 }
 
-export enum SkillTagColor {
+export enum SkillTagCategory {
   default = "default",
-  magenta = "magenta",
-  red = "red",
-  volcano = "volcano",
-  orange = "orange",
-  gold = "gold",
-  lime = "lime",
-  green = "green",
-  cyan = "cyan",
-  blue = "blue",
-  geekblue = "geekblue",
-  purple = "purple"
+  frontend = "frontend",
+  backend = "backend",
+  cloudServices = "cloudServices",
+  mobile = "mobile",
+  databases = "databases",
+  devops = "devops",
+  languageSkills = "languageSkills",
+  softSkills = "softSkills"
+
 }

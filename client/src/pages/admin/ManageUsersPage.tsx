@@ -34,6 +34,7 @@ import { renderUserCell } from "../../components/table/RenderUserCell";
 import { UserRolesLabels, UserStatusLabels } from "../../sections/users";
 import { SkillTagsSelect } from "../../components/form/SkillTagsSelect";
 import { SkillTag } from "../../shared/skillTag.interface";
+import { SkillTagCategoryToColor } from "../../sections/skillTag";
 
 const { Content } = Layout;
 const { Paragraph } = Typography;
@@ -318,7 +319,8 @@ export const ManageUsersPage: FC = () => {
       key: "skills",
       render: (values: SkillTag[]) => {
         return <Space>
-          {values.map((v, idx) => <Tag color={v.color} key={idx}>{v.name}</Tag>)}
+          {values.map((v, idx) => <Tag color={SkillTagCategoryToColor[v.category]}
+                                       key={idx}>{`${v.category} | ${v.name}`}</Tag>)}
         </Space>;
       }
     },
