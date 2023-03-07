@@ -6,7 +6,11 @@ const projectSchema: Schema = new Schema({
     type: String,
     required: true,
     unique: true
-  }
+  },
+  startDate: Date,
+  manager: { type: Schema.Types.ObjectId, ref: "User" },
+  workers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  client: { type: Schema.Types.ObjectId, ref: "Client" }
 });
 
 const projectModel = model<Project & Document>("Project", projectSchema);
