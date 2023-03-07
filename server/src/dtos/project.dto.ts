@@ -1,4 +1,5 @@
-import { IsArray, IsDateString, IsString, MaxLength } from "class-validator";
+import { IsArray, IsDateString, IsEnum, IsString, MaxLength } from "class-validator";
+import { ProjectStatus } from "@interfaces/project.interface";
 
 
 export class CreateProjectDto {
@@ -19,6 +20,9 @@ export class CreateProjectDto {
 
   @IsString()
   client: string;
+
+  @IsEnum(ProjectStatus)
+  status?: ProjectStatus;
 }
 
 export class UpdateProjectDto extends CreateProjectDto {

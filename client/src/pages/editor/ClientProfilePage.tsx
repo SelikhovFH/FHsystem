@@ -9,6 +9,7 @@ import { Avatar, Card, Col, Descriptions, Divider, Row, theme, Typography } from
 import { Content } from "antd/es/layout/layout";
 import { formatDate } from "../../utils/formatters";
 import { renderMultipleUsersCell, renderUserCell } from "../../components/table/RenderUserCell";
+import { renderProjectStatus } from "../../sections/project";
 
 type Props = {}
 const { Text, Title } = Typography;
@@ -69,6 +70,7 @@ export const ClientProfilePage: FC<Props> = (props) => {
                 {clientProfile?.data?.projects.map(project => (<Col xxl={12} xl={12} sm={24} key={project._id}>
                   <Card title={project.name} style={{ height: "100%" }} size={"small"}>
                     <Descriptions size={"small"} column={1}>
+                      <Descriptions.Item label="Status">{renderProjectStatus(project.status)}</Descriptions.Item>
                       <Descriptions.Item
                         label="Start date">{formatDate(project.startDate)}</Descriptions.Item>
                       <Descriptions.Item label="Manager">{renderUserCell(project.manager)}</Descriptions.Item>

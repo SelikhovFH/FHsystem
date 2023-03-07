@@ -3,7 +3,7 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Button, Card, DatePicker, Form, Input, Layout, Modal, Space, Table } from "antd";
+import { Button, Card, DatePicker, Form, Input, Layout, Modal, Select, Space, Table } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
@@ -11,7 +11,7 @@ import styles from "../FormStyles.module.css";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
 import { useApiFactory } from "../../services/apiFactory";
-import { Project } from "../../shared/project.interface";
+import { Project, ProjectStatus } from "../../shared/project.interface";
 import { Client } from "../../shared/client.interface";
 import dayjs from "dayjs";
 import { UserSelect } from "../../components/form/UserSelect";
@@ -19,6 +19,7 @@ import { ClientSelect } from "../../components/form/ClientSelect";
 import { renderClientCell } from "../../components/table/RenderClientCell";
 import { renderMultipleUsersCell, renderUserCell } from "../../components/table/RenderUserCell";
 import { renderDateCell } from "../../components/table/RenderDateCell";
+import { renderProjectStatus } from "../../sections/project";
 
 const { Content } = Layout;
 
@@ -27,7 +28,8 @@ const schema = yup.object().shape({
   startDate: yup.string().required(),
   manager: yup.string().required(),
   workers: yup.array().of(yup.string()).required(),
-  client: yup.string().required()
+  client: yup.string().required(),
+  status: yup.string().required()
 });
 
 
@@ -42,6 +44,12 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
     <Form.Item rules={[getYupRule(schema)]} label="Name"
                name="name">
       <Input />
+    </Form.Item>
+    <Form.Item rules={[getYupRule(schema)]} label="Status"
+               name="status">
+      <Select
+        options={Object.values(ProjectStatus).map(v => ({ value: v, label: v }))}
+      />
     </Form.Item>
     <Form.Item rules={[getYupRule(schema)]} label="Start date"
                name="startDate">
@@ -143,6 +151,12 @@ export const ManageProjectsPage: FC = () => {
       title: "Name",
       dataIndex: "name",
       key: "name"
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: renderProjectStatus
     },
     {
       title: "Start date",
