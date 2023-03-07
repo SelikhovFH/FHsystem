@@ -17,6 +17,7 @@ class ClientsRoute implements Routes {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, isEditorMiddleware, this.clientController.getClients);
+    this.router.get(`${this.path}/:id`, isEditorMiddleware, this.clientController.getClientProfile);
     this.router.post(`${this.path}`, isEditorMiddleware, validationMiddleware(CreateClientDto, "body"), this.clientController.createClient);
     this.router.delete(`${this.path}/:id`, isEditorMiddleware, validationMiddleware(DeleteDto, "params"), this.clientController.deleteClient);
     this.router.patch(`${this.path}`, isEditorMiddleware, validationMiddleware(UpdateClientDto, "body"), this.clientController.updateClient);

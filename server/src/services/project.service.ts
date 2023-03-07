@@ -24,6 +24,10 @@ class ProjectService {
   public async getProjects(): Promise<Project[]> {
     return this.project.find().populate("client").populate("manager", "_id name surname email").populate("workers", "_id name surname email");
   }
+
+  public async getClientProjects(client: string): Promise<Project[]> {
+    return this.project.find({ client }).populate("manager", "_id name surname email").populate("workers", "_id name surname email");
+  }
 }
 
 export default ProjectService;
