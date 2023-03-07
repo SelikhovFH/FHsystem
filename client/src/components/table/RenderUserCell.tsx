@@ -39,3 +39,12 @@ export const renderUserCell = (user?: User): ReactNode => {
   }
   return <UserCell user={user} />;
 };
+
+export const renderMultipleUsersCell = (users?: User[]): ReactNode => {
+  if (!users) {
+    return null;
+  }
+  return <div style={{ display: "flex", flexDirection: "row", gap: 16 }}>
+    {users.map(u => <UserCell user={u} key={u._id} />)}
+  </div>;
+};

@@ -12,6 +12,8 @@ export enum EditorRoutes {
   manageItems = "/manage_items",
   manageDeliveries = "/manage_deliveries",
   manageProjects = "/manage_projects",
+  manageClients = "/manage_clients",
+  client = "/client/:id",
   manageSkillTags = "/manage_skill_tags",
   timeTrackOverview = "/time_tracks_overview",
   userTimeTracks = "/time_tracks/:id"
@@ -28,4 +30,8 @@ export const getUserProfileRoute = (userId: string) => {
 
 export const getUserTracksRoute = (userId: string) => {
   return `/time_tracks/${userId}`;
+};
+
+export const getClientProfileRoute = (clientId: string) => {
+  return `/client/${clientId}`;
 };

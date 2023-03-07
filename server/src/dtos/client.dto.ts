@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsString, IsUrl } from "class-validator";
+import { IsDateString, IsEmail, IsOptional, IsString, IsUrl } from "class-validator";
 
 
 export class CreateClientDto {
@@ -9,9 +9,11 @@ export class CreateClientDto {
   email: string;
 
   @IsUrl()
+  @IsOptional()
   website;
 
   @IsString()
+  @IsOptional()
   additionalContacts;
 
   @IsDateString()

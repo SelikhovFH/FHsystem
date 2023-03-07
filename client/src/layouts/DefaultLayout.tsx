@@ -42,6 +42,7 @@ const editorItems = [
     getItem("Manage devices", EditorRoutes.manageDevices, <span>💻</span>),
     getItem("Manage items", EditorRoutes.manageItems, <span>🪑</span>),
     getItem("Manage deliveries", EditorRoutes.manageDeliveries, <span>🚚</span>),
+    getItem("Manage clients", EditorRoutes.manageClients, <span>💼</span>),
     getItem("Manage projects", EditorRoutes.manageProjects, <span>🚧</span>),
     getItem("Manage skill tags", EditorRoutes.manageSkillTags, <span>🤹</span>)
 

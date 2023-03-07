@@ -22,7 +22,7 @@ class ProjectService {
   }
 
   public async getProjects(): Promise<Project[]> {
-    return this.project.find();
+    return this.project.find().populate("client").populate("manager", "_id name surname email").populate("workers", "_id name surname email");
   }
 }
 

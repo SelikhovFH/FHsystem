@@ -85,6 +85,7 @@ export const HomePage: FC = (props) => {
             <ActivityCard title={"Manage devices"} link={EditorRoutes.manageDevices} icon={"💻"} />
             <ActivityCard title={"Manage items"} link={EditorRoutes.manageItems} icon={"🪑"} />
             <ActivityCard title={"Manage deliveries"} link={EditorRoutes.manageDeliveries} icon={"🚚"} />
+            <ActivityCard title={"Manage clients"} link={EditorRoutes.manageClients} icon={"💼"} />
             <ActivityCard title={"Manage projects"} link={EditorRoutes.manageProjects} icon={"🚧"} />
             <ActivityCard title={"Manage skill tags"} link={EditorRoutes.manageSkillTags} icon={"🤹"} />
           </Space>
