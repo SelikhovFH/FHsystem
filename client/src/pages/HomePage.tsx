@@ -96,7 +96,7 @@ export const HomePage: FC = (props) => {
             Admin actions
           </Title>
           <Space wrap size={"middle"}>
-            <ActivityCard title={"Manage users"} link={AdminRoutes.manageUsers} icon={"👥"} />
+            <ActivityCard title={"Employees"} link={AdminRoutes.manageUsers} icon={"👥"} />
           </Space>
         </>}
       </Content>

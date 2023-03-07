@@ -206,7 +206,7 @@ export const ManageDevicesPage: FC = () => {
       key: "owner"
     },
     {
-      title: "Assigned to user",
+      title: "Assigned to employee",
       dataIndex: "assignedToUser",
       key: "assignedToUser",
       render: renderUserCell

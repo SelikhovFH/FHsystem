@@ -63,7 +63,8 @@ export const TimeTrackOverviewPage: FC = () => {
           <Gutter size={1} />
           <Row gutter={16}>
             <Col span={6}>
-              <Statistic title="Users with time tracked / total users" value={usersTracked} suffix={`/ ${totalUsers}`}
+              <Statistic title="Employees with time tracked / total users" value={usersTracked}
+                         suffix={`/ ${totalUsers}`}
                          loading={isLoading} />
             </Col>
             <Col span={6}>

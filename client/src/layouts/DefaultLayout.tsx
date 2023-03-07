@@ -51,7 +51,7 @@ const editorItems = [
 
 const adminItems = [
   getItem("Admin", "admin", null, [
-    getItem("Manage users", AdminRoutes.manageUsers, <span>👥</span>)
+    getItem("Manage employees", AdminRoutes.manageUsers, <span>👥</span>)
   ], "group")
 ];
 

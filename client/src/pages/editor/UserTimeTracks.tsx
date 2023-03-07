@@ -39,7 +39,7 @@ export const UserTimeTracksPage: FC = () => {
 
   return (
     <>
-      <AppHeader title={"User time tracks"} />
+      <AppHeader title={"Employee time tracks"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock
           errors={[
@@ -52,7 +52,7 @@ export const UserTimeTracksPage: FC = () => {
         </Card>
         <Gutter size={1} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
-          <Title level={4}>User time tracking statistics in {formatMonth(selectedMonth)}</Title>
+          <Title level={4}>Employee time tracking statistics in {formatMonth(selectedMonth)}</Title>
           <Gutter size={1} />
           <Row gutter={[16, 16]}>
             <Col span={8}>

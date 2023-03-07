@@ -206,7 +206,7 @@ export const ManageDeliveriesPage: FC = () => {
       render: renderDeliveryStatus
     },
     {
-      title: "Deliver to User",
+      title: "Deliver to Employee",
       dataIndex: "deliverToUser",
       key: "deliverToUser",
       render: renderUserCell

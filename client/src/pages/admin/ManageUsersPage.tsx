@@ -90,7 +90,7 @@ const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ for
     </Form.Item>
     <Form.Item>
       <Button disabled={buttonDisabled} type="primary" htmlType="submit">
-        Register new user
+        Register new employee
       </Button>
     </Form.Item>
   </Form>;
@@ -168,7 +168,7 @@ const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonD
     </Form.Item>
     <Form.Item>
       <Button disabled={buttonDisabled} type="primary" htmlType="submit">
-        Update user
+        Update employee
       </Button>
     </Form.Item>
   </Form>;
@@ -248,7 +248,7 @@ export const ManageUsersPage: FC = () => {
     //     }
     // },
     {
-      title: "User",
+      title: "Employee",
       dataIndex: "user",
       key: "user",
       render: (_, record) => {
@@ -365,7 +365,7 @@ export const ManageUsersPage: FC = () => {
   return (
     <>
       {messageContext}
-      <Modal footer={[]} title={"Update user"} open={isOpen && !!userToEdit}
+      <Modal footer={[]} title={"Update employee"} open={isOpen && !!userToEdit}
              onCancel={handleEditCancel}>
         <UpdateForm
           initialValues={userToEdit}
@@ -374,7 +374,7 @@ export const ManageUsersPage: FC = () => {
           buttonDisabled={editMutation.isLoading}
         />
       </Modal>
-      <Modal footer={[]} title={"Register user"} open={isOpen && !userToEdit}
+      <Modal footer={[]} title={"Register employee"} open={isOpen && !userToEdit}
              onCancel={handleAddCancel}>
         <RegisterForm
           form={form}
@@ -382,7 +382,7 @@ export const ManageUsersPage: FC = () => {
           buttonDisabled={addMutation.isLoading}
         />
       </Modal>
-      <AppHeader title={"Manage users"} />
+      <AppHeader title={"Manage employees"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock errors={[users.error, addMutation.error]} />
 
