@@ -20,7 +20,7 @@ export const UserProfilePage: FC<Props> = (props) => {
 
   return (
     <>
-      <AppHeader title={"User profile"} />
+      <AppHeader title={"Employee profile"} />
       <ErrorsBlock errors={[profile.error]} />
       <Profile profile={profile.data} isLoading={profile.isLoading} />
     </>

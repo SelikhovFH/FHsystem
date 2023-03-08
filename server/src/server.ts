@@ -10,6 +10,7 @@ import DeliveriesRoute from "@routes/delivery.route";
 import ProjectsRoute from "@routes/project.route";
 import TimeTracksRoute from "@routes/timeTracks.route";
 import SkillTagRoute from "@routes/skillTag.route";
+import ClientsRoute from "./routes/client.route";
 
 validateEnv();
 
@@ -23,7 +24,8 @@ const app = new App([
   new DeliveriesRoute(),
   new ProjectsRoute(),
   new TimeTracksRoute(),
-  new SkillTagRoute()
+  new SkillTagRoute(),
+  new ClientsRoute()
 ]);
 
 app.listen();
