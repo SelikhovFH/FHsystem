@@ -3,7 +3,7 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Button, Card, DatePicker, Form, Input, Layout, Modal, Select, Space, Table } from "antd";
+import { Button, Card, DatePicker, Form, Input, Layout, Modal, Segmented, Space, Table } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
@@ -11,25 +11,22 @@ import styles from "../FormStyles.module.css";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
 import { useApiFactory } from "../../services/apiFactory";
-import { Project, ProjectStatus } from "../../shared/project.interface";
-import { Client } from "../../shared/client.interface";
 import dayjs from "dayjs";
 import { UserSelect } from "../../components/form/UserSelect";
-import { ClientSelect } from "../../components/form/ClientSelect";
-import { renderClientCell } from "../../components/table/RenderClientCell";
-import { renderMultipleUsersCell, renderUserCell } from "../../components/table/RenderUserCell";
+import { renderUserCell } from "../../components/table/RenderUserCell";
 import { renderDateCell } from "../../components/table/RenderDateCell";
-import { renderProjectStatus } from "../../sections/project";
+import { OneToOneRecord } from "../../shared/oneToOneRecord.interface";
+import { useAuth0 } from "@auth0/auth0-react";
+import { API } from "../../services/api";
+import { formatMonth } from "../../utils/formatters";
 
 const { Content } = Layout;
 
 const schema = yup.object().shape({
-  name: yup.string().required(),
-  startDate: yup.string().required(),
-  manager: yup.string().required(),
-  workers: yup.array().of(yup.string()).required(),
-  client: yup.string().required(),
-  status: yup.string().required()
+  creator: yup.string().required(),
+  user: yup.string().required(),
+  date: yup.string().required(),
+  notes: yup.string().required()
 });
 
 
@@ -41,31 +38,21 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
                layout={"vertical"}
                onFinish={onFinish}
                autoComplete="off">
-    <Form.Item rules={[getYupRule(schema)]} label="Name"
-               name="name">
-      <Input />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Status"
-               name="status">
-      <Select
-        options={Object.values(ProjectStatus).map(v => ({ value: v, label: v }))}
-      />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Start date"
-               name="startDate">
-      <DatePicker />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Client"
-               name="client">
-      <ClientSelect />
-    </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Project manager"
-               name="manager">
+    <Form.Item rules={[getYupRule(schema)]} label="Creator"
+               name="creator">
       <UserSelect />
     </Form.Item>
-    <Form.Item rules={[getYupRule(schema)]} label="Project workers"
-               name="workers">
-      <UserSelect mode={"multiple"} />
+    <Form.Item rules={[getYupRule(schema)]} label="Employee"
+               name="user">
+      <UserSelect />
+    </Form.Item>
+    <Form.Item rules={[getYupRule(schema)]} label="Date"
+               name="date">
+      <DatePicker />
+    </Form.Item>
+    <Form.Item rules={[getYupRule(schema)]} label="Notes"
+               name="notes">
+      <Input.TextArea />
     </Form.Item>
     <Form.Item>
       <Button disabled={buttonDisabled} type="primary" htmlType="submit">
@@ -76,19 +63,32 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
 };
 
 export const ManageOneToOnePage: FC = () => {
-
+  const { user } = useAuth0();
+  const [mode, setMode] = useState<string | number>("List");
   const [isOpen, setIsOpen] = useState(false);
-  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
+  const [oneToOneToEdit, setOneToOneToEdit] = useState<OneToOneRecord | null>(null);
+  const [selectedYear, setSelectedYear] = useState(dayjs());
+  const show2dTable = mode === "Table";
 
   const {
-    data: items,
+    data: records,
     form,
     addMutation,
     deleteMutation,
     editMutation,
     messageContext
-  } = useApiFactory<Project[], Project>({
-    basePath: "/projects",
+  } = useApiFactory<{ records: OneToOneRecord[], dates: string[], recordsByUser: OneToOneRecord[][] }, OneToOneRecord>({
+    basePath: "/one_to_one_records",
+    get: {
+      queryKeys: ["/one_to_one_records", selectedYear],
+      fetcher: async (config) => {
+        const params = new URLSearchParams({
+          date: selectedYear.toISOString()
+        });
+        const res = await API.get(`/one_to_one_records/?${params.toString()}`, config);
+        return res.data.data as { records: OneToOneRecord[], dates: string[], recordsByUser: OneToOneRecord[][] };
+      }
+    },
     add: {
       onSuccess: () => {
         setIsOpen(false);
@@ -97,10 +97,11 @@ export const ManageOneToOnePage: FC = () => {
     edit: {
       onSuccess: () => {
         setIsOpen(false);
-        setProjectToEdit(null);
+        setOneToOneToEdit(null);
       }
     }
   });
+  console.log(records.data);
 
   const showAddModal = () => {
     setIsOpen(true);
@@ -112,75 +113,84 @@ export const ManageOneToOnePage: FC = () => {
   };
 
   const handleEditCancel = () => {
-    setProjectToEdit(null);
+    setOneToOneToEdit(null);
     form.resetFields();
     setIsOpen(false);
   };
 
 
   const onAddFinish = (values: any) => {
-    addMutation.mutate({ ...values, startDate: values.startDate.toISOString() });
+    addMutation.mutate({ ...values, date: values.date.toISOString() });
   };
 
   const onEditFinish = (values: any) => {
-    editMutation.mutate({ _id: projectToEdit?._id, ...values, startDate: values.startDate.toISOString() });
+    editMutation.mutate({ _id: oneToOneToEdit?._id, ...values, date: values.date.toISOString() });
   };
 
   const onDelete = (values: any) => {
     deleteMutation.mutate(values._id);
   };
 
-  const onEditClick = (item: Project) => {
-    setProjectToEdit({
+  const onEditClick = (item: OneToOneRecord) => {
+    setOneToOneToEdit({
       ...item,
       // @ts-ignore
-      startDate: dayjs(item.startDate),
+      date: dayjs(item.date),
       // @ts-ignore
-      manager: item.manager._id,
+      creator: item.creator._id,
       // @ts-ignore
-      client: item.client._id,
-      // @ts-ignore
-      workers: item.workers
-        .map(w => w._id)
+      user: item.user._id
     });
     setIsOpen(true);
   };
 
-  const columns: ColumnsType<Project> = [
+  const table2dColumns: ColumnsType<OneToOneRecord[]> = [{
+    title: "Employee",
+    dataIndex: "user",
+    key: "user",
+    width: 200,
+    fixed: "left",
+    render: (_: any, record: OneToOneRecord[]) => {
+      return renderUserCell(record[0].user);
+    }
+  }, ...(records?.data?.dates.map(d => ({
+    title: formatMonth(d),
+    dataIndex: d,
+    width: 200,
+    key: d,
+    render: (_: any, record: OneToOneRecord[]) => {
+      const foundNote = record.find(r => dayjs(r.date).month() === dayjs(d).month());
+      if (foundNote) {
+        return foundNote.notes;
+      }
+      return <></>;
+    }
+  })) ?? [])];
+
+
+  const columns: ColumnsType<OneToOneRecord> = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name"
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: renderProjectStatus
-    },
-    {
-      title: "Start date",
-      dataIndex: "startDate",
-      key: "startDate",
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
       render: renderDateCell
     },
     {
-      title: "Client",
-      dataIndex: "client",
-      key: "client",
-      render: renderClientCell
-    },
-    {
-      title: "Manager",
-      dataIndex: "manager",
-      key: "manager",
+      title: "Creator",
+      dataIndex: "creator",
+      key: "creator",
       render: renderUserCell
     },
     {
-      title: "Workers",
-      dataIndex: "workers",
-      key: "workers",
-      render: renderMultipleUsersCell
+      title: "Employee",
+      dataIndex: "user",
+      key: "user",
+      render: renderUserCell
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+      key: "notes"
     },
     {
       title: "Operations",
@@ -205,42 +215,51 @@ export const ManageOneToOnePage: FC = () => {
     <>
       {messageContext}
 
-      <Modal destroyOnClose footer={[]} title={"Update project"} open={isOpen && !!projectToEdit}
+      <Modal destroyOnClose footer={[]} title={"Update one to one record"} open={isOpen && !!oneToOneToEdit}
              onCancel={handleEditCancel}>
         <AddOrUpdateForm
-          initialValues={projectToEdit}
+          initialValues={oneToOneToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
-          buttonText={"Edit project"} />
+          buttonText={"Edit one to one record"} />
       </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add project"} open={isOpen && !projectToEdit}
+      <Modal destroyOnClose footer={[]} title={"Add one to one record"} open={isOpen && !oneToOneToEdit}
              onCancel={handleAddCancel}>
         <AddOrUpdateForm
+          initialValues={{ creator: user?.db_id, date: dayjs() }}
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
-          buttonText={"Add new project"} />
+          buttonText={"Add new one to one record"} />
       </Modal>
 
 
-      <AppHeader title={"Manage projects"} />
+      <AppHeader title={"Manage one to one records"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock
           errors={[
-            items.error as AxiosError,
+            records.error as AxiosError,
             addMutation.error as AxiosError,
             editMutation.error as AxiosError,
             deleteMutation.error as AxiosError
           ]} />
         <Gutter size={2} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
-          <Button onClick={showAddModal} type="primary" icon={<PlusOutlined />}>
-            Add project
-          </Button>
+          <Space>
+            <Segmented options={["List", "Table"]} value={mode} onChange={setMode} />
+            <DatePicker allowClear={false} value={selectedYear} onChange={v => setSelectedYear(v!)} picker="year" />
+            <Button onClick={showAddModal} type="primary" icon={<PlusOutlined />}>
+              Add one to one record
+            </Button>
+          </Space>
         </Card>
         <Gutter size={2} />
-        <Table loading={items.isLoading} dataSource={items.data} columns={columns} />
+        {show2dTable ?
+          <Table bordered scroll={{ x: true }} loading={records.isLoading} dataSource={records.data?.recordsByUser}
+                 columns={table2dColumns} /> :
+          <Table loading={records.isLoading} dataSource={records.data?.records} columns={columns} />}
+
       </Content>
     </>
   );

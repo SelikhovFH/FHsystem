@@ -1,6 +1,7 @@
 import oneToOneRecordModel from "@models/oneToOneRecord.model";
 import { CreateOneToOneRecordDto, UpdateOneToOneRecordDto } from "@dtos/oneToOneRecord.dto";
 import { Dayjs } from "dayjs";
+import { OneToOneRecord } from "@interfaces/oneToOneRecord.interface";
 
 class OneToOneRecordService {
   private oneToOneRecord = oneToOneRecordModel;
@@ -40,6 +41,17 @@ class OneToOneRecordService {
       groups[key].push(date);
     });
     return Object.values(groups).map(v => v[0]);
+  };
+
+  public groupOneToOneRecordsByUser = (records: OneToOneRecord[]) => {
+    return Object.values(records.reduce((acc, cur) => {
+      const user = cur.user._id;
+      if (!acc[user]) {
+        acc[user] = [];
+      }
+      acc[user].push(cur);
+      return acc;
+    }, {}));
   };
 
 }

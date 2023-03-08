@@ -43,7 +43,8 @@ class OneToOneRecordController {
       const records = await this.oneToOneRecordService.getOneToOneRecordsFullYear(dayjs(date));
       const _dates = records.map(record => new Date(record.date));
       const dates = this.oneToOneRecordService.getAggregatedDatesForOneToOne(_dates);
-      res.status(200).json({ message: "ok", data: { dates, records } });
+      const recordsByUser = this.oneToOneRecordService.groupOneToOneRecordsByUser(records);
+      res.status(200).json({ message: "ok", data: { dates, records, recordsByUser } });
     } catch (error) {
       next(error);
     }
