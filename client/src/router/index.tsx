@@ -22,6 +22,7 @@ import { UserTimeTracksPage } from "../pages/editor/UserTimeTracks";
 import { ManageSkillTagsPage } from "../pages/editor/ManageSkillTags";
 import { ManageClientsPage } from "../pages/editor/ManageClients";
 import { ClientProfilePage } from "../pages/editor/ClientProfilePage";
+import { ManageOneToOnePage } from "../pages/editor/ManageOneToOne";
 
 // TODO Dynamic module import
 
@@ -88,6 +89,10 @@ export const router = createBrowserRouter(
             <Route
               path={EditorRoutes.manageProjects}
               element={<ManageProjectsPage />}
+            />
+            <Route
+              path={EditorRoutes.manageOneToOne}
+              element={<ManageOneToOnePage />}
             />
             <Route
               path={EditorRoutes.manageSkillTags}

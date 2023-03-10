@@ -81,6 +81,7 @@ export const HomePage: FC = (props) => {
           <Space wrap size={"middle"}>
             <ActivityCard title={"Confirm day off"} link={EditorRoutes.confirmDayOff} icon={"✅"} />
             <ActivityCard title={"Time tracking"} link={EditorRoutes.confirmDayOff} icon={"🕒"} />
+            <ActivityCard title={"Manage one to one"} link={EditorRoutes.manageOneToOne} icon={"🎥"} />
             <ActivityCard title={"Celebrations"} link={EditorRoutes.holidaysAndCelebrations} icon={"🎉"} />
             <ActivityCard title={"Manage devices"} link={EditorRoutes.manageDevices} icon={"💻"} />
             <ActivityCard title={"Manage items"} link={EditorRoutes.manageItems} icon={"🪑"} />

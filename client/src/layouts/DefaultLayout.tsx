@@ -38,6 +38,7 @@ const editorItems = [
   getItem("Editor", "editor", null, [
     getItem("Confirm day off", EditorRoutes.confirmDayOff, <span>✅</span>),
     getItem("Time tracking overview", EditorRoutes.timeTrackOverview, <span>🕒</span>),
+    getItem("Manage one to one", EditorRoutes.manageOneToOne, <span>🎥</span>),
     getItem("Holidays & celebrations", EditorRoutes.holidaysAndCelebrations, <span>🎉</span>),
     getItem("Manage devices", EditorRoutes.manageDevices, <span>💻</span>),
     getItem("Manage items", EditorRoutes.manageItems, <span>🪑</span>),

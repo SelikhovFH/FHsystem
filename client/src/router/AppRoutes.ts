@@ -15,6 +15,7 @@ export enum EditorRoutes {
   manageClients = "/manage_clients",
   client = "/client/:id",
   manageSkillTags = "/manage_skill_tags",
+  manageOneToOne = "/manage_one_to_one",
   timeTrackOverview = "/time_tracks_overview",
   userTimeTracks = "/time_tracks/:id"
 }

@@ -11,6 +11,7 @@ import ProjectsRoute from "@routes/project.route";
 import TimeTracksRoute from "@routes/timeTracks.route";
 import SkillTagRoute from "@routes/skillTag.route";
 import ClientsRoute from "./routes/client.route";
+import OneToOneRecordRoute from "@routes/oneToOneRecord.route";
 
 validateEnv();
 
@@ -25,7 +26,8 @@ const app = new App([
   new ProjectsRoute(),
   new TimeTracksRoute(),
   new SkillTagRoute(),
-  new ClientsRoute()
+  new ClientsRoute(),
+  new OneToOneRecordRoute()
 ]);
 
 app.listen();
