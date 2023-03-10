@@ -6,7 +6,8 @@ const oneToOneRecordSchema: Schema = new Schema({
   creator: { type: Schema.Types.ObjectId, ref: "User" },
   user: { type: Schema.Types.ObjectId, ref: "User" },
   date: Date,
-  notes: String
+  notes: String,
+  impression: Number
 });
 
 const oneToOneRecordModel = model<OneToOneRecord & Document>("oneToOneRecord", oneToOneRecordSchema);

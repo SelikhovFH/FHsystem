@@ -3,7 +3,7 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Button, Card, DatePicker, Form, Input, Layout, Modal, Segmented, Space, Table } from "antd";
+import { Button, Card, DatePicker, Form, Input, Layout, Modal, Segmented, Select, Space, Table } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
@@ -15,10 +15,12 @@ import dayjs from "dayjs";
 import { UserSelect } from "../../components/form/UserSelect";
 import { renderUserCell } from "../../components/table/RenderUserCell";
 import { renderDateCell } from "../../components/table/RenderDateCell";
-import { OneToOneRecord } from "../../shared/oneToOneRecord.interface";
+import { Impression, OneToOneRecord } from "../../shared/oneToOneRecord.interface";
 import { useAuth0 } from "@auth0/auth0-react";
 import { API } from "../../services/api";
 import { formatMonth } from "../../utils/formatters";
+import { CollapsedTextCell } from "../../components/table/RenderCollapsedTextCell";
+import { ImpressionLabel } from "../../sections/oneToOne";
 
 const { Content } = Layout;
 
@@ -26,7 +28,8 @@ const schema = yup.object().shape({
   creator: yup.string().required(),
   user: yup.string().required(),
   date: yup.string().required(),
-  notes: yup.string().required()
+  notes: yup.string().required(),
+  impression: yup.number().required()
 });
 
 
@@ -50,9 +53,15 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
                name="date">
       <DatePicker />
     </Form.Item>
+    <Form.Item rules={[getYupRule(schema)]} label="Impression"
+               name="impression">
+      <Select
+        options={[1, 2, 3, 4, 5].map(v => ({ value: v, label: ImpressionLabel[v as Impression] }))}
+      />
+    </Form.Item>
     <Form.Item rules={[getYupRule(schema)]} label="Notes"
                name="notes">
-      <Input.TextArea />
+      <Input.TextArea rows={10} />
     </Form.Item>
     <Form.Item>
       <Button disabled={buttonDisabled} type="primary" htmlType="submit">
@@ -148,7 +157,7 @@ export const ManageOneToOnePage: FC = () => {
     title: "Employee",
     dataIndex: "user",
     key: "user",
-    width: 200,
+    width: 300,
     fixed: "left",
     render: (_: any, record: OneToOneRecord[]) => {
       return renderUserCell(record[0].user);
@@ -156,12 +165,13 @@ export const ManageOneToOnePage: FC = () => {
   }, ...(records?.data?.dates.map(d => ({
     title: formatMonth(d),
     dataIndex: d,
-    width: 200,
+    width: 300,
     key: d,
     render: (_: any, record: OneToOneRecord[]) => {
       const foundNote = record.find(r => dayjs(r.date).month() === dayjs(d).month());
       if (foundNote) {
-        return foundNote.notes;
+        return <CollapsedTextCell text={foundNote.notes}
+                                  title={`${ImpressionLabel[foundNote.impression]} - ${foundNote.creator.name} ${foundNote.creator.surname}`} />;
       }
       return <></>;
     }
@@ -188,9 +198,18 @@ export const ManageOneToOnePage: FC = () => {
       render: renderUserCell
     },
     {
+      title: "Impression",
+      dataIndex: "impression",
+      key: "impression",
+      render: (text) => ImpressionLabel[text as Impression]
+    },
+    {
       title: "Notes",
       dataIndex: "notes",
-      key: "notes"
+      key: "notes",
+      render: (text) => {
+        return <CollapsedTextCell text={text} />;
+      }
     },
     {
       title: "Operations",

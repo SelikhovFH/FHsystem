@@ -6,4 +6,7 @@ export interface OneToOneRecord {
   user: User;
   date: string;
   notes: string;
+  impression: Impression;
 }
+
+export type Impression = 1 | 2 | 3 | 4 | 5

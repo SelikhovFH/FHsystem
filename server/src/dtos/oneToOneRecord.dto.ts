@@ -1,4 +1,5 @@
-import { IsDateString, IsString } from "class-validator";
+import { IsDateString, IsInt, IsString, Max, Min } from "class-validator";
+import { Impression } from "@interfaces/oneToOneRecord.interface";
 
 
 export class CreateOneToOneRecordDto {
@@ -10,6 +11,11 @@ export class CreateOneToOneRecordDto {
   date: string;
   @IsString()
   notes: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  impression: Impression;
 }
 
 export class GetOneToOneRecordsFullYear {
