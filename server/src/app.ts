@@ -82,8 +82,8 @@ class App {
   }
 
   private initializeCertChallenge() {
-    this.app.use("/.well-known/acme-challenge/HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4", (req, res) => {
-      return res.status(200).send("HVVqKGM_cmR4RCn0f1i3FEHanJbw_Otf__Z1kEpcfl4.TY-sdxBgzkm-s_HcB-gGJYbxv1ApqdvMTeVydFg7820");
+    this.app.use("/.well-known/acme-challenge/WViavPd5oVzAFFg8749gzb6pzI5uZ-DAIjNMSmFhpTM", (req, res) => {
+      return res.status(200).send("WViavPd5oVzAFFg8749gzb6pzI5uZ-DAIjNMSmFhpTM.TY-sdxBgzkm-s_HcB-gGJYbxv1ApqdvMTeVydFg7820");
     });
   }
 
