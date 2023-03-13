@@ -85,6 +85,9 @@ class App {
     this.app.use("/.well-known/acme-challenge/WViavPd5oVzAFFg8749gzb6pzI5uZ-DAIjNMSmFhpTM", (req, res) => {
       return res.status(200).send("WViavPd5oVzAFFg8749gzb6pzI5uZ-DAIjNMSmFhpTM.TY-sdxBgzkm-s_HcB-gGJYbxv1ApqdvMTeVydFg7820");
     });
+    this.app.use("/.well-known/acme-challenge/Tm15zfum8cX05kdUTxIZA2j_ezNhBmkcmn2Qcl6-Qbc", (req, res) => {
+      return res.status(200).send("Tm15zfum8cX05kdUTxIZA2j_ezNhBmkcmn2Qcl6-Qbc.TY-sdxBgzkm-s_HcB-gGJYbxv1ApqdvMTeVydFg7820");
+    });
   }
 
   private initializeSwagger() {
