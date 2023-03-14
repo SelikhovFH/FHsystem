@@ -1,6 +1,5 @@
 import compression from "compression";
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import hpp from "hpp";
@@ -8,7 +7,7 @@ import morgan from "morgan";
 import { connect, set } from "mongoose";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { LOG_FORMAT, NODE_ENV, ORIGIN, PORT } from "@config";
+import { LOG_FORMAT, NODE_ENV, PORT } from "@config";
 import { dbConnection } from "@databases";
 import { Routes } from "@interfaces/routes.interface";
 import errorMiddleware from "@middlewares/error.middleware";
@@ -18,6 +17,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayjsBusinessDays from "dayjs-business-days";
 import minMax from "dayjs/plugin/minMax";
+import { allowCrossDomain } from "./middlewares/allowCrossDomain.middleware";
 
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
@@ -65,8 +65,7 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    console.log("CORS ORIGIN", ORIGIN);
-    this.app.use(cors({ origin: ORIGIN }));
+    this.app.use(allowCrossDomain);
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());
