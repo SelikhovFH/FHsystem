@@ -15,7 +15,8 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayjsBusinessDays from "dayjs-business-days";
 import minMax from "dayjs/plugin/minMax";
-import { allowCrossDomain } from "./middlewares/allowCrossDomain.middleware";
+import { authMiddleware } from "./middlewares/auth.middleware";
+import helmet from "helmet";
 
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
@@ -63,14 +64,14 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    this.app.use(allowCrossDomain);
+    // this.app.use(allowCrossDomain);
     this.app.use(hpp());
-    // this.app.use(helmet());
+    this.app.use(helmet());
     this.app.use(compression());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    // this.app.use(authMiddleware);
+    this.app.use(authMiddleware);
   }
 
   private initializeRoutes(routes: Routes[]) {
