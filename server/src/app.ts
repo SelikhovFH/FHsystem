@@ -65,6 +65,7 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
+    console.log("CORS ORIGIN", ORIGIN);
     this.app.use(cors({ origin: ORIGIN }));
     this.app.use(hpp());
     this.app.use(helmet());
