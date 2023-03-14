@@ -12,7 +12,6 @@ import { dbConnection } from "@databases";
 import { Routes } from "@interfaces/routes.interface";
 import errorMiddleware from "@middlewares/error.middleware";
 import { logger, stream } from "@utils/logger";
-import { authMiddleware } from "@middlewares/auth.middleware";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayjsBusinessDays from "dayjs-business-days";
@@ -72,7 +71,7 @@ class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    this.app.use(authMiddleware);
+    // this.app.use(authMiddleware);
   }
 
   private initializeRoutes(routes: Routes[]) {
