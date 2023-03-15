@@ -17,7 +17,6 @@ import dayjsBusinessDays from "dayjs-business-days";
 import minMax from "dayjs/plugin/minMax";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import helmet from "helmet";
-import cors from "cors";
 
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
@@ -65,16 +64,16 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    this.app.use(cors({
-      origin: "*",
-      credentials: true,
-      methods: ["GET", "POST", "OPTIONS", "PATCH", "PUT", "DELETE"],
-      allowedHeaders: [
-        "Origin", "Accept", "X-Requested-With", "X-Forwarded-For",
-        "X-Forwarded-Proto", "X-Real-IP", "Host", "Content-Type", "Authorization"
-      ]
-    }));
-    this.app.options("*", cors());
+    // this.app.use(cors({
+    //   origin: "*",
+    //   credentials: true,
+    //   methods: ["GET", "POST", "OPTIONS", "PATCH", "PUT", "DELETE"],
+    //   allowedHeaders: [
+    //     "Origin", "Accept", "X-Requested-With", "X-Forwarded-For",
+    //     "X-Forwarded-Proto", "X-Real-IP", "Host", "Content-Type", "Authorization"
+    //   ]
+    // }));
+    // this.app.options("*", cors());
     // this.app.get("*", cors())
     this.app.use(hpp());
     this.app.use(helmet());
