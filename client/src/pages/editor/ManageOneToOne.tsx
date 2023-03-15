@@ -3,7 +3,20 @@ import { AppHeader } from "../../layouts/Header";
 import { ErrorsBlock } from "../../components/ErrorsBlock";
 import { AxiosError } from "axios/index";
 import { Gutter } from "../../components/Gutter";
-import { Button, Card, DatePicker, Form, Input, Layout, Modal, Segmented, Select, Space, Table } from "antd";
+import {
+  Button,
+  Card,
+  DatePicker,
+  Descriptions,
+  Form,
+  Input,
+  Layout,
+  Modal,
+  Segmented,
+  Select,
+  Space,
+  Table
+} from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
@@ -20,11 +33,12 @@ import { renderDateCell } from "../../components/table/RenderDateCell";
 import { Impression, OneToOneRecord } from "../../shared/oneToOneRecord.interface";
 import { useAuth0 } from "@auth0/auth0-react";
 import { API } from "../../services/api";
-import { formatMonth } from "../../utils/formatters";
+import { formatDate, formatMonth } from "../../utils/formatters";
 import { CollapsedTextCell } from "../../components/table/RenderCollapsedTextCell";
 import { ImpressionLabel } from "../../sections/oneToOne";
 import { ColumnType } from "antd/es/table/interface";
 import { getDisplayName } from "../../sections/users/getDisplayName";
+import { User } from "../../shared/user.interface";
 
 const { Content } = Layout;
 
@@ -37,7 +51,13 @@ const schema = yup.object().shape({
 });
 
 
-const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, buttonText, initialValues }) => {
+const AddOrUpdateForm: FC<FormProps> = ({
+                                          form,
+                                          onFinish,
+                                          buttonDisabled,
+                                          buttonText,
+                                          initialValues
+                                        }) => {
   useEffect(() => {
     form.resetFields();
   }, [initialValues]);
@@ -80,6 +100,9 @@ export const ManageOneToOnePage: FC = () => {
   const [mode, setMode] = useState<string | number>("List");
   const [isOpen, setIsOpen] = useState(false);
   const [oneToOneToEdit, setOneToOneToEdit] = useState<OneToOneRecord | null>(null);
+  const [oneToOneToRead, setOneToOneToRead] = useState<OneToOneRecord | null>(null);
+  const [initialValueUserId, setInitialValueUserId] = useState<string | null>(null);
+
   const [selectedYear, setSelectedYear] = useState(dayjs());
   const show2dTable = mode === "Table";
 
@@ -114,7 +137,6 @@ export const ManageOneToOnePage: FC = () => {
       }
     }
   });
-  console.log(records.data);
 
   const showAddModal = () => {
     setIsOpen(true);
@@ -131,6 +153,10 @@ export const ManageOneToOnePage: FC = () => {
     setIsOpen(false);
   };
 
+  const handleReadCancel = () => {
+    setOneToOneToRead(null);
+  };
+
 
   const onAddFinish = (values: any) => {
     addMutation.mutate({ ...values, date: values.date.toISOString() });
@@ -144,6 +170,11 @@ export const ManageOneToOnePage: FC = () => {
     deleteMutation.mutate(values._id);
   };
 
+  const onUserAdd = (user: User) => {
+    setInitialValueUserId(user._id);
+    showAddModal();
+  };
+
   const onEditClick = (item: OneToOneRecord) => {
     setOneToOneToEdit({
       ...item,
@@ -155,6 +186,10 @@ export const ManageOneToOnePage: FC = () => {
       user: item.user._id
     });
     setIsOpen(true);
+  };
+
+  const onReadClick = (item: OneToOneRecord) => {
+    setOneToOneToRead(item);
   };
 
   const table2dColumns: ColumnsType<OneToOneRecord[]> = [{
@@ -176,11 +211,12 @@ export const ManageOneToOnePage: FC = () => {
       render: (_: any, record: OneToOneRecord[]) => {
         const foundNote = record.find(r => dayjs(r.date).month() === dayjs(d).month());
         if (foundNote) {
-          return <Card className={tableStyles.card}
+          return <Card onClick={() => onReadClick(foundNote)} className={tableStyles.card}
                        size={"small"}>{getDisplayName(foundNote.user)} - {getDisplayName(foundNote.creator)}</Card>;
         }
         if (isCurrentMonth) {
-          return <Button danger style={{ width: "100%" }} type={"dashed"}>Add one to one record</Button>;
+          return <Button onClick={() => onUserAdd(record[0].user)} danger style={{ width: "100%" }} type={"dashed"}>Add
+            one to one record</Button>;
         }
         return <></>;
       }
@@ -243,7 +279,16 @@ export const ManageOneToOnePage: FC = () => {
   return (
     <>
       {messageContext}
-
+      <Modal destroyOnClose footer={[]} title={"Info for one to one record"} open={!!oneToOneToRead}
+             onCancel={handleReadCancel}>
+        {oneToOneToRead && <Descriptions size={"small"} column={1}>
+          <Descriptions.Item label="Employee">{getDisplayName(oneToOneToRead.user)}</Descriptions.Item>
+          <Descriptions.Item label="Creator">{getDisplayName(oneToOneToRead.creator)}</Descriptions.Item>
+          <Descriptions.Item label="Date">{formatDate(oneToOneToRead.date)}</Descriptions.Item>
+          <Descriptions.Item label="Impression">{ImpressionLabel[oneToOneToRead.impression]}</Descriptions.Item>
+          <Descriptions.Item label="Notes">{oneToOneToRead.notes}</Descriptions.Item>
+        </Descriptions>}
+      </Modal>
       <Modal destroyOnClose footer={[]} title={"Update one to one record"} open={isOpen && !!oneToOneToEdit}
              onCancel={handleEditCancel}>
         <AddOrUpdateForm
@@ -256,7 +301,7 @@ export const ManageOneToOnePage: FC = () => {
       <Modal destroyOnClose footer={[]} title={"Add one to one record"} open={isOpen && !oneToOneToEdit}
              onCancel={handleAddCancel}>
         <AddOrUpdateForm
-          initialValues={{ creator: user?.db_id, date: dayjs() }}
+          initialValues={{ creator: user?.db_id, date: dayjs(), user: initialValueUserId }}
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
