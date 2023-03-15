@@ -17,6 +17,7 @@ import dayjsBusinessDays from "dayjs-business-days";
 import minMax from "dayjs/plugin/minMax";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import helmet from "helmet";
+import cors from "cors";
 
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
@@ -64,7 +65,8 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    // this.app.use(allowCrossDomain);
+    this.app.use(cors());
+    this.app.options("*", cors());
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());
