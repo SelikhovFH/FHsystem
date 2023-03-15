@@ -55,8 +55,8 @@ class App {
   }
 
   private connectToDatabase() {
-    if (this.env !== 'production') {
-      set('debug', true);
+    if (this.env !== "production") {
+      set("debug", true);
     }
 
     //@ts-ignore
@@ -65,8 +65,17 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    this.app.use(cors());
+    this.app.use(cors({
+      origin: "*",
+      credentials: true,
+      methods: ["GET", "POST", "OPTIONS", "PATCH", "PUT", "DELETE"],
+      allowedHeaders: [
+        "Origin", "Accept", "X-Requested-With", "X-Forwarded-For",
+        "X-Forwarded-Proto", "X-Real-IP", "Host", "Content-Type", "Authorization"
+      ]
+    }));
     this.app.options("*", cors());
+    // this.app.get("*", cors())
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());
@@ -100,11 +109,11 @@ class App {
           description: "Example docs"
         }
       },
-      apis: ['swagger.yaml'],
+      apis: ["swagger.yaml"]
     };
 
     const specs = swaggerJSDoc(options);
-    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
   }
 
   private initializeErrorHandling() {
