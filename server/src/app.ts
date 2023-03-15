@@ -15,7 +15,6 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import dayjsBusinessDays from "dayjs-business-days";
 import minMax from "dayjs/plugin/minMax";
-import { authMiddleware } from "./middlewares/auth.middleware";
 import helmet from "helmet";
 
 dayjs.extend(isBetween);
@@ -81,7 +80,7 @@ class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    this.app.use(authMiddleware);
+    // this.app.use(authMiddleware);
   }
 
   private initializeRoutes(routes: Routes[]) {
