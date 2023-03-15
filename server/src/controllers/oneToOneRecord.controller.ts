@@ -42,7 +42,12 @@ class OneToOneRecordController {
       const { date } = req.query as unknown as GetTimeTrackDto;
       const records = await this.oneToOneRecordService.getOneToOneRecordsFullYear(dayjs(date));
       const _dates = records.map(record => new Date(record.date));
+
       const dates = this.oneToOneRecordService.getAggregatedDatesForOneToOne(_dates);
+      const currentMothPresent = dates.find(d => (dayjs().isSame(dayjs(d), "month")));
+      if (!currentMothPresent) {
+        dates.push(new Date());
+      }
       const recordsByUser = this.oneToOneRecordService.groupOneToOneRecordsByUser(records);
       res.status(200).json({ message: "ok", data: { dates, records, recordsByUser } });
     } catch (error) {

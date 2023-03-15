@@ -1,0 +1,21 @@
+.highlightColumn {
+    z-index: 3;
+    border-inline: 2px solid #91d5ff;
+    border-inline-end: 2px solid #91d5ff !important;
+}
+
+
+.card {
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all .25s ease-in-out;
+}
+
+.card:hover {
+    /*border-color: #1890ff;*/
+    background: #fafafa;
+}
+
+.noHoverTable td {
+    background: none !important;
+}

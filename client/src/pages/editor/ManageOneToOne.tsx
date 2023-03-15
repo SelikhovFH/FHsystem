@@ -8,6 +8,8 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { getYupRule } from "../../utils/yupRule";
 import styles from "../FormStyles.module.css";
+import tableStyles from "./ManageOneToOne.module.css";
+
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
 import { useApiFactory } from "../../services/apiFactory";
@@ -21,6 +23,8 @@ import { API } from "../../services/api";
 import { formatMonth } from "../../utils/formatters";
 import { CollapsedTextCell } from "../../components/table/RenderCollapsedTextCell";
 import { ImpressionLabel } from "../../sections/oneToOne";
+import { ColumnType } from "antd/es/table/interface";
+import { getDisplayName } from "../../sections/users/getDisplayName";
 
 const { Content } = Layout;
 
@@ -162,20 +166,26 @@ export const ManageOneToOnePage: FC = () => {
     render: (_: any, record: OneToOneRecord[]) => {
       return renderUserCell(record[0].user);
     }
-  }, ...(records?.data?.dates.map(d => ({
-    title: formatMonth(d),
-    dataIndex: d,
-    width: 300,
-    key: d,
-    render: (_: any, record: OneToOneRecord[]) => {
-      const foundNote = record.find(r => dayjs(r.date).month() === dayjs(d).month());
-      if (foundNote) {
-        return <CollapsedTextCell text={foundNote.notes}
-                                  title={`${ImpressionLabel[foundNote.impression]} - ${foundNote.creator.name} ${foundNote.creator.surname}`} />;
+  }, ...(records?.data?.dates.map(d => {
+    const isCurrentMonth = dayjs().isSame(dayjs(d), "month");
+    return ({
+      title: formatMonth(d),
+      dataIndex: d,
+      key: d,
+      className: isCurrentMonth && tableStyles.highlightColumn,
+      render: (_: any, record: OneToOneRecord[]) => {
+        const foundNote = record.find(r => dayjs(r.date).month() === dayjs(d).month());
+        if (foundNote) {
+          return <Card className={tableStyles.card}
+                       size={"small"}>{getDisplayName(foundNote.user)} - {getDisplayName(foundNote.creator)}</Card>;
+        }
+        if (isCurrentMonth) {
+          return <Button danger style={{ width: "100%" }} type={"dashed"}>Add one to one record</Button>;
+        }
+        return <></>;
       }
-      return <></>;
-    }
-  })) ?? [])];
+    } as ColumnType<OneToOneRecord[]>);
+  }) ?? [])];
 
 
   const columns: ColumnsType<OneToOneRecord> = [
@@ -275,7 +285,8 @@ export const ManageOneToOnePage: FC = () => {
         </Card>
         <Gutter size={2} />
         {show2dTable ?
-          <Table bordered scroll={{ x: true }} loading={records.isLoading} dataSource={records.data?.recordsByUser}
+          <Table className={tableStyles.noHoverTable} bordered scroll={{ x: true }} loading={records.isLoading}
+                 dataSource={records.data?.recordsByUser}
                  columns={table2dColumns} /> :
           <Table loading={records.isLoading} dataSource={records.data?.records} columns={columns} />}
 
