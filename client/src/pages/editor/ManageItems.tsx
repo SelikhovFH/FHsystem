@@ -18,22 +18,24 @@ const { Content } = Layout;
 const schema = yup.object().shape({
     name: yup.string().required(),
     description: yup.string(),
-    quantity: yup.number().min(0),
+    quantity: yup.number().min(0).required(),
     size: yup.string()
 });
 
 
 const AddOrUpdateForm: FC<FormProps> = ({form, onFinish, buttonDisabled, buttonText, initialValues}) => {
+
     useEffect(() => {
         form.resetFields();
-    }, [initialValues])
+    }, [initialValues]);
+
     return <Form className={styles.form} initialValues={initialValues} form={form} name="item"
                  layout={"vertical"}
                  onFinish={onFinish}
                  autoComplete="off">
         <Form.Item rules={[getYupRule(schema)]} label="Name"
                    name="name">
-            <Input/>
+            <Input />
         </Form.Item>
         <Form.Item rules={[getYupRule(schema)]} label="Description"
                    name="description">
@@ -90,14 +92,14 @@ export const ManageItemsPage: FC = () => {
     };
 
     const handleAddCancel = () => {
-        form.resetFields();
         setIsOpen(false);
+        form.resetFields();
     };
 
     const handleEditCancel = () => {
         setItemToEdit(null);
-        form.resetFields();
         setIsOpen(false);
+        form.resetFields();
     };
 
 
@@ -159,30 +161,30 @@ export const ManageItemsPage: FC = () => {
     ];
 
     return (
-        <>
-            {messageContext}
+      <>
+          {messageContext}
 
-            <Modal destroyOnClose footer={[]} title={"Update item"} open={isOpen && !!itemToEdit}
-                   onCancel={handleEditCancel}>
-                <AddOrUpdateForm
-                  initialValues={itemToEdit}
-                  form={form}
-                  onFinish={onEditFinish}
-                  buttonDisabled={editMutation.isLoading}
-                  buttonText={"Edit item"} />
-            </Modal>
-            <Modal destroyOnClose footer={[]} title={"Add item"} open={isOpen && !itemToEdit}
-                   onCancel={handleAddCancel}>
-                <AddOrUpdateForm
-                  form={form}
-                  onFinish={onAddFinish}
-                  buttonDisabled={addMutation.isLoading}
-                  buttonText={"Add new item"} />
-            </Modal>
+          {isOpen && !!itemToEdit && <Modal footer={[]} title={"Update item"} open={true}
+                                            onCancel={handleEditCancel}>
+              <AddOrUpdateForm
+                initialValues={itemToEdit}
+                form={form}
+                onFinish={onEditFinish}
+                buttonDisabled={editMutation.isLoading}
+                buttonText={"Edit item"} />
+          </Modal>}
+          {isOpen && !itemToEdit && <Modal footer={[]} title={"Add item"} open={true}
+                                           onCancel={handleAddCancel}>
+              <AddOrUpdateForm
+                form={form}
+                onFinish={onAddFinish}
+                buttonDisabled={addMutation.isLoading}
+                buttonText={"Add new item"} />
+          </Modal>}
 
 
-            <AppHeader title={"Manage items"}/>
-            <Content style={{margin: 32}}>
+          <AppHeader title={"Manage items"} />
+          <Content style={{ margin: 32 }}>
                 <ErrorsBlock
                     errors={[
                         items.error as AxiosError,

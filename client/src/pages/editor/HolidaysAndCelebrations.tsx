@@ -277,23 +277,23 @@ export const HolidaysAndCelebrationsPage: FC = () => {
   return (
     <>
       {messageContext}
-      <Modal destroyOnClose footer={[]} title={"Update calendar event"} open={isOpen && !!calendarEventToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!calendarEventToEdit && <Modal footer={[]} title={"Update calendar event"} open={true}
+                                                 onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={calendarEventToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit calendar event"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add calendar event"} open={isOpen && !calendarEventToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !calendarEventToEdit && <Modal footer={[]} title={"Add calendar event"} open={true}
+                                                onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new calendar event"} />
-      </Modal>
+      </Modal>}
       <AppHeader title={"Holidays & celebrations"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock

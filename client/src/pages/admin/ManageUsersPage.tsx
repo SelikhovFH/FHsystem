@@ -99,7 +99,7 @@ const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ for
 const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonDisabled, initialValues }) => {
   useEffect(() => {
     form.resetFields();
-  }, [initialValues]);
+  });
   return <Form className={styles.form} form={form} name="updateForm"
                initialValues={initialValues}
                layout={"vertical"}
@@ -365,23 +365,23 @@ export const ManageUsersPage: FC = () => {
   return (
     <>
       {messageContext}
-      <Modal footer={[]} title={"Update employee"} open={isOpen && !!userToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!userToEdit && <Modal footer={[]} title={"Update employee"} open={true}
+                                        onCancel={handleEditCancel}>
         <UpdateForm
           initialValues={userToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
         />
-      </Modal>
-      <Modal footer={[]} title={"Register employee"} open={isOpen && !userToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !userToEdit && <Modal footer={[]} title={"Register employee"} open={true}
+                                       onCancel={handleAddCancel}>
         <RegisterForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
         />
-      </Modal>
+      </Modal>}
       <AppHeader title={"Manage employees"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock errors={[users.error, addMutation.error]} />

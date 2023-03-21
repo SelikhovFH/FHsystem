@@ -60,7 +60,7 @@ const AddOrUpdateForm: FC<FormProps & { isEditForm?: boolean }> = ({
                                                                    }) => {
   useEffect(() => {
     form.resetFields();
-  }, []);
+  }, [initialValues]);
 
   return <Form className={styles.form} initialValues={initialValues} form={form} name="timeTrack"
                layout={"vertical"}
@@ -225,8 +225,8 @@ export const TimeTrackPage: FC = () => {
     <>
       {messageContext}
 
-      <Modal destroyOnClose footer={[]} title={"Update time track"} open={isOpen && !!timeTrackToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!timeTrackToEdit && <Modal footer={[]} title={"Update time track"} open={true}
+                                             onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={timeTrackToEdit}
           form={form}
@@ -234,16 +234,16 @@ export const TimeTrackPage: FC = () => {
           buttonDisabled={editMutation.isLoading}
           isEditForm
           buttonText={"Edit time track"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add time track"} open={isOpen && !timeTrackToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !timeTrackToEdit && <Modal footer={[]} title={"Add time track"} open={true}
+                                            onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
           initialValues={{ date: dayjs() }}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new time track"} />
-      </Modal>
+      </Modal>}
 
 
       <AppHeader title={"Track your working time"} />

@@ -178,23 +178,23 @@ export const ManageClientsPage: FC = () => {
     <>
       {messageContext}
 
-      <Modal destroyOnClose footer={[]} title={"Update client"} open={isOpen && !!clientToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!clientToEdit && <Modal footer={[]} title={"Update client"} open={true}
+                                          onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={clientToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit client"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add client"} open={isOpen && !clientToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !clientToEdit && <Modal footer={[]} title={"Add client"} open={true}
+                                         onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new client"} />
-      </Modal>
+      </Modal>}
 
 
       <AppHeader title={"Manage clients"} />

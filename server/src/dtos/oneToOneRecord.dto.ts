@@ -24,5 +24,6 @@ export class GetOneToOneRecordsFullYear {
 }
 
 export class UpdateOneToOneRecordDto extends CreateOneToOneRecordDto {
+  @IsString()
   _id: string;
 }
