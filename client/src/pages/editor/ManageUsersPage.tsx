@@ -35,6 +35,7 @@ import { UserRolesLabels, UserStatusLabels } from "../../sections/users";
 import { SkillTagsSelect } from "../../components/form/SkillTagsSelect";
 import { SkillTag } from "../../shared/skillTag.interface";
 import { SkillTagCategoryToColor } from "../../sections/skillTag";
+import { useIsAdmin } from "../../wrappers/RequireAdmin";
 
 const { Content } = Layout;
 const { Paragraph } = Typography;
@@ -178,6 +179,7 @@ const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonD
 export const ManageUsersPage: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  const isAdmin = useIsAdmin();
 
   const {
     data: users,
@@ -350,7 +352,7 @@ export const ManageUsersPage: FC = () => {
         return <Space>
           <Button onClick={() => onEditClick(record)} type={"primary"} icon={<EditOutlined />}>
           </Button>
-          <Button disabled={deleteMutation.isLoading} onClick={() => onDelete(record)} danger
+          <Button disabled={deleteMutation.isLoading || !isAdmin} onClick={() => onDelete(record)} danger
                   type={"primary"}
                   icon={<DeleteOutlined />}>
           </Button>
@@ -388,7 +390,7 @@ export const ManageUsersPage: FC = () => {
 
         <Gutter size={2} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
-          <Button onClick={showAddModal} type="primary">
+          <Button disabled={!isAdmin} onClick={showAddModal} type="primary">
             Register
           </Button>
         </Card>

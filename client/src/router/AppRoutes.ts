@@ -17,12 +17,13 @@ export enum EditorRoutes {
   manageSkillTags = "/manage_skill_tags",
   manageOneToOne = "/manage_one_to_one",
   timeTrackOverview = "/time_tracks_overview",
-  userTimeTracks = "/time_tracks/:id"
+  userTimeTracks = "/time_tracks/:id",
+  manageUsers = "/manage_users",
+  user = "/user/:id",
 }
 
 export enum AdminRoutes {
-  manageUsers = "/manage_users",
-  user = "/user/:id",
+
 }
 
 export const getUserProfileRoute = (userId: string) => {
