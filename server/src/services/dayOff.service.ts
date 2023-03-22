@@ -26,6 +26,14 @@ class DayOffService {
     return this.dayOff.findOneAndUpdate({ _id: id }, data);
   }
 
+  public async deleteDayOff(_id: string) {
+    return this.dayOff.findOneAndDelete({ _id });
+  }
+
+  public async getDayOffs() {
+    return this.dayOff.find();
+  }
+
   public async getPendingDaysOff(): Promise<DayOff[]> {
     return this.dayOff
       .aggregate()

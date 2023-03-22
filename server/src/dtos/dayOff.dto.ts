@@ -12,6 +12,20 @@ export class CreateDayOffDto {
   public type: DayOffType;
 }
 
+export class CreateDayOffEditorDto extends CreateDayOffDto {
+  @IsString()
+  public userId: string;
+
+  @IsEnum(DayOffStatus)
+  status: DayOffStatus;
+}
+
+export class UpdateDayOffEditorDto extends CreateDayOffEditorDto {
+  @IsString()
+  id: string;
+}
+
+
 export class CreateDayOffBackendDto extends CreateDayOffDto {
   @IsString()
   public userId: string;

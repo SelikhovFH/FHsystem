@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import DayOffService from "@services/dayOff.service";
-import { ConfirmDayOffDto, CreateDayOffDto } from "@dtos/dayOff.dto";
+import { ConfirmDayOffDto, CreateDayOffDto, CreateDayOffEditorDto, UpdateDayOffEditorDto } from "@dtos/dayOff.dto";
 import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
 import CalendarEventService from "@services/calendarEvent.service";
@@ -11,13 +11,54 @@ class DayOffController {
   private userService = new UserService();
   private calendarEventService = new CalendarEventService();
 
-  createDayOff = async (req: Request, res: Response, next: NextFunction) => {
+  createDayOffMy = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.auth.payload.db_id as string;
       const dayOffData: CreateDayOffDto = req.body;
       await this.dayOffService.validateDayOff(userId, dayOffData);
       const dayCount = this.dayOffService.calculateDayOffDayCount(dayOffData);
       const data = await this.dayOffService.createDayOff({ ...dayOffData, userId, dayCount });
+      res.status(201).json({ message: "created", data });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getDayOffs = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = await this.dayOffService.getDayOffs();
+      res.status(200).json({ data, message: "OK" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateDayOff = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dayOffData: UpdateDayOffEditorDto = req.body;
+      const data = await this.dayOffService.updateDayOff(dayOffData.id, dayOffData);
+      res.status(200).json({ data: data, message: "OK" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteDayOff = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = await this.dayOffService.deleteDayOff(req.params.id);
+      res.status(200).json({ data: data, message: "OK" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createDayOff = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dayOffData: CreateDayOffEditorDto = req.body;
+      const data = await this.dayOffService.createDayOff({
+        ...dayOffData,
+        dayCount: this.dayOffService.calculateDayOffDayCount(dayOffData)
+      });
       res.status(201).json({ message: "created", data });
     } catch (error) {
       next(error);
