@@ -4,6 +4,7 @@ import { ConfirmDayOffDto, CreateDayOffDto, CreateDayOffEditorDto, UpdateDayOffE
 import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
 import CalendarEventService from "@services/calendarEvent.service";
+import { HttpException } from "@exceptions/HttpException";
 
 class DayOffController {
   private dayOffService = new DayOffService();
@@ -35,7 +36,11 @@ class DayOffController {
 
   updateDayOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.auth.payload.db_id;
       const dayOffData: UpdateDayOffEditorDto = req.body;
+      if (dayOffData.userId === userId) {
+        throw new HttpException(400, "You can't update your day off via this method");
+      }
       const data = await this.dayOffService.updateDayOff(dayOffData.id, dayOffData);
       res.status(200).json({ data: data, message: "OK" });
     } catch (error) {
@@ -45,6 +50,11 @@ class DayOffController {
 
   deleteDayOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.auth.payload.db_id;
+      const dayOffData = await this.dayOffService.getDayOffById(req.params.id);
+      if (dayOffData.userId === userId) {
+        throw new HttpException(400, "You can't delete your day off via this method");
+      }
       const data = await this.dayOffService.deleteDayOff(req.params.id);
       res.status(200).json({ data: data, message: "OK" });
     } catch (error) {
@@ -54,7 +64,11 @@ class DayOffController {
 
   createDayOff = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.auth.payload.db_id;
       const dayOffData: CreateDayOffEditorDto = req.body;
+      if (dayOffData.userId === userId) {
+        throw new HttpException(400, "You can't create day off for yourself via this method");
+      }
       const data = await this.dayOffService.createDayOff({
         ...dayOffData,
         dayCount: this.dayOffService.calculateDayOffDayCount(dayOffData)

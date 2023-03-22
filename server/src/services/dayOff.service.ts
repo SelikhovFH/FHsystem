@@ -34,6 +34,10 @@ class DayOffService {
     return this.dayOff.find();
   }
 
+  public async getDayOffById(_id: string): Promise<DayOff> {
+    return this.dayOff.findOne({ _id });
+  }
+
   public async getPendingDaysOff(): Promise<DayOff[]> {
     return this.dayOff
       .aggregate()
