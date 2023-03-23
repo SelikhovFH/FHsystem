@@ -18,10 +18,10 @@ class DaysOffRoute implements Routes {
   private initializeRoutes() {
     this.router.post(`${this.path}`, isEditorMiddleware, validationMiddleware(CreateDayOffEditorDto, "body"), this.dayOffController.createDayOff);
     this.router.patch(`${this.path}`, isEditorMiddleware, validationMiddleware(UpdateDayOffEditorDto, "body"), this.dayOffController.updateDayOff);
-    this.router.delete(`${this.path}`, isEditorMiddleware, validationMiddleware(DeleteDto, "params"), this.dayOffController.deleteDayOff);
+    this.router.delete(`${this.path}/:id`, isEditorMiddleware, validationMiddleware(DeleteDto, "params"), this.dayOffController.deleteDayOff);
     this.router.get(`${this.path}`, isEditorMiddleware, this.dayOffController.getDayOffs);
 
-    this.router.post(`/my${this.path}`, validationMiddleware(CreateDayOffDto, "body"), this.dayOffController.createDayOffMy);
+    this.router.post(`${this.path}/my`, validationMiddleware(CreateDayOffDto, "body"), this.dayOffController.createDayOffMy);
     this.router.get(`${this.path}/pending`, isEditorMiddleware, this.dayOffController.getPendingDaysOff);
     this.router.get(`${this.path}/my`, this.dayOffController.getMyDaysOff);
     this.router.get(`${this.path}/my/usage`, this.dayOffController.getMyDaysOffUsage);

@@ -52,7 +52,7 @@ class DayOffController {
     try {
       const userId = req.auth.payload.db_id;
       const dayOffData = await this.dayOffService.getDayOffById(req.params.id);
-      if (dayOffData.userId === userId) {
+      if (dayOffData.userId.toString() === userId) {
         throw new HttpException(400, "You can't delete your day off via this method");
       }
       const data = await this.dayOffService.deleteDayOff(req.params.id);
@@ -102,6 +102,11 @@ class DayOffController {
     try {
       const userId = req.auth.payload.db_id as string;
       const dayOffData: ConfirmDayOffDto = req.body;
+      const dayOff = await this.dayOffService.getDayOffById(dayOffData.id);
+
+      if (dayOff.userId.toString() === userId) {
+        throw new HttpException(400, "You can't confirm your day off via this method");
+      }
       const data = await this.dayOffService.updateDayOff(dayOffData.id, {
         status: dayOffData.status,
         approvedById: userId

@@ -8,7 +8,6 @@ import {
   getWorkingDays,
   YearlyLimitsForDaysOffTypes
 } from "@utils/dayOff.helpers";
-import userService from "@services/user.service";
 import CalendarEventService from "@services/calendarEvent.service";
 import { CalendarEvent } from "@interfaces/calendarEvent.interface";
 import mongoose from "mongoose";
@@ -31,7 +30,7 @@ class DayOffService {
   }
 
   public async getDayOffs() {
-    return this.dayOff.find();
+    return this.dayOff.find().populate("userId", "_id name surname email");
   }
 
   public async getDayOffById(_id: string): Promise<DayOff> {
@@ -39,20 +38,7 @@ class DayOffService {
   }
 
   public async getPendingDaysOff(): Promise<DayOff[]> {
-    return this.dayOff
-      .aggregate()
-      .match({ status: DayOffStatus.pending })
-      .lookup({
-        from: "users",
-        as: "user",
-        localField: "userId",
-        foreignField: "_id"
-      })
-      .unwind({
-        path: "$user"
-      })
-      .project(userService.GET_PUBLIC_PROJECTION("user"))
-      .exec();
+    return this.dayOff.find({ status: DayOffStatus.pending }).populate("userId", "_id name surname email").lean();
   }
 
   public async getUserDaysOff(userId: string): Promise<DayOff[]> {

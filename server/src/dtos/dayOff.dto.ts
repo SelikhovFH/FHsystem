@@ -22,7 +22,7 @@ export class CreateDayOffEditorDto extends CreateDayOffDto {
 
 export class UpdateDayOffEditorDto extends CreateDayOffEditorDto {
   @IsString()
-  id: string;
+  _id: string;
 }
 
 

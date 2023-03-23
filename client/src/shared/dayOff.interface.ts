@@ -12,8 +12,15 @@ export interface DayOff {
   type: DayOffType;
 }
 
-export interface DayOffResponse extends DayOff {
-  user: User;
+export interface DayOffResponse {
+  _id: string;
+  startDate: string;
+  finishDate: string;
+  dayCount: number;
+  approvedById: string;
+  status: DayOffStatus;
+  type: DayOffType;
+  userId: User;
   dayOffExceedsLimit: boolean;
 }
 
