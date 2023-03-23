@@ -35,6 +35,7 @@ import { UserRolesLabels, UserStatusLabels } from "../../sections/users";
 import { SkillTagsSelect } from "../../components/form/SkillTagsSelect";
 import { SkillTag } from "../../shared/skillTag.interface";
 import { SkillTagCategoryToColor } from "../../sections/skillTag";
+import { useIsAdmin } from "../../wrappers/RequireAdmin";
 
 const { Content } = Layout;
 const { Paragraph } = Typography;
@@ -99,7 +100,7 @@ const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ for
 const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonDisabled, initialValues }) => {
   useEffect(() => {
     form.resetFields();
-  }, [initialValues]);
+  });
   return <Form className={styles.form} form={form} name="updateForm"
                initialValues={initialValues}
                layout={"vertical"}
@@ -178,6 +179,7 @@ const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonD
 export const ManageUsersPage: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  const isAdmin = useIsAdmin();
 
   const {
     data: users,
@@ -350,7 +352,7 @@ export const ManageUsersPage: FC = () => {
         return <Space>
           <Button onClick={() => onEditClick(record)} type={"primary"} icon={<EditOutlined />}>
           </Button>
-          <Button disabled={deleteMutation.isLoading} onClick={() => onDelete(record)} danger
+          <Button disabled={deleteMutation.isLoading || !isAdmin} onClick={() => onDelete(record)} danger
                   type={"primary"}
                   icon={<DeleteOutlined />}>
           </Button>
@@ -365,30 +367,30 @@ export const ManageUsersPage: FC = () => {
   return (
     <>
       {messageContext}
-      <Modal footer={[]} title={"Update employee"} open={isOpen && !!userToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!userToEdit && <Modal footer={[]} title={"Update employee"} open={true}
+                                        onCancel={handleEditCancel}>
         <UpdateForm
           initialValues={userToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
         />
-      </Modal>
-      <Modal footer={[]} title={"Register employee"} open={isOpen && !userToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !userToEdit && <Modal footer={[]} title={"Register employee"} open={true}
+                                       onCancel={handleAddCancel}>
         <RegisterForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
         />
-      </Modal>
+      </Modal>}
       <AppHeader title={"Manage employees"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock errors={[users.error, addMutation.error]} />
 
         <Gutter size={2} />
         <Card bordered={false} style={{ boxShadow: "none", borderRadius: 4 }}>
-          <Button onClick={showAddModal} type="primary">
+          <Button disabled={!isAdmin} onClick={showAddModal} type="primary">
             Register
           </Button>
         </Card>

@@ -2,10 +2,10 @@ import { createBrowserRouter, createRoutesFromElements, Route } from "react-rout
 import { ErrorPage } from "../pages/ErrorPage";
 import { DefaultLayout } from "../layouts/DefaultLayout";
 import { HomePage } from "../pages/HomePage";
-import { AdminRoutes, AppRoutes, EditorRoutes } from "./AppRoutes";
+import { AppRoutes, EditorRoutes } from "./AppRoutes";
 import { BookDayOffPage } from "../pages/BookDayOffPage";
 import { MyProfilePage } from "../pages/MyProfilePage";
-import { ManageUsersPage } from "../pages/admin/ManageUsersPage";
+import { ManageUsersPage } from "../pages/editor/ManageUsersPage";
 import { ConfirmDayOffPage } from "../pages/editor/ConfirmDayOffPage";
 import { RequireAuth } from "../wrappers/RequireAuth";
 import RequireAdmin from "../wrappers/RequireAdmin";
@@ -14,7 +14,7 @@ import { HolidaysAndCelebrationsPage } from "../pages/editor/HolidaysAndCelebrat
 import { ManageDevicesPage } from "../pages/editor/ManageDevices";
 import { ManageItemsPage } from "../pages/editor/ManageItems";
 import { ManageDeliveriesPage } from "../pages/editor/ManageDeliveries";
-import { UserProfilePage } from "../pages/admin/UserProfilePage";
+import { UserProfilePage } from "../pages/editor/UserProfilePage";
 import { TimeTrackPage } from "../pages/TimeTrack";
 import { TimeTrackOverviewPage } from "../pages/editor/TimeTrackOverview";
 import { ManageProjectsPage } from "../pages/editor/ManageProjects";
@@ -33,8 +33,8 @@ export const router = createBrowserRouter(
 
         <Route
           path="/"
-                    element={<DefaultLayout/>}
-                    errorElement={<ErrorPage/>}
+          element={<DefaultLayout />}
+          errorElement={<ErrorPage />}
         >
           <Route index element={<HomePage />} />
           <Route
@@ -98,19 +98,20 @@ export const router = createBrowserRouter(
               path={EditorRoutes.manageSkillTags}
               element={<ManageSkillTagsPage />}
             />
-          </Route>
-          <Route element={<RequireAdmin />}>
             <Route
-              path={AdminRoutes.manageUsers}
+              path={EditorRoutes.manageUsers}
               element={<ManageUsersPage />}
             />
             <Route
-              path={AdminRoutes.user}
+              path={EditorRoutes.user}
               element={<UserProfilePage />}
             />
-                    </Route>
-                </Route>
-            </Route>
-        </>
-    )
+          </Route>
+          <Route element={<RequireAdmin />}>
+
+          </Route>
+        </Route>
+      </Route>
+    </>
+  )
 );

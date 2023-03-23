@@ -3,7 +3,7 @@ import { AppHeader } from "../layouts/Header";
 import { Card, Divider, Layout, Modal, Space, Typography } from "antd";
 import styles from "./HomePage.module.css";
 import { Link } from "react-router-dom";
-import { AdminRoutes, AppRoutes, EditorRoutes } from "../router/AppRoutes";
+import { AppRoutes, EditorRoutes } from "../router/AppRoutes";
 import { useIsAdmin } from "../wrappers/RequireAdmin";
 import { useIsEditor } from "../wrappers/RequireEditor";
 
@@ -89,6 +89,8 @@ export const HomePage: FC = (props) => {
             <ActivityCard title={"Manage clients"} link={EditorRoutes.manageClients} icon={"💼"} />
             <ActivityCard title={"Manage projects"} link={EditorRoutes.manageProjects} icon={"🚧"} />
             <ActivityCard title={"Manage skill tags"} link={EditorRoutes.manageSkillTags} icon={"🤹"} />
+            <ActivityCard title={"Employees"} link={EditorRoutes.manageUsers} icon={"👥"} />
+
           </Space>
         </>}
         {isAdmin && <>
@@ -97,7 +99,6 @@ export const HomePage: FC = (props) => {
             Admin actions
           </Title>
           <Space wrap size={"middle"}>
-            <ActivityCard title={"Employees"} link={AdminRoutes.manageUsers} icon={"👥"} />
           </Space>
         </>}
       </Content>

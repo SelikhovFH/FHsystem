@@ -279,8 +279,8 @@ export const ManageOneToOnePage: FC = () => {
   return (
     <>
       {messageContext}
-      <Modal destroyOnClose footer={[]} title={"Info for one to one record"} open={!!oneToOneToRead}
-             onCancel={handleReadCancel}>
+      {!!oneToOneToRead && <Modal footer={[]} title={"Info for one to one record"} open={true}
+                                  onCancel={handleReadCancel}>
         {oneToOneToRead && <Descriptions size={"small"} column={1}>
           <Descriptions.Item label="Employee">{getDisplayName(oneToOneToRead.user)}</Descriptions.Item>
           <Descriptions.Item label="Creator">{getDisplayName(oneToOneToRead.creator)}</Descriptions.Item>
@@ -288,25 +288,25 @@ export const ManageOneToOnePage: FC = () => {
           <Descriptions.Item label="Impression">{ImpressionLabel[oneToOneToRead.impression]}</Descriptions.Item>
           <Descriptions.Item label="Notes">{oneToOneToRead.notes}</Descriptions.Item>
         </Descriptions>}
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Update one to one record"} open={isOpen && !!oneToOneToEdit}
-             onCancel={handleEditCancel}>
+      </Modal>}
+      {isOpen && !!oneToOneToEdit && <Modal footer={[]} title={"Update one to one record"} open={true}
+                                            onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={oneToOneToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit one to one record"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add one to one record"} open={isOpen && !oneToOneToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !oneToOneToEdit && <Modal footer={[]} title={"Add one to one record"} open={true}
+                                           onCancel={handleAddCancel}>
         <AddOrUpdateForm
           initialValues={{ creator: user?.db_id, date: dayjs(), user: initialValueUserId }}
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new one to one record"} />
-      </Modal>
+      </Modal>}
 
 
       <AppHeader title={"Manage one to one records"} />

@@ -59,7 +59,7 @@ export const BookDayOffPage: FC = (props) => {
   const mutation = useMutation(async (newDayOff) => {
     const token = await getAccessTokenSilently();
     requestMessages.onLoad();
-    const res = await API.post("/days_off", newDayOff, getRequestConfig(token));
+    const res = await API.post("/days_off/my", newDayOff, getRequestConfig(token));
     return res.data.data;
   }, {
     onSuccess: async () => {

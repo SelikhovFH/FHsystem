@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { Layout, Menu, MenuProps, theme, Typography } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AdminRoutes, AppRoutes, EditorRoutes } from "../router/AppRoutes";
+import { AppRoutes, EditorRoutes } from "../router/AppRoutes";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserRole } from "../shared/user.interface";
 import { LogoSvg } from "../components/svg/Logo";
@@ -45,15 +45,13 @@ const editorItems = [
     getItem("Manage deliveries", EditorRoutes.manageDeliveries, <span>🚚</span>),
     getItem("Manage clients", EditorRoutes.manageClients, <span>💼</span>),
     getItem("Manage projects", EditorRoutes.manageProjects, <span>🚧</span>),
-    getItem("Manage skill tags", EditorRoutes.manageSkillTags, <span>🤹</span>)
-
+    getItem("Manage skill tags", EditorRoutes.manageSkillTags, <span>🤹</span>),
+    getItem("Manage employees", EditorRoutes.manageUsers, <span>👥</span>)
   ], "group")
 ];
 
 const adminItems = [
-  getItem("Admin", "admin", null, [
-    getItem("Manage employees", AdminRoutes.manageUsers, <span>👥</span>)
-  ], "group")
+  getItem("Admin", "admin", null, [], "group")
 ];
 
 const getMenuItemsByRole = (role: UserRole) => {

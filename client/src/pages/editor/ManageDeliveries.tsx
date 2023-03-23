@@ -263,23 +263,23 @@ export const ManageDeliveriesPage: FC = () => {
   return (
     <>
       {messageContext}
-      <Modal destroyOnClose footer={[]} title={"Update delivery"} open={isOpen && !!itemToEdit}
-             onCancel={handleCancel}>
+      {isOpen && !!itemToEdit && <Modal footer={[]} title={"Update delivery"} open={true}
+                                        onCancel={handleCancel}>
         <AddOrUpdateForm
           initialValues={itemToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit delivery"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add delivery"} open={isOpen && !itemToEdit}
-             onCancel={handleCancel}>
+      </Modal>}
+      {isOpen && !itemToEdit && <Modal footer={[]} title={"Add delivery"} open={true}
+                                       onCancel={handleCancel}>
         <AddOrUpdateForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new delivery"} />
-      </Modal>
+      </Modal>}
 
 
       <AppHeader title={"Manage deliveries"} />

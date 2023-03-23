@@ -205,23 +205,23 @@ export const ManageProjectsPage: FC = () => {
     <>
       {messageContext}
 
-      <Modal destroyOnClose footer={[]} title={"Update project"} open={isOpen && !!projectToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!projectToEdit && <Modal footer={[]} title={"Update project"} open={true}
+                                           onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={projectToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit project"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add project"} open={isOpen && !projectToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !projectToEdit && <Modal footer={[]} title={"Add project"} open={true}
+                                          onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new project"} />
-      </Modal>
+      </Modal>}
 
 
       <AppHeader title={"Manage projects"} />

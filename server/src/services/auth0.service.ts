@@ -1,9 +1,9 @@
 import {
   AUTH0_AUDIENCE,
+  AUTH0_CLIENT_ID,
   AUTH0_MANAGEMENT_SERVICE_CLIENT_ID,
   AUTH0_MANAGEMENT_SERVICE_CLIENT_SECRET,
-  AUTH0_MANAGEMENT_SERVICE_DOMAIN,
-  CLIENT_URL
+  AUTH0_MANAGEMENT_SERVICE_DOMAIN
 } from "@config";
 import { ManagementClient } from "auth0";
 import { generate } from "generate-password";
@@ -34,8 +34,9 @@ class Auth0Service {
   public async sendSignupInvitation(user_id: string) {
     return this.management.createPasswordChangeTicket({
       user_id,
-      result_url: CLIENT_URL,
-      mark_email_as_verified: true
+      mark_email_as_verified: true,
+      includeEmailInRedirect: true,
+      client_id: AUTH0_CLIENT_ID
     });
   }
 

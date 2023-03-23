@@ -148,23 +148,23 @@ export const ManageSkillTagsPage: FC = () => {
     <>
       {messageContext}
 
-      <Modal destroyOnClose footer={[]} title={"Update skill tag"} open={isOpen && !!skillTagToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!skillTagToEdit && <Modal footer={[]} title={"Update skill tag"} open={true}
+                                            onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={skillTagToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit skill tag"} />
-      </Modal>
-      <Modal destroyOnClose footer={[]} title={"Add skill tag"} open={isOpen && !skillTagToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !skillTagToEdit && <Modal footer={[]} title={"Add skill tag"} open={true}
+                                           onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new skill tag"} />
-      </Modal>
+      </Modal>}
 
 
       <AppHeader title={"Manage skill tags"} />

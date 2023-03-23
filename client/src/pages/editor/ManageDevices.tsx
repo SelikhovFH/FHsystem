@@ -120,18 +120,21 @@ export const ManageDevicesPage: FC = () => {
   });
 
   const showAddModal = () => {
+    form.resetFields();
     setIsOpen(true);
   };
 
   const handleAddCancel = () => {
-    form.resetFields();
     setIsOpen(false);
+    form.resetFields();
+    form.setFieldsValue({});
   };
 
   const handleEditCancel = () => {
     setDeviceToEdit(null);
-    form.resetFields();
     setIsOpen(false);
+    form.resetFields();
+    form.setFieldsValue({});
   };
 
 
@@ -248,29 +251,29 @@ export const ManageDevicesPage: FC = () => {
     }
   ];
 
+  console.log(form.getFieldValue("name"));
+
   return (
     <>
       {messageContext}
 
-      <Modal footer={[]} title={"Update device"} open={isOpen && !!deviceToEdit}
-             onCancel={handleEditCancel}>
+      {isOpen && !!deviceToEdit && <Modal footer={[]} title={"Update device"} open={true}
+                                          onCancel={handleEditCancel}>
         <AddOrUpdateForm
           initialValues={deviceToEdit}
           form={form}
           onFinish={onEditFinish}
           buttonDisabled={editMutation.isLoading}
           buttonText={"Edit device"} />
-      </Modal>
-      <Modal footer={[]} title={"Add device"} open={isOpen && !deviceToEdit}
-             onCancel={handleAddCancel}>
+      </Modal>}
+      {isOpen && !deviceToEdit && <Modal footer={[]} title={"Add device"} open={true}
+                                         onCancel={handleAddCancel}>
         <AddOrUpdateForm
           form={form}
           onFinish={onAddFinish}
           buttonDisabled={addMutation.isLoading}
           buttonText={"Add new device"} />
-      </Modal>
-
-
+      </Modal>}
       <AppHeader title={"Manage devices"} />
       <Content style={{ margin: 32 }}>
         <ErrorsBlock
