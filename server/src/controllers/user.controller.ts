@@ -5,11 +5,15 @@ import UserService from "@services/user.service";
 import * as mongoose from "mongoose";
 import { UserRole } from "@interfaces/user.interface";
 import DeliveryService from "@services/delivery.service";
+import { EmailSender } from "@services/notifications/email.sender";
+import { Container } from "typedi";
+import { EmailTemplates } from "@interfaces/email.interface";
 
 class UserController {
   private authOService = new Auth0Service();
   private userService = new UserService();
   private deliveryService = new DeliveryService();
+  private emailSender = Container.get(EmailSender);
 
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -36,7 +40,18 @@ class UserController {
         _id: mongoUserId.toString(),
         phone: phone_number
       });
-      res.status(201).json({ message: "created", data });
+      await this.emailSender.sendEmails([{
+        to: {
+          name: `${given_name} ${family_name}`,
+          email: userData.email
+        },
+        subject: "Trempel registration",
+        templateId: EmailTemplates.Register,
+        variables: {
+          reset_password_link: data.ticket
+        }
+      }]);
+      res.status(201).json({ message: "created" });
     } catch (error) {
       next(error);
     }

@@ -17,18 +17,17 @@ export class EmailSender {
     }));
 
     try {
-      const request = await this.mailjet
+      await this.mailjet
         .post("send", { "version": "v3.1" })
         .request({
           "Globals": {
             "From": {
-              "Email": "notifications@trempel.co",
+              "Email": "no-reply@trempel.co",
               "Name": "Trempel"
             }
           },
           "Messages": messages
         });
-      console.log(request.response);
     } catch (e) {
       console.error(e);
     }
