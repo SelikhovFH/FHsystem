@@ -65,15 +65,17 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    this.app.use(cors({
-      origin: "*",
-      credentials: true,
-      methods: ["GET", "POST", "OPTIONS", "PATCH", "PUT", "DELETE"],
-      allowedHeaders: [
-        "Origin", "Accept", "X-Requested-With", "X-Forwarded-For",
-        "X-Forwarded-Proto", "X-Real-IP", "Host", "Content-Type", "Authorization"
-      ]
-    }));
+    if (this.env === "development") {
+      this.app.use(cors({
+        origin: "*",
+        credentials: true,
+        methods: ["GET", "POST", "OPTIONS", "PATCH", "PUT", "DELETE"],
+        allowedHeaders: [
+          "Origin", "Accept", "X-Requested-With", "X-Forwarded-For",
+          "X-Forwarded-Proto", "X-Real-IP", "Host", "Content-Type", "Authorization"
+        ]
+      }));
+    }
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());
