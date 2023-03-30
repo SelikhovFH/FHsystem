@@ -10,11 +10,6 @@ export interface Notification {
   event?: string;
 }
 
-export interface Email {
-  template: string;
-  params: Record<string, string>;
-}
-
 export enum NotificationType {
   info = "info",
   warning = "warning",

@@ -16,6 +16,7 @@ class NotificationsRoute implements Routes {
   private initializeRoutes() {
     this.router.get(`${this.path}`, this.notificationController.getUserNotifications);
     this.router.get(`${this.path}/unread`, this.notificationController.getUnreadUserNotifications);
+    this.router.patch(`${this.path}/all`, this.notificationController.markAllNotificationsAsRead);
     this.router.patch(`${this.path}/:id`, validationMiddleware(MarkNotificationAsReadDto, "params"), this.notificationController.markNotificationAsRead);
     this.router.get(`${this.path}/subscribe`, this.notificationController.subscribe);
   }

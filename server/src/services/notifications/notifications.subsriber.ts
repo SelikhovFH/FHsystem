@@ -1,5 +1,6 @@
 import { Notification } from "@/interfaces/notification.interface";
 import { Service } from "typedi";
+import * as console from "console";
 
 @Service()
 export class NotificationsSubscriber {
@@ -7,6 +8,7 @@ export class NotificationsSubscriber {
 
 
   subscribeUser = (userId: string, notify: Function) => {
+    console.log("subscribed user", userId);
     this.subscribedUsers.push([userId, notify]);
   };
 
@@ -14,10 +16,13 @@ export class NotificationsSubscriber {
     this.subscribedUsers = this.subscribedUsers.filter(([id, _]) => id !== userId);
   };
 
-  notifyUsers = (notification: Notification, userIds: string[]) => {
+  notifyUsers = (notifications: Notification[]) => {
+    console.log("notify users", notifications);
     this.subscribedUsers.forEach(([id, notify]) => {
-      if (userIds.includes(id)) {
-        notify(notification);
+      const userNotification = notifications.find(notification => notification.user.toString() === id);
+      if (userNotification) {
+        console.log("userNotification", userNotification);
+        notify(userNotification);
       }
     });
   };

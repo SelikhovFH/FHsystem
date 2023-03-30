@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import NotificationsService from "@services/notifications/notifications.service";
 import { HttpException } from "@exceptions/HttpException";
-import { Notification, NotificationType } from "@interfaces/notification.interface";
+import { Notification } from "@interfaces/notification.interface";
 import { Container } from "typedi";
 import { NotificationsSubscriber } from "@services/notifications/notifications.subsriber";
+import { v4 } from "uuid";
 
 class NotificationController {
   private notificationService = new NotificationsService();
@@ -44,6 +45,15 @@ class NotificationController {
       next(error);
     }
   };
+  markAllNotificationsAsRead = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.auth.payload.db_id as string;
+      const notifications = await this.notificationService.markAllNotificationsAsRead(userId);
+      res.status(200).json({ data: notifications, message: "ok" });
+    } catch (error) {
+      next(error);
+    }
+  };
 
   subscribe = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -55,23 +65,11 @@ class NotificationController {
       });
 
       const notifyUser = async (notification: Notification) => {
-        res.write(`id: ${(new Date()).toLocaleTimeString()}\ndata: ${JSON.stringify(notification)}\n\n`);
+        res.write(`id: ${v4()}\ndata: ${JSON.stringify(notification)}\n\n`);
         res.flush();
       };
 
       this.notificationsSubscriber.subscribeUser(userId, notifyUser);
-
-      this.notificationsSubscriber.notifyUsers({
-        _id: Date.now().toString(),
-        user: userId,
-        type: NotificationType.error,
-        description: "You have a new notification",
-        isRead: false,
-        link: "/",
-        title: "New notification",
-        event: "5f9f1b9b9b9b9b9b9b9b9b9b",
-        createdAt: new Date()
-      }, [userId]);
 
       req.on("close", () => {
         this.notificationsSubscriber.unsubscribeUser(userId);

@@ -2,7 +2,9 @@ import { User } from "@interfaces/user.interface";
 import userModel from "@models/user.model";
 import { UpdateUserAdminDto } from "@dtos/user.dto";
 import mongoose from "mongoose";
+import { Service } from "typedi";
 
+@Service()
 class UserService {
   public user = userModel;
 
@@ -64,6 +66,10 @@ class UserService {
     return this.user.find().select("+salaryHistory").populate("skills");
   }
 
+  public getUserById(_id: string) {
+    return this.user.findById(_id).select("+salaryHistory").populate("skills");
+  }
+
   public async getUsersDisplayInfo(): Promise<{ _id: string; name: string; surname: string; email: string }[]> {
     return this.user.find().select("name surname email");
   }
@@ -71,6 +77,15 @@ class UserService {
   public async getUserDisplayInfoById(_id: string): Promise<{ _id: string; name: string; surname: string; email: string }> {
     return this.user.findOne({ _id }).select("name surname email");
   }
+
+  public async getEditorsIds(): Promise<string[]> {
+    return this.user.find({ role: { $in: ["editor", "admin"] } }).select("_id").then(res => res.map(r => r._id.toString()));
+  }
+
+  public async getAdminsIds(): Promise<string[]> {
+    return this.user.find({ role: "admin" }).select("_id").then(res => res.map(r => r._id.toString()));
+  }
+
 }
 
 export default UserService;

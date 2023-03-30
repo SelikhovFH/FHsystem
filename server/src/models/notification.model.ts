@@ -6,10 +6,10 @@ const notificationSchema: Schema = new Schema({
   title: String,
   description: String,
   type: { type: String, enum: Object.values(NotificationType), default: NotificationType.info },
-  isRead: Boolean,
+  isRead: { type: Boolean, default: false },
   link: String,
   event: String
-});
+}, { timestamps: true });
 const notificationModel = model<Notification & Document>("Notification", notificationSchema);
 
 export default notificationModel;
