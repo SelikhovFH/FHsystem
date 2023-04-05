@@ -17,7 +17,7 @@ export class EmailSender {
     }));
 
     try {
-      await this.mailjet
+      const request = await this.mailjet
         .post("send", { "version": "v3.1" })
         .request({
           "Globals": {
@@ -28,6 +28,8 @@ export class EmailSender {
           },
           "Messages": messages
         });
+      console.log(request.response.status);
+      console.log(request.response.data);
     } catch (e) {
       console.error(e);
     }

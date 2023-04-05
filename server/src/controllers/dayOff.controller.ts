@@ -8,7 +8,7 @@ import { HttpException } from "@exceptions/HttpException";
 import { NotificationsDispatcher } from "@/services/notifications/notifications.dispatcher";
 import { Container } from "typedi";
 import { NotificationType } from "@interfaces/notification.interface";
-import { formatters, getDisplayName } from "@utils/formatters";
+import { formatDate, getDisplayName } from "@utils/formatters";
 
 class DayOffController {
   private dayOffService = new DayOffService();
@@ -25,10 +25,10 @@ class DayOffController {
       const dayCount = this.dayOffService.calculateDayOffDayCount(dayOffData);
       const data = await this.dayOffService.createDayOff({ ...dayOffData, userId, dayCount });
       const user = await this.userService.getUserById(userId);
-      this.notificationDispatcher.dispatchNotification({
+      this.notificationDispatcher.dispatchMultipleNotifications({
         type: NotificationType.info,
         title: "New day off request",
-        description: `You have a new day off request from for ${getDisplayName(user)} date ${formatters(dayOffData.startDate)} to ${formatters(dayOffData.finishDate)}`,
+        description: `You have a new day off request from for ${getDisplayName(user)} date ${formatDate(dayOffData.startDate)} to ${formatDate(dayOffData.finishDate)}`,
         link: "/confirm_day_off",
         event: "day_off_created"
       }, await this.notificationDispatcher.getEditorIds());
@@ -54,7 +54,7 @@ class DayOffController {
       if (dayOffData.userId === userId) {
         throw new HttpException(400, "You can't update your day off via this method");
       }
-      const data = await this.dayOffService.updateDayOff(dayOffData.id, dayOffData);
+      const data = await this.dayOffService.updateDayOff(dayOffData._id, dayOffData);
       res.status(200).json({ data: data, message: "OK" });
     } catch (error) {
       next(error);

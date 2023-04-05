@@ -2,9 +2,15 @@ import oneToOneRecordModel from "@models/oneToOneRecord.model";
 import { CreateOneToOneRecordDto, UpdateOneToOneRecordDto } from "@dtos/oneToOneRecord.dto";
 import { Dayjs } from "dayjs";
 import { OneToOneRecord } from "@interfaces/oneToOneRecord.interface";
+import { Service } from "typedi";
 
+@Service()
 class OneToOneRecordService {
   private oneToOneRecord = oneToOneRecordModel;
+
+  constructor() {
+    // this.notifyForTimeToHoldOneToOne();
+  }
 
   public async createOneToOneRecord(data: CreateOneToOneRecordDto) {
     return this.oneToOneRecord.create(data);
@@ -16,6 +22,14 @@ class OneToOneRecordService {
 
   public async deleteOneToOneRecord(_id: string) {
     return this.oneToOneRecord.findOneAndDelete({ _id });
+  }
+
+  private async notifyForTimeToHoldOneToOne() {
+    try {
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 

@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from "dayjs";
 import { User } from "@interfaces/user.interface";
 
-export const formatters = (date?: string | Date | Dayjs) => {
+export const formatDate = (date?: string | Date | Dayjs) => {
   if (!date) {
     return null;
   }
