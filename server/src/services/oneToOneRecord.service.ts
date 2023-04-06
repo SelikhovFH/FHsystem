@@ -1,23 +1,33 @@
 import oneToOneRecordModel from "@models/oneToOneRecord.model";
 import { CreateOneToOneRecordDto, UpdateOneToOneRecordDto } from "@dtos/oneToOneRecord.dto";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { OneToOneRecord } from "@interfaces/oneToOneRecord.interface";
 import { Container, Service } from "typedi";
 import { OneToOneSettings, OneToOneSettingsPeriod } from "@interfaces/settings/oneToOneSettings";
 import { SettingsService } from "@services/settings.service";
 import { SettingsModules } from "@interfaces/settings/settingsModules.enum";
 import * as console from "console";
+import UserService from "@services/user.service";
+import { NotificationsDispatcher } from "@services/notifications/notifications.dispatcher";
+import { getDisplayName } from "@utils/formatters";
+import { NotificationType } from "@interfaces/notification.interface";
+import { CronJob } from "cron";
+import { CronExpression } from "@utils/cron-expression.enum";
 
 @Service()
 class OneToOneRecordService {
   private oneToOneRecord = oneToOneRecordModel;
   private oneToOneSettings: OneToOneSettings;
   private settingsService = Container.get(SettingsService);
+  private userService = Container.get(UserService);
+  private notificationsDispatcher = Container.get(NotificationsDispatcher);
 
   constructor() {
     this.settingsService.getSettings<OneToOneSettings>(SettingsModules.OneToOne).then(settings => {
       this.oneToOneSettings = settings;
     });
+    const job = new CronJob(CronExpression.EVERY_DAY_AT_MIDNIGHT, this.notifyForTimeToHoldOneToOne.bind(this));
+    job.start();
   }
 
   public async createOneToOneRecord(data: CreateOneToOneRecordDto) {
@@ -34,6 +44,34 @@ class OneToOneRecordService {
 
   private async notifyForTimeToHoldOneToOne() {
     try {
+      const currentPeriod = await this.getCurrentPeriod();
+      const currentDate = dayjs();
+      const endOfPeriodIsInSevenDays = currentDate.add(7, "day").isSame(currentPeriod.finishDate, "day");
+
+      if (!endOfPeriodIsInSevenDays) {
+        return;
+      }
+
+      const users = await this.userService.getUsers();
+      const currentPeriodOneToOnes = await this.oneToOneRecord.find({
+        date: {
+          $gte: currentPeriod.startDate,
+          $lte: currentPeriod.finishDate
+        }
+      }).populate("creator", "_id name surname email").populate("user", "_id name surname email");
+
+      const usersWithoutOneToOne = users.filter(user => {
+        return !currentPeriodOneToOnes.find(oneToOne => oneToOne.user === user._id);
+      });
+
+      await this.notificationsDispatcher.dispatchMultipleNotifications({
+        title: "Time to hold one-to-one",
+        description: `It's time to hold one-to-one with your team members. You have 7 days left to do it.
+         Users without one-to-one: ${usersWithoutOneToOne.map(user => getDisplayName(user)).join(", ")}`,
+        type: NotificationType.warning,
+        link: "/manage_one_to_one",
+        event: "time_to_hold_one_to_one"
+      }, await this.notificationsDispatcher.getEditorIds());
 
     } catch (error) {
       console.error(error);
@@ -50,8 +88,15 @@ class OneToOneRecordService {
     }).populate("creator", "_id name surname email").populate("user", "_id name surname email");
   }
 
-  public generatePeriods(): ([Date, Date])[] {
-    console.log(this.oneToOneSettings);
+  private async getCurrentPeriod(): Promise<({ startDate: Date, finishDate: Date })> {
+    const periods = this.generatePeriods();
+    const currentDate = new Date();
+    const currentPeriod =
+      periods.find(period => currentDate >= period.startDate && currentDate <= period.finishDate);
+    return currentPeriod;
+  }
+
+  public generatePeriods(): ({ startDate: Date, finishDate: Date })[] {
     const periodType = this.oneToOneSettings.period;
     const currentDate = new Date();
     const year = currentDate.getFullYear();

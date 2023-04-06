@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { Layout, Menu, MenuProps, theme, Typography } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AppRoutes, EditorRoutes } from "../router/AppRoutes";
+import { AdminRoutes, AppRoutes, EditorRoutes } from "../router/AppRoutes";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserRole } from "../shared/user.interface";
 import { LogoSvg } from "../components/svg/Logo";
@@ -51,7 +51,9 @@ const editorItems = [
 ];
 
 const adminItems = [
-  getItem("Admin", "admin", null, [], "group")
+  getItem("Admin", "admin", null, [
+    getItem("Settings", AdminRoutes.settings, <span>⚙️</span>)
+  ], "group")
 ];
 
 const getMenuItemsByRole = (role: UserRole) => {

@@ -23,7 +23,7 @@ export enum EditorRoutes {
 }
 
 export enum AdminRoutes {
-
+  settings = "/settings",
 }
 
 export const getUserProfileRoute = (userId: string) => {

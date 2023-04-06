@@ -3,7 +3,7 @@ import { AppHeader } from "../layouts/Header";
 import { Card, Divider, Layout, Modal, Space, Typography } from "antd";
 import styles from "./HomePage.module.css";
 import { Link } from "react-router-dom";
-import { AppRoutes, EditorRoutes } from "../router/AppRoutes";
+import { AdminRoutes, AppRoutes, EditorRoutes } from "../router/AppRoutes";
 import { useIsAdmin } from "../wrappers/RequireAdmin";
 import { useIsEditor } from "../wrappers/RequireEditor";
 
@@ -99,6 +99,7 @@ export const HomePage: FC = (props) => {
             Admin actions
           </Title>
           <Space wrap size={"middle"}>
+            <ActivityCard title={"Settings"} link={AdminRoutes.settings} icon={"⚙️"} />
           </Space>
         </>}
       </Content>
