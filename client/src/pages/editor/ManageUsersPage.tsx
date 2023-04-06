@@ -100,7 +100,7 @@ const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ for
 const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonDisabled, initialValues }) => {
   useEffect(() => {
     form.resetFields();
-  });
+  }, [initialValues]);
   return <Form className={styles.form} form={form} name="updateForm"
                initialValues={initialValues}
                layout={"vertical"}

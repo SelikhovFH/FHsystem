@@ -23,8 +23,8 @@ export const UpdateMyProfileForm: FC<Omit<FormProps, "buttonText">> = ({
                                                                            initialValues
                                                                        }) => {
     useEffect(() => {
-      form.resetFields();
-    });
+        form.resetFields();
+    }, [initialValues]);
     return <Form className={styles.form} form={form} name="updateMyProfile"
                  initialValues={initialValues}
                  layout={"vertical"}

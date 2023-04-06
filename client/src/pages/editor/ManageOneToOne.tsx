@@ -113,7 +113,11 @@ export const ManageOneToOnePage: FC = () => {
     deleteMutation,
     editMutation,
     messageContext
-  } = useApiFactory<{ records: OneToOneRecord[], dates: string[], recordsByUser: OneToOneRecord[][] }, OneToOneRecord>({
+  } = useApiFactory<{
+    records: OneToOneRecord[],
+    dates: { startDate: string, finishDate: string }[],
+    recordsByUser: OneToOneRecord[][]
+  }, OneToOneRecord>({
     basePath: "/one_to_one_records",
     get: {
       queryKeys: ["/one_to_one_records", selectedYear],
@@ -122,7 +126,11 @@ export const ManageOneToOnePage: FC = () => {
           date: selectedYear.toISOString()
         });
         const res = await API.get(`/one_to_one_records/?${params.toString()}`, config);
-        return res.data.data as { records: OneToOneRecord[], dates: string[], recordsByUser: OneToOneRecord[][] };
+        return res.data.data as {
+          records: OneToOneRecord[],
+          dates: { startDate: string, finishDate: string }[],
+          recordsByUser: OneToOneRecord[][]
+        };
       }
     },
     add: {
@@ -201,20 +209,22 @@ export const ManageOneToOnePage: FC = () => {
     render: (_: any, record: OneToOneRecord[]) => {
       return renderUserCell(record[0].user);
     }
-  }, ...(records?.data?.dates.map(d => {
-    const isCurrentMonth = dayjs().isSame(dayjs(d), "month");
+  }, ...(records?.data?.dates.map(({ startDate, finishDate }) => {
+    const isSameMonth = dayjs(startDate).isSame(dayjs(finishDate), "month");
+    const isCurrentPeriod = dayjs().isBetween(dayjs(startDate), dayjs(finishDate), "month", "[]");
+    const title = isSameMonth ? formatMonth(startDate) : `${formatMonth(startDate)} - ${formatMonth(finishDate)}`;
     return ({
-      title: formatMonth(d),
-      dataIndex: d,
-      key: d,
-      className: isCurrentMonth && tableStyles.highlightColumn,
+      title: title,
+      dataIndex: title,
+      key: title,
+      className: isCurrentPeriod && tableStyles.highlightColumn,
       render: (_: any, record: OneToOneRecord[]) => {
-        const foundNote = record.find(r => dayjs(r.date).month() === dayjs(d).month());
+        const foundNote = record.find(r => dayjs(r.date).isBetween(dayjs(startDate), dayjs(finishDate), "day", "[]"));
         if (foundNote) {
           return <Card onClick={() => onReadClick(foundNote)} className={tableStyles.card}
                        size={"small"}>{getDisplayName(foundNote.user)} - {getDisplayName(foundNote.creator)}</Card>;
         }
-        if (isCurrentMonth) {
+        if (isCurrentPeriod) {
           return <Button onClick={() => onUserAdd(record[0].user)} danger style={{ width: "100%" }} type={"dashed"}>Add
             one to one record</Button>;
         }
