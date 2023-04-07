@@ -1,3 +1,6 @@
+import "reflect-metadata";
+
+
 import App from "@/app";
 import IndexRoute from "@routes/index.route";
 import UsersRoute from "@routes/users.route";
@@ -12,6 +15,9 @@ import TimeTracksRoute from "@routes/timeTracks.route";
 import SkillTagRoute from "@routes/skillTag.route";
 import ClientsRoute from "./routes/client.route";
 import OneToOneRecordRoute from "@routes/oneToOneRecord.route";
+import NotificationsRoute from "@routes/notification.route";
+import SettingsRoute from "@routes/settings.route";
+
 
 validateEnv();
 
@@ -27,7 +33,9 @@ const app = new App([
   new TimeTracksRoute(),
   new SkillTagRoute(),
   new ClientsRoute(),
-  new OneToOneRecordRoute()
+  new OneToOneRecordRoute(),
+  new NotificationsRoute(),
+  new SettingsRoute()
 ]);
 
 app.listen();

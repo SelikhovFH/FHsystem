@@ -3,10 +3,66 @@ import { CreateCalendarEventBackendDto, UpdateCalendarEventDto } from "@dtos/cal
 import { CalendarEvent } from "@interfaces/calendarEvent.interface";
 import { getStartOfCurrentYear } from "@utils/dayOff.helpers";
 import userModel from "@models/user.model";
+import dayjs from "dayjs";
+import { Container } from "typedi";
+import { NotificationsDispatcher } from "@services/notifications/notifications.dispatcher";
+import { NotificationType } from "@interfaces/notification.interface";
+import * as console from "console";
+import { CronJob } from "cron";
+import { formatDate } from "@utils/formatters";
+import { CronExpression } from "@utils/cron-expression.enum";
 
 class CalendarEventService {
   public calendarEvent = calendarEventModel;
   public user = userModel;
+
+  private notificationsDispatcher = Container.get(NotificationsDispatcher);
+
+  constructor() {
+    const job = new CronJob(CronExpression.EVERY_DAY_AT_MIDNIGHT, this.notifyAboutUpcomingEvents.bind(this));
+    job.start();
+  }
+
+  private notifyAboutUpcomingEvents() {
+    try {
+      console.log(this);
+      const eventsInTenDays = this.calendarEvent.find({
+        date: {
+          $gte: new Date(),
+          $lte: dayjs().add(10, "day").toDate()
+        }
+      });
+      const eventsInThreeDays = this.calendarEvent.find({
+        date: {
+          $gte: new Date(),
+          $lte: dayjs().add(3, "day").toDate()
+        }
+      });
+      const todayEvents = this.calendarEvent.find({
+        date: {
+          $gte: dayjs().startOf("day").toDate(),
+          $lte: dayjs().endOf("day").toDate()
+        }
+      });
+      const editorIds = this.notificationsDispatcher.getEditorIds();
+      Promise.all([eventsInTenDays, eventsInThreeDays, todayEvents, editorIds])
+        .then(async ([eventsInTenDays, eventsInThreeDays, todayEvents, editorIds]) => {
+          const events = [...eventsInTenDays, ...eventsInThreeDays, ...todayEvents];
+          events.forEach(event => {
+            this.notificationsDispatcher.dispatchMultipleNotifications({
+              title: event.title,
+              description: `Calendar event ${event.title} will happen in ${formatDate(event.date)}. Description: ${event.description}.`,
+              event: "calendar_event",
+              link: "/holidays_and_celebrations",
+              type: NotificationType.info
+            }, editorIds);
+          });
+        });
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   public async createCalendarEvent(data: CreateCalendarEventBackendDto): Promise<CalendarEvent> {
     return this.calendarEvent.create({ ...data, date: new Date(data.date) });

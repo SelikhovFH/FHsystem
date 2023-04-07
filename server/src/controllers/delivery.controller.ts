@@ -5,11 +5,16 @@ import ItemService from "@services/item.service";
 import DeviceService from "@services/device.service";
 import { HttpException } from "@exceptions/HttpException";
 import { DeliveryStatus } from "@interfaces/delivery.interface";
+import { Container } from "typedi";
+import { NotificationsDispatcher } from "@services/notifications/notifications.dispatcher";
+import { NotificationType } from "@/interfaces/notification.interface";
 
 class DeliveryController {
   private deliveryService = new DeliveryService();
   private itemService = new ItemService();
   private deviceService = new DeviceService();
+  private notificationDispatcher = Container.get(NotificationsDispatcher);
+
 
   createDelivery = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -31,6 +36,16 @@ class DeliveryController {
       }
 
       const data = await this.deliveryService.createDelivery(deliveryData);
+
+      this.notificationDispatcher.dispatchNotification({
+        type: NotificationType.info,
+        title: "New delivery for you",
+        description: `Delivery #${data.deliveryCode} is coming to you.`,
+        user: deliveryData.deliverToId,
+        link: "/profile",
+        event: "new_delivery"
+      });
+
       res.status(201).json({ message: "created", data });
     } catch (error) {
       next(error);

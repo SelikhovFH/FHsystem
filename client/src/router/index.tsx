@@ -2,7 +2,7 @@ import { createBrowserRouter, createRoutesFromElements, Route } from "react-rout
 import { ErrorPage } from "../pages/ErrorPage";
 import { DefaultLayout } from "../layouts/DefaultLayout";
 import { HomePage } from "../pages/HomePage";
-import { AppRoutes, EditorRoutes } from "./AppRoutes";
+import { AdminRoutes, AppRoutes, EditorRoutes } from "./AppRoutes";
 import { BookDayOffPage } from "../pages/BookDayOffPage";
 import { MyProfilePage } from "../pages/MyProfilePage";
 import { ManageUsersPage } from "../pages/editor/ManageUsersPage";
@@ -23,6 +23,7 @@ import { ManageSkillTagsPage } from "../pages/editor/ManageSkillTags";
 import { ManageClientsPage } from "../pages/editor/ManageClients";
 import { ClientProfilePage } from "../pages/editor/ClientProfilePage";
 import { ManageOneToOnePage } from "../pages/editor/ManageOneToOne";
+import { SettingsPage } from "../pages/admin/Settings";
 
 // TODO Dynamic module import
 
@@ -108,7 +109,10 @@ export const router = createBrowserRouter(
             />
           </Route>
           <Route element={<RequireAdmin />}>
-
+            <Route
+              path={AdminRoutes.settings}
+              element={<SettingsPage />}
+            />
           </Route>
         </Route>
       </Route>

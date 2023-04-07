@@ -100,7 +100,7 @@ const RegisterForm: FC<Omit<FormProps, "initialValues" | "buttonText">> = ({ for
 const UpdateForm: FC<Omit<FormProps, "buttonText">> = ({ form, onFinish, buttonDisabled, initialValues }) => {
   useEffect(() => {
     form.resetFields();
-  });
+  }, [initialValues]);
   return <Form className={styles.form} form={form} name="updateForm"
                initialValues={initialValues}
                layout={"vertical"}
@@ -394,9 +394,9 @@ export const ManageUsersPage: FC = () => {
             Register
           </Button>
         </Card>
-        {addMutation.data?.ticket &&
-          <Alert style={{ marginTop: 16 }} type={"info"} message={"Send this link to future user"}
-                 description={<Paragraph copyable>{addMutation.data?.ticket}</Paragraph>} />}
+        {addMutation.status === "success" &&
+          <Alert style={{ marginTop: 16 }} type={"info"} message={"Success!"}
+                 description={<Paragraph>Password change link was sent to user</Paragraph>} />}
         <Gutter size={2} />
         <Table scroll={{ x: true }} loading={users.isLoading} dataSource={users.data} columns={columns} />
       </Content>

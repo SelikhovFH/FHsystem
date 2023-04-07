@@ -8,12 +8,47 @@ import { HttpException } from "@exceptions/HttpException";
 import calendarEventModel from "@models/calendarEvent.model";
 import dayOffModel from "@models/dayOff.model";
 import { DayOffStatus, DayOffType } from "@interfaces/dayOff.interface";
+import { CronJob } from "cron";
+import { CronExpression } from "@utils/cron-expression.enum";
+import { NotificationType } from "@interfaces/notification.interface";
+import { NotificationsDispatcher } from "@services/notifications/notifications.dispatcher";
+import Container from "typedi";
 
 class TimeTrackService {
   private timeTrack = timeTrackModel;
   private user = userModel;
   private calendarEvent = calendarEventModel;
   private dayOff = dayOffModel;
+  private notificationsDispatcher = Container.get(NotificationsDispatcher);
+
+  constructor() {
+    const job = new CronJob(CronExpression.EVERY_25TH_DAY_OF_MONTH, this.notifyAboutUntrackedTime.bind(this));
+    job.start();
+  }
+
+  private async notifyAboutUntrackedTime() {
+    const users = await this.user.find();
+    const currentMonthTimeTracks = await this.timeTrack.find({
+      date: {
+        $gte: dayjs().startOf("month").toDate(),
+        $lte: dayjs().endOf("month").toDate()
+      }
+    });
+    const usersWithoutTimeTracks = users.filter(user => {
+      return !currentMonthTimeTracks.find(timeTrack => timeTrack.userId === user._id);
+    });
+
+    const usersWithoutTimeTracksIds = usersWithoutTimeTracks.map(user => user._id);
+
+    this.notificationsDispatcher.dispatchMultipleNotifications({
+      title: "Untracked time",
+      description: `You haven't tracked your time for this month. Please do it as soon as possible.`,
+      event: "untracked_time",
+      link: "/time_track",
+      type: NotificationType.warning
+    }, usersWithoutTimeTracksIds);
+
+  }
 
 
   public async createTimeTrack(data: CreateTimeTrackDto & { userId: string }): Promise<TimeTrack> {

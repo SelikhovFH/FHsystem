@@ -5,12 +5,17 @@ import Auth0Service from "@services/auth0.service";
 import UserService from "@services/user.service";
 import CalendarEventService from "@services/calendarEvent.service";
 import { HttpException } from "@exceptions/HttpException";
+import { NotificationsDispatcher } from "@/services/notifications/notifications.dispatcher";
+import { Container } from "typedi";
+import { NotificationType } from "@interfaces/notification.interface";
+import { formatDate, getDisplayName } from "@utils/formatters";
 
 class DayOffController {
   private dayOffService = new DayOffService();
   private authOservice = new Auth0Service();
   private userService = new UserService();
   private calendarEventService = new CalendarEventService();
+  private notificationDispatcher = Container.get(NotificationsDispatcher);
 
   createDayOffMy = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -19,6 +24,14 @@ class DayOffController {
       await this.dayOffService.validateDayOff(userId, dayOffData);
       const dayCount = this.dayOffService.calculateDayOffDayCount(dayOffData);
       const data = await this.dayOffService.createDayOff({ ...dayOffData, userId, dayCount });
+      const user = await this.userService.getUserById(userId);
+      this.notificationDispatcher.dispatchMultipleNotifications({
+        type: NotificationType.info,
+        title: "New day off request",
+        description: `You have a new day off request from for ${getDisplayName(user)} date ${formatDate(dayOffData.startDate)} to ${formatDate(dayOffData.finishDate)}`,
+        link: "/confirm_day_off",
+        event: "day_off_created"
+      }, await this.notificationDispatcher.getEditorIds());
       res.status(201).json({ message: "created", data });
     } catch (error) {
       next(error);
@@ -41,7 +54,7 @@ class DayOffController {
       if (dayOffData.userId === userId) {
         throw new HttpException(400, "You can't update your day off via this method");
       }
-      const data = await this.dayOffService.updateDayOff(dayOffData.id, dayOffData);
+      const data = await this.dayOffService.updateDayOff(dayOffData._id, dayOffData);
       res.status(200).json({ data: data, message: "OK" });
     } catch (error) {
       next(error);
