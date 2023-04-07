@@ -21,7 +21,9 @@ class SettingsController {
     try {
       const module = req.params.module;
       const settings = req.body;
+      console.log("settings", settings);
       await this.settingsService.validateSettings(module as SettingsModules, settings);
+      console.log("validated");
       const data = await this.settingsService.updateSettings(module as SettingsModules, settings);
       res.status(200).json({ message: "OK", data });
     } catch (error) {

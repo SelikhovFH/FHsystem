@@ -17,15 +17,11 @@ import { CronExpression } from "@utils/cron-expression.enum";
 @Service()
 class OneToOneRecordService {
   private oneToOneRecord = oneToOneRecordModel;
-  private oneToOneSettings: OneToOneSettings;
   private settingsService = Container.get(SettingsService);
   private userService = Container.get(UserService);
   private notificationsDispatcher = Container.get(NotificationsDispatcher);
 
   constructor() {
-    this.settingsService.getSettings<OneToOneSettings>(SettingsModules.OneToOne).then(settings => {
-      this.oneToOneSettings = settings;
-    });
     const job = new CronJob(CronExpression.EVERY_DAY_AT_MIDNIGHT, this.notifyForTimeToHoldOneToOne.bind(this));
     job.start();
   }
@@ -89,15 +85,15 @@ class OneToOneRecordService {
   }
 
   private async getCurrentPeriod(): Promise<({ startDate: Date, finishDate: Date })> {
-    const periods = this.generatePeriods();
+    const periods = await this.generatePeriods();
     const currentDate = new Date();
     const currentPeriod =
       periods.find(period => currentDate >= period.startDate && currentDate <= period.finishDate);
     return currentPeriod;
   }
 
-  public generatePeriods(): ({ startDate: Date, finishDate: Date })[] {
-    const periodType = this.oneToOneSettings.period;
+  public async generatePeriods(): Promise<({ startDate: Date, finishDate: Date })[]> {
+    const { period } = await this.settingsService.getSettings<OneToOneSettings>(SettingsModules.OneToOne);
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const periods = [];
@@ -140,9 +136,9 @@ class OneToOneRecordService {
       }
     };
 
-    const periodTypeConfig = periodTypes[periodType];
+    const periodTypeConfig = periodTypes[period];
     if (!periodTypeConfig) {
-      throw new Error(`Invalid period type: ${periodType}`);
+      throw new Error(`Invalid period type: ${period}`);
     }
 
     for (let i = 0; i < periodTypeConfig.count; i++) {

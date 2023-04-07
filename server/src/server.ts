@@ -16,6 +16,7 @@ import SkillTagRoute from "@routes/skillTag.route";
 import ClientsRoute from "./routes/client.route";
 import OneToOneRecordRoute from "@routes/oneToOneRecord.route";
 import NotificationsRoute from "@routes/notification.route";
+import SettingsRoute from "@routes/settings.route";
 
 
 validateEnv();
@@ -33,7 +34,8 @@ const app = new App([
   new SkillTagRoute(),
   new ClientsRoute(),
   new OneToOneRecordRoute(),
-  new NotificationsRoute()
+  new NotificationsRoute(),
+  new SettingsRoute()
 ]);
 
 app.listen();
