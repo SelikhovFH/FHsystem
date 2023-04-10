@@ -1,8 +1,8 @@
 .day {
     margin: 0 4px;
     padding: 4px;
-    min-height: 112px;
-    height: 100%;
+    height: 136px;
+    overflow-y: auto;
 }
 
 .tdHack td {

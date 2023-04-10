@@ -80,12 +80,12 @@ export const useApiFactory = <Response = {}, Variables = {}>({
     return res.data.data;
   }, {
     onSuccess: async () => {
-      requestMessages.onSuccess();
-      form.resetFields();
-      await queryClient.invalidateQueries({ queryKey: [basePath] });
       if (edit?.onSuccess) {
         edit.onSuccess();
       }
+      requestMessages.onSuccess();
+      form.resetFields();
+      await queryClient.invalidateQueries({ queryKey: [basePath] });
     },
     onError: async () => {
       requestMessages.onError();
