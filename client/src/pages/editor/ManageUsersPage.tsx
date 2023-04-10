@@ -320,7 +320,7 @@ export const ManageUsersPage: FC = () => {
       dataIndex: "skills",
       key: "skills",
       render: (values: SkillTag[]) => {
-        return <Space>
+        return <Space style={{ maxWidth: 500, minWidth: 300 }} wrap>
           {values.map((v, idx) => <Tag color={SkillTagCategoryToColor[v.category]}
                                        key={idx}>{`${v.category} | ${v.name}`}</Tag>)}
         </Space>;
@@ -331,7 +331,7 @@ export const ManageUsersPage: FC = () => {
       dataIndex: "salaryHistory",
       key: "salaryHistory",
       render: (values: SalaryRecord[]) => {
-        return <Space>
+        return <Space style={{ maxWidth: 500, minWidth: 300 }} wrap>
           {values.map((v, idx) => <Tag key={idx}>{formatMoney(v.value)} | {formatDate(v.date)}</Tag>)}
         </Space>;
       }
@@ -341,7 +341,7 @@ export const ManageUsersPage: FC = () => {
       dataIndex: "cvLink",
       key: "cvLink",
       render: (link: string) => {
-        return <a href={link} target={"_blank"}>{link}</a>;
+        return <a href={link} target={"_blank"} style={{ whiteSpace: "nowrap" }}>Check resume</a>;
       }
     },
     {
