@@ -67,6 +67,7 @@ class TimeTrackService {
     const start = dayjs(date).startOf("month").toDate();
     const finish = dayjs(date).endOf("month").toDate();
     return this.timeTrack.aggregate().match({
+      userId,
       date: {
         $gte: start,
         $lte: finish
