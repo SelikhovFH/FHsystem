@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from "react";
 import { useApiFactory } from "../../services/apiFactory";
 import dayjs from "dayjs";
 import { ColumnsType } from "antd/es/table";
-import { renderClientCell } from "../table/RenderClientCell";
 import { Button, Card, DatePicker, Form, Layout, Modal, Radio, Space, Table } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ErrorsBlock } from "../ErrorsBlock";
@@ -16,6 +15,7 @@ import { DayOff, DayOffStatus, DayOffType } from "../../shared/dayOff.interface"
 import { StatusLabels, TypeLabels } from "../../sections/dayOff";
 import { UserSelect } from "../form/UserSelect";
 import { formatDate } from "../../utils/formatters";
+import { renderUserCell } from "../table/RenderUserCell";
 
 type Props = {}
 
@@ -136,7 +136,7 @@ export const DayOffTableWidget: FC<Props> = (props) => {
       dataIndex: "userId",
       key: "userId",
       render: (user) => {
-        return renderClientCell(user);
+        return renderUserCell(user);
       }
     },
     {
