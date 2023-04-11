@@ -18,7 +18,7 @@ class ItemController {
   updateItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const itemData: UpdateItemDto = req.body;
-      const data = await this.itemService.updateItem(itemData._id, itemData);
+      const data = await this.itemService.replaceItem(itemData._id, itemData);
       res.status(200).json({ message: "OK", data });
     } catch (error) {
       next(error);

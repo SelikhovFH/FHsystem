@@ -10,6 +10,10 @@ class ItemService {
   }
 
   public async updateItem(_id: string, data: Partial<UpdateItemDto>): Promise<Item> {
+    return this.item.findOneAndUpdate({ _id }, data);
+  }
+
+  public async replaceItem(_id: string, data: UpdateItemDto): Promise<Item> {
     return this.item.findOneAndReplace({ _id }, data);
   }
 
