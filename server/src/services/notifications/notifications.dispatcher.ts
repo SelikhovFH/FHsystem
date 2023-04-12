@@ -25,8 +25,8 @@ export class NotificationsDispatcher {
   async dispatchNotification(notification: Omit<Notification, | "_id" | "isRead" | "createdAt">) {
     const dbNotifications = await this.notificationService.createNotifications([notification]);
     this.notificationSubscriber.notifyUsers(dbNotifications);
-    const emails = await Promise.all(dbNotifications.map((notification) => this.notificationToEmail(notification)));
-    this.emailSender.sendEmails(emails);
+    // const emails = await Promise.all(dbNotifications.map((notification) => this.notificationToEmail(notification)));
+    // this.emailSender.sendEmails(emails);
   }
 
   private async notificationToEmail(notification: Notification): Promise<Email> {
