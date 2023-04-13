@@ -13,6 +13,7 @@ import { CronExpression } from "@utils/cron-expression.enum";
 import { NotificationType } from "@interfaces/notification.interface";
 import { NotificationsDispatcher } from "@services/notifications/notifications.dispatcher";
 import Container from "typedi";
+import mongoose from "mongoose";
 
 class TimeTrackService {
   private timeTrack = timeTrackModel;
@@ -67,7 +68,7 @@ class TimeTrackService {
     const start = dayjs(date).startOf("month").toDate();
     const finish = dayjs(date).endOf("month").toDate();
     return this.timeTrack.aggregate().match({
-      userId,
+      userId: new mongoose.Types.ObjectId(userId),
       date: {
         $gte: start,
         $lte: finish
