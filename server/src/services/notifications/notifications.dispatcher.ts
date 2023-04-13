@@ -18,8 +18,8 @@ export class NotificationsDispatcher {
     const notificationWithUsers = userIds.map(userId => ({ ...notification, user: userId }));
     const dbNotifications = await this.notificationService.createNotifications(notificationWithUsers);
     this.notificationSubscriber.notifyUsers(dbNotifications);
-    const emails = await Promise.all(dbNotifications.map((notification) => this.notificationToEmail(notification)));
-    this.emailSender.sendEmails(emails);
+    // const emails = await Promise.all(dbNotifications.map((notification) => this.notificationToEmail(notification)));
+    // this.emailSender.sendEmails(emails);
   }
 
   async dispatchNotification(notification: Omit<Notification, | "_id" | "isRead" | "createdAt">) {
