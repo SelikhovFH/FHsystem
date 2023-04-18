@@ -17,7 +17,7 @@ export const UserSelect: FC<Props> = (props) => {
 
     const options = useMemo(() => data?.map(user => ({
       value: user._id,
-      label: `${user.name} ${user.surname} (${user.email})`
+      label: `${user.name} ${user.surname}`
     })) ?? [], [data])
     return (
         <Select

@@ -14,7 +14,10 @@ const projectSchema: Schema = new Schema({
     default: ProjectStatus.ongoing
   },
   manager: { type: Schema.Types.ObjectId, ref: "User" },
-  workers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  workers: [{
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+    titles: [{ startDate: Date, finishDate: Date, rate: Number }]
+  }],
   client: { type: Schema.Types.ObjectId, ref: "Client" }
 });
 

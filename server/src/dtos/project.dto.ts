@@ -1,5 +1,20 @@
-import { IsArray, IsDateString, IsEnum, IsString, MaxLength } from "class-validator";
+import { IsArray, IsDateString, IsEnum, IsString, ValidateNested } from "class-validator";
 import { ProjectStatus } from "@interfaces/project.interface";
+import { Type } from "class-transformer";
+
+class ProjectWorker {
+  @IsString()
+  user: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProjectWorker)
+  titles: {
+    startDate: string
+    finishDate: string
+    rate: number
+  }[];
+}
 
 
 export class CreateProjectDto {
@@ -10,10 +25,9 @@ export class CreateProjectDto {
   manager: string;
 
   @IsArray()
-  @MaxLength(50, {
-    each: true
-  })
-  workers: string[];
+    // @ValidateNested({ each: true })
+    // @Type(() => ProjectWorker)
+  workers: ProjectWorker[];
 
   @IsDateString()
   startDate: string;
