@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Container } from 'typedi';
-import { BudgetService } from '@services/BudgetService';
+import { BudgetService } from '@services/budget.service';
 
 class BudgetController {
   private budgetService = Container.get(BudgetService);

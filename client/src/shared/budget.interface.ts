@@ -1,9 +1,9 @@
-import { User } from '@interfaces/user.interface';
+import { User } from "./user.interface";
 
 export interface MonthlyGeneral {
   workers: {
     user: User;
-    income: { rate: number; project: string; hours: number; total: number }[];
+    income: { rate: number; project: number; hours: number; total: number }[];
     incomeTotal: number;
     unpaidDayOffs: number;
     salaryTotal: number;
