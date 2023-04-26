@@ -8,7 +8,7 @@ import styles from "../../components/profile/Profile.module.css";
 import { Avatar, Card, Col, Descriptions, Divider, Row, theme, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { formatDate } from "../../utils/formatters";
-import { renderMultipleUsersCell, renderUserCell } from "../../components/table/RenderUserCell";
+import { renderUserCell } from "../../components/table/RenderUserCell";
 import { renderProjectStatus } from "../../sections/project";
 
 type Props = {}
@@ -75,7 +75,7 @@ export const ClientProfilePage: FC<Props> = (props) => {
                         label="Start date">{formatDate(project.startDate)}</Descriptions.Item>
                       <Descriptions.Item label="Manager">{renderUserCell(project.manager)}</Descriptions.Item>
                       <Descriptions.Item label="Workers">
-                        {renderMultipleUsersCell(project.workers)}
+                        {/*{renderMultipleUsersCell(project.workers)}*/}
                       </Descriptions.Item>
                     </Descriptions>
                   </Card>

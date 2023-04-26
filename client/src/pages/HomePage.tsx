@@ -10,25 +10,40 @@ import { useIsEditor } from "../wrappers/RequireEditor";
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
-type ActivityCardProps = { title: string, link: string, icon: string; onClick?: () => void }
+type ActivityCardProps = {
+  title: string;
+  link: string;
+  icon: string;
+  onClick?: () => void;
+};
 
-const ActivityCard: FC<ActivityCardProps> = ({ link, title, icon, onClick }) => {
-  return <Link to={link}>
-    <Card onClick={onClick ? (e) => {
-      e.preventDefault();
-      onClick();
-    } : undefined
-    } className={styles.card} bodyStyle={{ padding: 0, height: "100%" }}>
-      <div className={styles.cardInner}>
-        <div>
-          {icon}
+const ActivityCard: FC<ActivityCardProps> = ({
+  link,
+  title,
+  icon,
+  onClick,
+}) => {
+  return (
+    <Link to={link}>
+      <Card
+        onClick={
+          onClick
+            ? (e) => {
+                e.preventDefault();
+                onClick();
+              }
+            : undefined
+        }
+        className={styles.card}
+        bodyStyle={{ padding: 0, height: "100%" }}
+      >
+        <div className={styles.cardInner}>
+          <div>{icon}</div>
+          <div>{title}</div>
         </div>
-        <div>
-          {title}
-        </div>
-      </div>
-    </Card>
-  </Link>;
+      </Card>
+    </Link>
+  );
 };
 
 export const HomePage: FC = (props) => {
@@ -45,7 +60,12 @@ export const HomePage: FC = (props) => {
 
   return (
     <>
-      <Modal title="Report a bug" open={isModalOpen} footer={[]} onCancel={handleCancel}>
+      <Modal
+        title="Report a bug"
+        open={isModalOpen}
+        footer={[]}
+        onCancel={handleCancel}
+      >
         <Paragraph>
           You can contact developer to report a bug:
           <br />
@@ -61,47 +81,112 @@ export const HomePage: FC = (props) => {
       </Modal>
       <AppHeader title={"Homepage"} />
       <Content style={{ margin: 32 }}>
-        <Title level={1}>
-          Welcome to FH System
-        </Title>
-        <Title level={3}>
-          User actions
-        </Title>
+        <Title level={1}>Welcome to FH System</Title>
+        <Title level={3}>User actions</Title>
         <Space wrap size={"middle"}>
-          <ActivityCard title={"Book day off"} link={AppRoutes.bookDayOff} icon={"📅"} />
-          <ActivityCard title={"Track time"} link={AppRoutes.timeTrack} icon={"⏱"} />
-          <ActivityCard title={"Profile"} link={AppRoutes.profile} icon={"👤"} />
-          <ActivityCard title={"Report a bug"} link={""} icon={"🐛"} onClick={showModal} />
+          <ActivityCard
+            title={"Book day off"}
+            link={AppRoutes.bookDayOff}
+            icon={"📅"}
+          />
+          <ActivityCard
+            title={"Track time"}
+            link={AppRoutes.timeTrack}
+            icon={"⏱"}
+          />
+          <ActivityCard
+            title={"Profile"}
+            link={AppRoutes.profile}
+            icon={"👤"}
+          />
+          <ActivityCard
+            title={"Report a bug"}
+            link={""}
+            icon={"🐛"}
+            onClick={showModal}
+          />
         </Space>
-        {isEditor && <>
-          <Divider dashed />
-          <Title level={3}>
-            Editor actions
-          </Title>
-          <Space wrap size={"middle"}>
-            <ActivityCard title={"Confirm day off"} link={EditorRoutes.confirmDayOff} icon={"✅"} />
-            <ActivityCard title={"Time tracking"} link={EditorRoutes.confirmDayOff} icon={"🕒"} />
-            <ActivityCard title={"Manage one to one"} link={EditorRoutes.manageOneToOne} icon={"🎥"} />
-            <ActivityCard title={"Celebrations"} link={EditorRoutes.holidaysAndCelebrations} icon={"🎉"} />
-            <ActivityCard title={"Manage devices"} link={EditorRoutes.manageDevices} icon={"💻"} />
-            <ActivityCard title={"Manage items"} link={EditorRoutes.manageItems} icon={"🪑"} />
-            <ActivityCard title={"Manage deliveries"} link={EditorRoutes.manageDeliveries} icon={"🚚"} />
-            <ActivityCard title={"Manage clients"} link={EditorRoutes.manageClients} icon={"💼"} />
-            <ActivityCard title={"Manage projects"} link={EditorRoutes.manageProjects} icon={"🚧"} />
-            <ActivityCard title={"Manage skill tags"} link={EditorRoutes.manageSkillTags} icon={"🤹"} />
-            <ActivityCard title={"Employees"} link={EditorRoutes.manageUsers} icon={"👥"} />
-
-          </Space>
-        </>}
-        {isAdmin && <>
-          <Divider dashed />
-          <Title level={3}>
-            Admin actions
-          </Title>
-          <Space wrap size={"middle"}>
-            <ActivityCard title={"Settings"} link={AdminRoutes.settings} icon={"⚙️"} />
-          </Space>
-        </>}
+        {isEditor && (
+          <>
+            <Divider dashed />
+            <Title level={3}>Editor actions</Title>
+            <Space wrap size={"middle"}>
+              <ActivityCard
+                title={"Confirm day off"}
+                link={EditorRoutes.confirmDayOff}
+                icon={"✅"}
+              />
+              <ActivityCard
+                title={"Time tracking"}
+                link={EditorRoutes.confirmDayOff}
+                icon={"🕒"}
+              />
+              <ActivityCard
+                title={"Manage one to one"}
+                link={EditorRoutes.manageOneToOne}
+                icon={"🎥"}
+              />
+              <ActivityCard
+                title={"Celebrations"}
+                link={EditorRoutes.holidaysAndCelebrations}
+                icon={"🎉"}
+              />
+              <ActivityCard
+                title={"Manage devices"}
+                link={EditorRoutes.manageDevices}
+                icon={"💻"}
+              />
+              <ActivityCard
+                title={"Manage items"}
+                link={EditorRoutes.manageItems}
+                icon={"🪑"}
+              />
+              <ActivityCard
+                title={"Manage deliveries"}
+                link={EditorRoutes.manageDeliveries}
+                icon={"🚚"}
+              />
+              <ActivityCard
+                title={"Manage clients"}
+                link={EditorRoutes.manageClients}
+                icon={"💼"}
+              />
+              <ActivityCard
+                title={"Manage projects"}
+                link={EditorRoutes.manageProjects}
+                icon={"🚧"}
+              />
+              <ActivityCard
+                title={"Manage skill tags"}
+                link={EditorRoutes.manageSkillTags}
+                icon={"🤹"}
+              />
+              <ActivityCard
+                title={"Employees"}
+                link={EditorRoutes.manageUsers}
+                icon={"👥"}
+              />
+              <ActivityCard
+                title={"Budget overview"}
+                link={EditorRoutes.budgetGeneral}
+                icon={"💰"}
+              />
+            </Space>
+          </>
+        )}
+        {isAdmin && (
+          <>
+            <Divider dashed />
+            <Title level={3}>Admin actions</Title>
+            <Space wrap size={"middle"}>
+              <ActivityCard
+                title={"Settings"}
+                link={AdminRoutes.settings}
+                icon={"⚙️"}
+              />
+            </Space>
+          </>
+        )}
       </Content>
     </>
   );

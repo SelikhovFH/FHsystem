@@ -1,8 +1,8 @@
 export enum AppRoutes {
-    index = "/",
-    bookDayOff = "/book_day_off",
-    profile = "/profile",
-    timeTrack = "/time_track"
+  index = "/",
+  bookDayOff = "/book_day_off",
+  profile = "/profile",
+  timeTrack = "/time_track",
 }
 
 export enum EditorRoutes {
@@ -20,6 +20,7 @@ export enum EditorRoutes {
   userTimeTracks = "/time_tracks/:id",
   manageUsers = "/manage_users",
   user = "/user/:id",
+  budgetGeneral = "/budget_general",
 }
 
 export enum AdminRoutes {

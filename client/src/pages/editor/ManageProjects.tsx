@@ -11,7 +11,7 @@ import styles from "../FormStyles.module.css";
 import { ColumnsType } from "antd/es/table";
 import { FormProps } from "../../utils/types";
 import { useApiFactory } from "../../services/apiFactory";
-import { Project, ProjectStatus } from "../../shared/project.interface";
+import { Project, ProjectStatus, ProjectWorker } from "../../shared/project.interface";
 import { Client } from "../../shared/client.interface";
 import dayjs from "dayjs";
 import { UserSelect } from "../../components/form/UserSelect";
@@ -20,6 +20,8 @@ import { renderClientCell } from "../../components/table/RenderClientCell";
 import { renderMultipleUsersCell, renderUserCell } from "../../components/table/RenderUserCell";
 import { renderDateCell } from "../../components/table/RenderDateCell";
 import { renderProjectStatus } from "../../sections/project";
+import { WorkersInput } from "../../components/form/WorkersInput";
+import { User } from "../../shared/user.interface";
 
 const { Content } = Layout;
 
@@ -27,7 +29,7 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   startDate: yup.string().required(),
   manager: yup.string().required(),
-  workers: yup.array().of(yup.string()).required(),
+  workers: yup.array().required(),
   client: yup.string().required(),
   status: yup.string().required()
 });
@@ -65,7 +67,7 @@ const AddOrUpdateForm: FC<FormProps> = ({ form, onFinish, buttonDisabled, button
     </Form.Item>
     <Form.Item rules={[getYupRule(schema)]} label="Project workers"
                name="workers">
-      <UserSelect mode={"multiple"} />
+      <WorkersInput />
     </Form.Item>
     <Form.Item>
       <Button disabled={buttonDisabled} type="primary" htmlType="submit">
@@ -119,6 +121,7 @@ export const ManageProjectsPage: FC = () => {
 
 
   const onAddFinish = (values: any) => {
+    console.log(values);
     addMutation.mutate({ ...values, startDate: values.startDate.toISOString() });
   };
 
@@ -131,6 +134,7 @@ export const ManageProjectsPage: FC = () => {
   };
 
   const onEditClick = (item: Project) => {
+
     setProjectToEdit({
       ...item,
       // @ts-ignore
@@ -140,8 +144,13 @@ export const ManageProjectsPage: FC = () => {
       // @ts-ignore
       client: item.client._id,
       // @ts-ignore
-      workers: item.workers
-        .map(w => w._id)
+      workers: item.workers.map(w => ({
+        ...w, titles: w.titles.map(t => ({
+          ...t,
+          startDate: dayjs(t.startDate),
+          finishDate: dayjs(t.finishDate)
+        }))
+      }))
     });
     setIsOpen(true);
   };
@@ -180,7 +189,7 @@ export const ManageProjectsPage: FC = () => {
       title: "Workers",
       dataIndex: "workers",
       key: "workers",
-      render: renderMultipleUsersCell
+      render: (workers: ProjectWorker[]) => renderMultipleUsersCell(workers.map(w => w.user as User))
     },
     {
       title: "Operations",

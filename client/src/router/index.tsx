@@ -1,4 +1,8 @@
-import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+} from "react-router-dom";
 import { ErrorPage } from "../pages/ErrorPage";
 import { DefaultLayout } from "../layouts/DefaultLayout";
 import { HomePage } from "../pages/HomePage";
@@ -24,6 +28,7 @@ import { ManageClientsPage } from "../pages/editor/ManageClients";
 import { ClientProfilePage } from "../pages/editor/ClientProfilePage";
 import { ManageOneToOnePage } from "../pages/editor/ManageOneToOne";
 import { SettingsPage } from "../pages/admin/Settings";
+import { BudgetGeneralPage } from "../pages/editor/BudgetGeneralPage";
 
 // TODO Dynamic module import
 
@@ -31,25 +36,15 @@ export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route element={<RequireAuth />}>
-
         <Route
           path="/"
           element={<DefaultLayout />}
           errorElement={<ErrorPage />}
         >
           <Route index element={<HomePage />} />
-          <Route
-            path={AppRoutes.bookDayOff}
-            element={<BookDayOffPage />}
-          />
-          <Route
-            path={AppRoutes.profile}
-            element={<MyProfilePage />}
-          />
-          <Route
-            path={AppRoutes.timeTrack}
-            element={<TimeTrackPage />}
-          />
+          <Route path={AppRoutes.bookDayOff} element={<BookDayOffPage />} />
+          <Route path={AppRoutes.profile} element={<MyProfilePage />} />
+          <Route path={AppRoutes.timeTrack} element={<TimeTrackPage />} />
           <Route element={<RequireEditor />}>
             <Route
               path={EditorRoutes.confirmDayOff}
@@ -83,10 +78,7 @@ export const router = createBrowserRouter(
               path={EditorRoutes.manageClients}
               element={<ManageClientsPage />}
             />
-            <Route
-              path={EditorRoutes.client}
-              element={<ClientProfilePage />}
-            />
+            <Route path={EditorRoutes.client} element={<ClientProfilePage />} />
             <Route
               path={EditorRoutes.manageProjects}
               element={<ManageProjectsPage />}
@@ -103,16 +95,14 @@ export const router = createBrowserRouter(
               path={EditorRoutes.manageUsers}
               element={<ManageUsersPage />}
             />
+            <Route path={EditorRoutes.user} element={<UserProfilePage />} />
             <Route
-              path={EditorRoutes.user}
-              element={<UserProfilePage />}
+              path={EditorRoutes.budgetGeneral}
+              element={<BudgetGeneralPage />}
             />
           </Route>
           <Route element={<RequireAdmin />}>
-            <Route
-              path={AdminRoutes.settings}
-              element={<SettingsPage />}
-            />
+            <Route path={AdminRoutes.settings} element={<SettingsPage />} />
           </Route>
         </Route>
       </Route>

@@ -1,3 +1,3 @@
 import { User } from "../../shared/user.interface";
 
-export const getDisplayName = (user: User) => `${user.name} ${user.surname}`;
+export const getDisplayName = (user: User) => user ? `${user.name} ${user.surname}` : "";
