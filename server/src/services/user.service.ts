@@ -33,9 +33,9 @@ class UserService {
       { _id },
       {
         ...data,
-        salaryHistory: data.salaryHistory?.map(item => ({ ...item, value: this.encryptString(item.value.toString()) }),
+        salaryHistory: data.salaryHistory?.map(item => ({ ...item, value: this.encryptString(item.value.toString()) })),
       },
-      { new: true ,
+      { new: true },
     );
   }
 
@@ -47,19 +47,19 @@ class UserService {
     const res = await this.user
       .aggregate()
       .match({
-        _id: new mongoose.Types.ObjectId(userId)
+        _id: new mongoose.Types.ObjectId(userI),
       })
       .lookup({
-        from: "devices",
-        as: "devices",
-        localField: "_id",
-        foreignField: "assignedToId"
+        from: 'devices',
+        as: 'devices',
+        localField: '_id',
+        foreignField: 'assignedToId',
       })
       .lookup({
-        from: "dayoffs",
-        as: "daysOff",
-        localField: "_id",
-        foreignField: "userId"
+        from:"dayoffs"',
+        as:"daysOff"',
+        localField:"_id"',
+        foreignField:"userId",
       })
       .lookup({
         from: "skilltags",
@@ -107,7 +107,7 @@ class UserService {
 
   public async getUsersDisplayInfo(): Promise<{ _id: string; name: string; surname: string; email: string }[]> {
     return this.user.find().select("name surname email");
-  };
+  }
 
   public async getUserDisplayInfoById(_id: string): Promise<{
     _id: string;
@@ -116,21 +116,21 @@ class UserService {
     email: string;
   }> {
     return this.user.findOne({ _id }).select("name surname email");
-  };
+  }
 
   public async getEditorsIds(): Promise<string[]> {
     return this.user
       .find({ role: { $in: ["editor", "admin"] } })
       .select("_id")
       .then(res => res.map(r => r._id.toString()));
-  };
+  }
 
   public async getAdminsIds(): Promise<string[]> {
     return this.user
       .find({ role: "admin" })
       .select("_id")
       .then(res => res.map(r => r._id.toString()));
-  };
+  }
 }
 
 export default UserService;
