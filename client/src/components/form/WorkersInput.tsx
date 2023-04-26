@@ -14,7 +14,7 @@ import { API, getRequestConfig } from "../../services/api";
 type Props = {
   value?: ProjectWorker[];
   onChange?: (value: ProjectWorker[]) => void;
-}
+};
 
 export const WorkersInput: FC<Props> = (props) => {
   const [values, setValues] = useState<ProjectWorker[]>(props.value ?? []);
@@ -30,18 +30,23 @@ export const WorkersInput: FC<Props> = (props) => {
     return res.data.data;
   });
 
-  console.log(props.value);
-
-
   const disabled = Boolean(!startDate || !rate || !user);
 
   const onAddSalaryRecord = () => {
     if (disabled) {
       return;
     }
-    const userIndex = values.findIndex(({ user: _user }) => _user === user);
+    const userIndex = values.findIndex(
+      ({ user: _user }) => _user === user || (_user as any)?._id === user
+    );
 
-    const newTitle = { startDate: startDate!.toISOString(), finishDate: finishDate?.toISOString(), rate: rate! };
+    console.log(userIndex, user, values);
+
+    const newTitle = {
+      startDate: startDate!.toISOString(),
+      finishDate: finishDate?.toISOString(),
+      rate: rate!,
+    };
 
     if (userIndex !== -1) {
       values[userIndex].titles.push(newTitle);
@@ -57,11 +62,17 @@ export const WorkersInput: FC<Props> = (props) => {
   };
 
   const onRemoveRecord = (index: number) => {
-    setValues(values.filter((_, i) => i !== index));
+    const newValues = values.filter((_, i) => i !== index);
+    setValues(newValues);
   };
 
   const onRemoveTitle = (recordIndex: number, index: number) => {
-    values[recordIndex].titles = values[recordIndex].titles.filter((_, i) => i !== index);
+    const newTitles = values[recordIndex].titles.filter((_, i) => i !== index);
+    if (newTitles.length === 0) {
+      onRemoveRecord(recordIndex);
+      return;
+    }
+    values[recordIndex].titles = newTitles;
     setValues([...values]);
   };
 
@@ -78,61 +89,78 @@ export const WorkersInput: FC<Props> = (props) => {
         dataSource={values}
         renderItem={(record, recorIndex) => (
           <List.Item
-            actions={[<Button onClick={() => onRemoveRecord(recorIndex)} type="link" icon={<CloseOutlined />}></Button>
+            actions={[
+              <Button
+                onClick={() => onRemoveRecord(recorIndex)}
+                type="link"
+                icon={<CloseOutlined />}
+              ></Button>,
             ]}
           >
             <List.Item.Meta
-              // @ts-ignore
-              title={getDisplayName(data?.find(user => user._id === record.user || user._id === record.user?._id)!)}
-              description={<>
-                <List
-                  size={"small"}
-                  itemLayout="horizontal"
-                  dataSource={record.titles}
-                  renderItem={(title, index) => (
-                    <List.Item
-                      actions={[<Button onClick={() => onRemoveTitle(recorIndex, index)} type="link"
-                                        icon={<CloseOutlined />}></Button>
-                      ]}
-                    >
-                      <List.Item.Meta
-                        title={`${formatDate(title.startDate)} ${title.finishDate && `- ${formatDate(title.finishDate)}`}`}
-                        description={formatMoney(title.rate)}
-                      />
-                    </List.Item>
-                  )}
-                />
-              </>}
+              title={getDisplayName(
+                data?.find(
+                  (user) =>
+                    // @ts-ignore
+                    user._id === record.user || user._id === record.user?._id
+                )!
+              )}
+              description={
+                <>
+                  <List
+                    size={"small"}
+                    itemLayout="horizontal"
+                    dataSource={record.titles}
+                    renderItem={(title, index) => (
+                      <List.Item
+                        actions={[
+                          <Button
+                            onClick={() => onRemoveTitle(recorIndex, index)}
+                            type="link"
+                            icon={<CloseOutlined />}
+                          ></Button>,
+                        ]}
+                      >
+                        <List.Item.Meta
+                          title={`${formatDate(title.startDate)} ${
+                            title.finishDate &&
+                            `- ${formatDate(title.finishDate)}`
+                          }`}
+                          description={formatMoney(title.rate)}
+                        />
+                      </List.Item>
+                    )}
+                  />
+                </>
+              }
             />
           </List.Item>
         )}
       />
       <Divider />
       <Form.Item style={{ margin: 4 }} label={"Employee"}>
-        <UserSelect value={user} onChange={v => setUser(v as string)} />
+        <UserSelect value={user} onChange={(v) => setUser(v as string)} />
       </Form.Item>
       <Form.Item style={{ margin: 4 }} label={"Work start date"}>
-        <DatePicker
-          value={startDate}
-          onChange={v => setStartDate(v)}
-        />
+        <DatePicker value={startDate} onChange={(v) => setStartDate(v)} />
       </Form.Item>
       <Form.Item style={{ margin: 4 }} label={"Work finish date"}>
-        <DatePicker
-          value={finishDate}
-          onChange={v => setFinishDate(v)}
-        />
+        <DatePicker value={finishDate} onChange={(v) => setFinishDate(v)} />
       </Form.Item>
       <Form.Item style={{ margin: 4 }} label={"Rate"}>
         <InputNumber
           type="Value"
           value={rate}
           min={0}
-          onChange={v => setRate(v)}
+          onChange={(v) => setRate(v)}
         />
       </Form.Item>
       <Form.Item style={{ margin: 4 }} label={"Employee"}>
-        <Button onClick={onAddSalaryRecord} disabled={disabled} type={"primary"}>
+        <Button
+          onClick={onAddSalaryRecord}
+          disabled={disabled}
+          type={"primary"}
+        >
           Add worker or title
         </Button>
       </Form.Item>
