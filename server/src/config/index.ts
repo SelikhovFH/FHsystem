@@ -1,11 +1,10 @@
-import { config } from "dotenv";
+import { config } from 'dotenv';
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === 'development') {
   config({ path: `.env.development.local` });
 }
 
-
-export const CREDENTIALS = process.env.CREDENTIALS === "true";
+export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const {
   NODE_ENV,
   PORT,
@@ -21,5 +20,6 @@ export const {
   AUTH0_MANAGEMENT_SERVICE_DOMAIN,
   AUTH0_CLIENT_ID,
   MJ_APIKEY_PUBLIC,
-  MJ_APIKEY_PRIVATE
+  MJ_APIKEY_PRIVATE,
+  SALARY_HASH_KEY,
 } = process.env;

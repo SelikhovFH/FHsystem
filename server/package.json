@@ -21,6 +21,7 @@
   "dependencies": {
     "@types/auth0": "^2.35.9",
     "@types/cron": "^2.0.1",
+    "@types/crypto-js": "^4.1.1",
     "@types/uuid": "^9.0.1",
     "auth0": "^3.1.1",
     "bcrypt": "^5.0.1",
@@ -30,6 +31,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cron": "^2.3.0",
+    "crypto-js": "^4.1.1",
     "dayjs": "^1.11.7",
     "dayjs-business-days": "^1.0.4",
     "dotenv": "^16.0.1",
