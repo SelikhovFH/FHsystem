@@ -47,7 +47,7 @@ class UserService {
     const res = await this.user
       .aggregate()
       .match({
-        _id: new mongoose.Types.ObjectId(userI),
+        _id: new mongoose.Types.ObjectId(userId),
       })
       .lookup({
         from: 'devices',
@@ -56,9 +56,9 @@ class UserService {
         foreignField: 'assignedToId',
       })
       .lookup({
-        from:"dayoffs"',
-        as:"daysOff"',
-        localField:"_id"',
+        from:"dayoffs",
+        as:"daysOff",
+        localField:"_id",
         foreignField:"userId",
       })
       .lookup({
