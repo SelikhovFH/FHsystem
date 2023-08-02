@@ -75,13 +75,13 @@ class UserService {
   }
 
   public async getUsers() {
-    const users = await this.user.find().select("+salaryHistory").populate("skills");
+    const users = await this.user.find().select("+salaryHistory").populate("skills").lean();
     return users.map(user => ({
       ...user,
       salaryHistory: user.salaryHistory?.map(item => ({
         ...item,
         value: +this.decryptString(item.value as unknown as string)
-      }))
+      })),
     }));
   }
 
