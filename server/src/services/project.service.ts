@@ -1,6 +1,6 @@
-import projectModel from "@models/project.model";
-import { CreateProjectDto, UpdateProjectDto } from "@dtos/project.dto";
-import { Project } from "@interfaces/project.interface";
+import projectModel from '@models/project.model';
+import { CreateProjectDto, UpdateProjectDto } from '@dtos/project.dto';
+import { Project } from '@interfaces/project.interface';
 
 class ProjectService {
   private project = projectModel;
@@ -22,11 +22,18 @@ class ProjectService {
   }
 
   public async getProjects(): Promise<Project[]> {
-    return this.project.find().populate("client").populate("manager", "_id name surname email").populate("workers.user", "_id name surname email");
+    return this.project
+      .find()
+      .populate('client')
+      .populate('manager', '_id name surname email')
+      .populate({ path: 'workers', populate: { path: 'user', model: 'User', select: '_id name surname email' } });
   }
 
   public async getClientProjects(client: string): Promise<Project[]> {
-    return this.project.find({ client }).populate("manager", "_id name surname email").populate("workers", "_id name surname email");
+    return this.project
+      .find({ client })
+      .populate('manager', '_id name surname email')
+      .populate({ path: 'workers', populate: { path: 'user', model: 'User', select: '_id name surname email' } });
   }
 }
 
